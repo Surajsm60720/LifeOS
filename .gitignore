@@ -1,0 +1,30 @@
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+*.xcuserdata/
+xcuserdata/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# macOS
+.DS_Store
+
+# SwiftPM
+.swiftpm/
+Packages/
+Package.resolved
+
+# Temp / local
+*.log
+*.xcresult
+.cursor/
+
+# Secrets (none expected; keep habit)
+.env
+.env.*
+*.pem
+Credentials.plist
