@@ -11,6 +11,9 @@ struct LifeOSApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Entry.self,
+            LocationEntry.self,
+            ExpenseLine.self,
+            ExpenseBalance.self,
             RecurrenceRule.self,
             NotificationRule.self,
             EntryProgress.self,
@@ -38,6 +41,9 @@ enum PreviewData {
     static var container: ModelContainer = {
         let schema = Schema([
             Entry.self,
+            LocationEntry.self,
+            ExpenseLine.self,
+            ExpenseBalance.self,
             RecurrenceRule.self,
             NotificationRule.self,
             EntryProgress.self,

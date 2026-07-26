@@ -20,5 +20,7 @@
 	<string>1</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>LifeOS can look up place names for IRL events. Your live location is not required for search.</string>
 </dict>
 </plist>

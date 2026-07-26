@@ -19,6 +19,8 @@
 		24462DE6FB5141342D0F5D0C /* CalendarFilterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD7716889526753148DEAC7 /* CalendarFilterState.swift */; };
 		2B75E741C54A9553531491D0 /* LifeOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B41F187BAFD79954082EDBD /* LifeOSApp.swift */; };
 		2BFB06466988F02933575B4C /* WeekCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FFF8D5BDEC2B8015A014DD /* WeekCalendarView.swift */; };
+		2C24D07F7D708D126B4E2DE6 /* LifeOSDataMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0D09A2C324DDD8331EA19D /* LifeOSDataMigration.swift */; };
+		32ACB89FCB3A54EE0110DAC9 /* ExpenseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8850455795888D8A4365D053 /* ExpenseModels.swift */; };
 		33BD0BC4E4D61BA25D0B3071 /* RecapExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033148D5E32473FC5708FFD5 /* RecapExporter.swift */; };
 		34D9EB4510B9BC92D0CD6610 /* RecurrenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0D8D8EAC4881BDDE8AA0BD /* RecurrenceEngine.swift */; };
 		4324A24D6A8F738AE45B239E /* CalendarFilterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DFD7FCCAD12A7801DFBD696 /* CalendarFilterBar.swift */; };
@@ -27,6 +29,7 @@
 		6045343D15C51552040B405C /* EntryFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112E55BA567B0F9AF4F84870 /* EntryFormView.swift */; };
 		6426E3E48A61E51D45EF1001 /* EntryTemplates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9203422281A0C49F000459F6 /* EntryTemplates.swift */; };
 		6512B4A6C2F3A4ACA23B8099 /* NotificationsHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CE830A9F4DCE6CEDFF8293 /* NotificationsHubView.swift */; };
+		67B5E1E9BC252F9CB1DA7A28 /* PlaceSearchSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C460C4A8C45B9037D4936DB5 /* PlaceSearchSheet.swift */; };
 		6C60E17D94441268FA67ABA8 /* RecurrenceEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148659ED96FA271DF673B091 /* RecurrenceEditorView.swift */; };
 		718DF278660A174E82C0210B /* LifeOSTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49CF777C21B2F0AAA0C349C5 /* LifeOSTheme.swift */; };
 		74B07FC02CD6CF9EB41EE6A4 /* EntryCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EB0B26DD9A342BE1E3BDE7 /* EntryCapabilityTests.swift */; };
@@ -36,6 +39,7 @@
 		915C71D7054A80BB17848FAA /* EntryLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F8F4319605D673AA3736CF9 /* EntryLibraryView.swift */; };
 		98B18D162D72D9730DD66433 /* EntryProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F53D73630EB13B11DAE3BF1 /* EntryProgress.swift */; };
 		9A30CD52062529B79B084E43 /* GameIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A174492506A456C88F0CF5F9 /* GameIdentity.swift */; };
+		9C4F9719FB552C7B276A2AB5 /* LocationEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B728ECA39DCA23F15C8AD0 /* LocationEntry.swift */; };
 		A5F7B1A14791E9A3936216AC /* EntryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B7261B8D62DBF3E403F711 /* EntryStore.swift */; };
 		A7354B113F116422480DC16C /* RecapExporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4E97E83DA782ADB8C62777 /* RecapExporterTests.swift */; };
 		A7A187A995EE533516D84DCA /* NotificationRuleEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D26AD0186BE55701186C79 /* NotificationRuleEditor.swift */; };
@@ -73,6 +77,7 @@
 		148659ED96FA271DF673B091 /* RecurrenceEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceEditorView.swift; sourceTree = "<group>"; };
 		16FFF8D5BDEC2B8015A014DD /* WeekCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekCalendarView.swift; sourceTree = "<group>"; };
 		190E11EDAA6404EE8FA89ED0 /* CalendarRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarRootView.swift; sourceTree = "<group>"; };
+		1B0D09A2C324DDD8331EA19D /* LifeOSDataMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeOSDataMigration.swift; sourceTree = "<group>"; };
 		1F8F4319605D673AA3736CF9 /* EntryLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryLibraryView.swift; sourceTree = "<group>"; };
 		28F766EF19BF9EED6C4898BC /* RecurrenceEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceEngineTests.swift; sourceTree = "<group>"; };
 		35DAE3032AE0E83EE7877E79 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -91,6 +96,7 @@
 		73EB0B26DD9A342BE1E3BDE7 /* EntryCapabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryCapabilityTests.swift; sourceTree = "<group>"; };
 		77FA985FFB5285651B6D093F /* DayCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayCalendarView.swift; sourceTree = "<group>"; };
 		7A4E97E83DA782ADB8C62777 /* RecapExporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecapExporterTests.swift; sourceTree = "<group>"; };
+		8850455795888D8A4365D053 /* ExpenseModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseModels.swift; sourceTree = "<group>"; };
 		88CF326F1D71A8DB9F35265A /* NotificationRuleFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRuleFormView.swift; sourceTree = "<group>"; };
 		8B41F187BAFD79954082EDBD /* LifeOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeOSApp.swift; sourceTree = "<group>"; };
 		8D0D8D8EAC4881BDDE8AA0BD /* RecurrenceEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceEngine.swift; sourceTree = "<group>"; };
@@ -103,10 +109,12 @@
 		B699ECB2C7C6CA70EC1985A8 /* YearCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearCalendarView.swift; sourceTree = "<group>"; };
 		B97297AD78FF5ADABAE2C37D /* EntryDeleteModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryDeleteModifier.swift; sourceTree = "<group>"; };
 		C11A96F8DDBD0A30705FF2B4 /* TodayInboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInboxView.swift; sourceTree = "<group>"; };
+		C460C4A8C45B9037D4936DB5 /* PlaceSearchSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceSearchSheet.swift; sourceTree = "<group>"; };
 		C8D26AD0186BE55701186C79 /* NotificationRuleEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRuleEditor.swift; sourceTree = "<group>"; };
 		D17940F7D9B9485F0F20B6DF /* CategoryColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryColors.swift; sourceTree = "<group>"; };
 		D1922ABC9D8812D858744722 /* NotificationPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPreset.swift; sourceTree = "<group>"; };
 		DE9886A546B818C51CF32A74 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		E0B728ECA39DCA23F15C8AD0 /* LocationEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationEntry.swift; sourceTree = "<group>"; };
 		E865D330E9C7C91599A676D7 /* LifeOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LifeOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EFABDE036EFB7C1C882E3262 /* NotificationPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPlanner.swift; sourceTree = "<group>"; };
 		F53165DB57257DDAFBE960DC /* NotificationPlannerLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPlannerLogicTests.swift; sourceTree = "<group>"; };
@@ -179,6 +187,7 @@
 			children = (
 				64B7261B8D62DBF3E403F711 /* EntryStore.swift */,
 				9203422281A0C49F000459F6 /* EntryTemplates.swift */,
+				1B0D09A2C324DDD8331EA19D /* LifeOSDataMigration.swift */,
 				51216926CD8B2FE7DA6B2700 /* LifeOSNotificationDelegate.swift */,
 				EFABDE036EFB7C1C882E3262 /* NotificationPlanner.swift */,
 				033148D5E32473FC5708FFD5 /* RecapExporter.swift */,
@@ -239,6 +248,8 @@
 				058EF6D364266DBE592F6B37 /* EntryCategory.swift */,
 				5D4AFE259B3579BE2DF1CA74 /* EntryCompletion.swift */,
 				3F53D73630EB13B11DAE3BF1 /* EntryProgress.swift */,
+				8850455795888D8A4365D053 /* ExpenseModels.swift */,
+				E0B728ECA39DCA23F15C8AD0 /* LocationEntry.swift */,
 				FD11AB3DAD814570410AB48D /* NotificationRule.swift */,
 				4A1B928773E39C1A38AE8588 /* RecurrenceRule.swift */,
 			);
@@ -274,6 +285,7 @@
 			children = (
 				55D0D1C2BC50D670C5226278 /* EntryDetailView.swift */,
 				112E55BA567B0F9AF4F84870 /* EntryFormView.swift */,
+				C460C4A8C45B9037D4936DB5 /* PlaceSearchSheet.swift */,
 				148659ED96FA271DF673B091 /* RecurrenceEditorView.swift */,
 			);
 			path = Entry;
@@ -397,10 +409,13 @@
 				A5F7B1A14791E9A3936216AC /* EntryStore.swift in Sources */,
 				6426E3E48A61E51D45EF1001 /* EntryTemplates.swift in Sources */,
 				030C829A7A92427C1F0B8387 /* EntryTemplatesView.swift in Sources */,
+				32ACB89FCB3A54EE0110DAC9 /* ExpenseModels.swift in Sources */,
 				9A30CD52062529B79B084E43 /* GameIdentity.swift in Sources */,
 				2B75E741C54A9553531491D0 /* LifeOSApp.swift in Sources */,
+				2C24D07F7D708D126B4E2DE6 /* LifeOSDataMigration.swift in Sources */,
 				57C7E10B14025587243DFF75 /* LifeOSNotificationDelegate.swift in Sources */,
 				718DF278660A174E82C0210B /* LifeOSTheme.swift in Sources */,
+				9C4F9719FB552C7B276A2AB5 /* LocationEntry.swift in Sources */,
 				5F65E79A8BBF60EA768BF2F9 /* MonthCalendarView.swift in Sources */,
 				0D5A4B098FE6D1E29886B603 /* NotificationPlanner.swift in Sources */,
 				1161FEA66E88F1D1158037B8 /* NotificationPreset.swift in Sources */,
@@ -408,6 +423,7 @@
 				A7A187A995EE533516D84DCA /* NotificationRuleEditor.swift in Sources */,
 				E55E853D78110C75393F30E8 /* NotificationRuleFormView.swift in Sources */,
 				6512B4A6C2F3A4ACA23B8099 /* NotificationsHubView.swift in Sources */,
+				67B5E1E9BC252F9CB1DA7A28 /* PlaceSearchSheet.swift in Sources */,
 				D224721F6AA8AE076501A027 /* RecapExportView.swift in Sources */,
 				33BD0BC4E4D61BA25D0B3071 /* RecapExporter.swift in Sources */,
 				6C60E17D94441268FA67ABA8 /* RecurrenceEditorView.swift in Sources */,

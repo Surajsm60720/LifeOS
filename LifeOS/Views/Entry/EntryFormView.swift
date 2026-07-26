@@ -15,9 +15,15 @@ struct EntryFormView: View {
 
     @State private var entry: Entry
     @State private var hasRecurrence: Bool
+    @State private var trackExpense: Bool
+    @State private var splitNamesText: String
+    @State private var lineAmountTexts: [PersistentIdentifier: String]
+    @State private var balanceAmountTexts: [PersistentIdentifier: String]
     @State private var showDeleteConfirmation = false
     @State private var showingAddNotification = false
     @State private var editingNotification: NotificationRule?
+    @State private var locationSearchIndex: Int?
+    @State private var playedWithText: String
     @StateObject private var entryStore = EntryStore()
 
     init(mode: EntryFormMode) {
@@ -27,9 +33,27 @@ struct EntryFormView: View {
             let newEntry = Entry.makeDefault(category: category)
             _entry = State(initialValue: newEntry)
             _hasRecurrence = State(initialValue: false)
+            _trackExpense = State(initialValue: false)
+            _splitNamesText = State(initialValue: "")
+            _lineAmountTexts = State(initialValue: [:])
+            _balanceAmountTexts = State(initialValue: [:])
+            _playedWithText = State(initialValue: "")
         case .edit(let existing):
             _entry = State(initialValue: existing)
             _hasRecurrence = State(initialValue: existing.recurrence != nil)
+            _trackExpense = State(initialValue: existing.trackExpense || !existing.expenseLines.isEmpty)
+            _splitNamesText = State(initialValue: existing.expenseBalances.map(\.personName).joined(separator: "\n"))
+            var lineTexts: [PersistentIdentifier: String] = [:]
+            for line in existing.expenseLines {
+                lineTexts[line.persistentModelID] = Self.formatAmount(line.amount)
+            }
+            var balanceTexts: [PersistentIdentifier: String] = [:]
+            for balance in existing.expenseBalances {
+                balanceTexts[balance.persistentModelID] = Self.formatAmount(balance.amount)
+            }
+            _lineAmountTexts = State(initialValue: lineTexts)
+            _balanceAmountTexts = State(initialValue: balanceTexts)
+            _playedWithText = State(initialValue: existing.playedWith.joined(separator: "\n"))
         }
     }
 
@@ -41,10 +65,19 @@ struct EntryFormView: View {
                 if entry.supportsLocation {
                     locationSection
                 }
+                if entry.category == .irl {
+                    expenseSection
+                }
+                if entry.supportsEventType {
+                    eventTypeSection
+                }
+                if entry.supportsSessionLog {
+                    sessionLogSection
+                }
                 if entry.supportsProgress {
                     progressSection
                 }
-                if entry.supportsRecurrence {
+                if entry.supportsRecurrence || (entry.category == .irl && !trackExpense) {
                     recurrenceSection
                 }
                 if entry.supportsNotifications {
@@ -81,6 +114,18 @@ struct EntryFormView: View {
             }
             .sheet(item: $editingNotification) { rule in
                 NotificationRuleFormView(mode: .edit(rule))
+            }
+            .sheet(isPresented: Binding(
+                get: { locationSearchIndex != nil },
+                set: { if !$0 { locationSearchIndex = nil } }
+            )) {
+                PlaceSearchSheet { name, lat, lon in
+                    guard let index = locationSearchIndex, entry.locations.indices.contains(index) else { return }
+                    entry.locations[index].name = name
+                    entry.locations[index].latitude = lat
+                    entry.locations[index].longitude = lon
+                    locationSearchIndex = nil
+                }
             }
         }
     }
@@ -142,6 +187,12 @@ struct EntryFormView: View {
                             entry.recurrence = nil
                             entry.notificationRules.removeAll()
                         }
+                        if newValue.supportsEventType {
+                            entry.clearSessionLog()
+                            playedWithText = ""
+                        } else {
+                            entry.clearEventType()
+                        }
                     }
                 )) {
                     ForEach(GameSubCategory.allCases) { game in
@@ -169,11 +220,157 @@ struct EntryFormView: View {
     }
 
     private var locationSection: some View {
-        Section("Location") {
-            TextField("Location", text: Binding(
-                get: { entry.location ?? "" },
-                set: { entry.location = $0.isEmpty ? nil : $0 }
-            ))
+        Section {
+            if entry.locations.isEmpty {
+                Text("No locations yet.")
+                    .foregroundStyle(.secondary)
+            } else {
+                ForEach(Array(entry.locations.enumerated()), id: \.element.persistentModelID) { index, place in
+                    VStack(alignment: .leading, spacing: 8) {
+                        TextField("Place name", text: Binding(
+                            get: { place.name },
+                            set: { place.name = $0 }
+                        ))
+                        HStack {
+                            Button("Search Place") {
+                                locationSearchIndex = index
+                            }
+                            Spacer()
+                            if place.hasCoordinates {
+                                Text("Pinned")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+                .onDelete { offsets in
+                    for index in offsets {
+                        let place = entry.locations[index]
+                        modelContext.delete(place)
+                    }
+                    entry.locations.remove(atOffsets: offsets)
+                }
+            }
+
+            Button("Add Location") {
+                let place = LocationEntry(name: "")
+                place.entry = entry
+                entry.locations.append(place)
+            }
+        } header: {
+            Text("Locations")
+        } footer: {
+            Text("Multi-stop hangouts can list several places in order.")
+        }
+    }
+
+    private var expenseSection: some View {
+        Section {
+            Toggle("Track Expense", isOn: $trackExpense)
+                .disabled(hasRecurrence)
+                .onChange(of: trackExpense) { _, enabled in
+                    if enabled {
+                        hasRecurrence = false
+                        entry.recurrence = nil
+                        entry.trackExpense = true
+                        if entry.expenseLines.isEmpty {
+                            addExpenseLine()
+                        }
+                    } else {
+                        entry.clearExpense(modelContext: modelContext)
+                        lineAmountTexts = [:]
+                        balanceAmountTexts = [:]
+                        splitNamesText = ""
+                    }
+                }
+
+            if trackExpense, !hasRecurrence {
+                ForEach(Array(entry.expenseLines.enumerated()), id: \.element.persistentModelID) { index, line in
+                    VStack(alignment: .leading, spacing: 8) {
+                        TextField("What was it spent on?", text: Binding(
+                            get: { line.title },
+                            set: { line.title = $0 }
+                        ))
+                        TextField("Amount", text: lineAmountBinding(for: line))
+                            .keyboardType(.decimalPad)
+                    }
+                }
+                .onDelete(perform: deleteExpenseLines)
+
+                Button("Add Expense Line") {
+                    addExpenseLine()
+                }
+
+                LabeledContent("Total") {
+                    Text(Self.formatAmount(entry.expenseTotal))
+                        .fontWeight(.semibold)
+                }
+
+                ForEach(Array(entry.expenseBalances.enumerated()), id: \.element.persistentModelID) { _, balance in
+                    VStack(alignment: .leading, spacing: 8) {
+                        TextField("Who owes you?", text: Binding(
+                            get: { balance.personName },
+                            set: { balance.personName = $0 }
+                        ))
+                        TextField("Amount", text: balanceAmountBinding(for: balance))
+                            .keyboardType(.decimalPad)
+                    }
+                }
+                .onDelete(perform: deleteExpenseBalances)
+
+                Button("Add Person Who Owes You") {
+                    addExpenseBalance()
+                }
+
+                TextField("Names for equal split (one per line)", text: $splitNamesText, axis: .vertical)
+                    .lineLimit(2...5)
+
+                Button("Split Total Equally") {
+                    syncLineAmountsIntoModels()
+                    let names = splitNamesText
+                        .split(whereSeparator: { $0 == "\n" || $0 == "," })
+                        .map(String.init)
+                    entry.applyEqualSplit(among: names, modelContext: modelContext)
+                    balanceAmountTexts = [:]
+                    for balance in entry.expenseBalances {
+                        balanceAmountTexts[balance.persistentModelID] = Self.formatAmount(balance.amount)
+                    }
+                }
+                .disabled(entry.expenseTotal == 0 || splitNamesText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+        } header: {
+            Text("Expense")
+        } footer: {
+            Text(hasRecurrence
+                 ? "Expense tracking is for one-off hangouts. Turn off recurrence to track spend."
+                 : "Add freestyle line items to build the total. Optionally record who should pay you back, or split the total equally.")
+        }
+    }
+
+    private var eventTypeSection: some View {
+        Section("Event Type") {
+            Picker("Type", selection: Binding(
+                get: { entry.eventType ?? .dailies },
+                set: { entry.eventType = $0 }
+            )) {
+                ForEach(GameEventType.allCases) { type in
+                    Text(type.displayName).tag(type)
+                }
+            }
+        }
+    }
+
+    private var sessionLogSection: some View {
+        Section("Session Log") {
+            TextField("Planned activity", text: Binding(
+                get: { entry.plannedActivity ?? "" },
+                set: { entry.plannedActivity = $0.isEmpty ? nil : $0 }
+            ), axis: .vertical)
+            .lineLimit(2...4)
+
+            TextField("Played with (one name per line)", text: $playedWithText, axis: .vertical)
+                .lineLimit(2...6)
         }
     }
 
@@ -195,6 +392,20 @@ struct EntryFormView: View {
                         set: { progress.totalUnits = $0 }
                     ), in: 1...10_000)
                 }
+                Toggle("Session Target", isOn: Binding(
+                    get: { progress.targetUnitsPerSession != nil },
+                    set: { enabled in progress.targetUnitsPerSession = enabled ? 1 : nil }
+                ))
+                if progress.targetUnitsPerSession != nil {
+                    Stepper(
+                        "Target: \(progress.targetUnitsPerSession ?? 1) / session",
+                        value: Binding(
+                            get: { progress.targetUnitsPerSession ?? 1 },
+                            set: { progress.targetUnitsPerSession = $0 }
+                        ),
+                        in: 1...500
+                    )
+                }
                 TextField("Unit Label", text: Bindable(progress).unitLabel)
             }
         }
@@ -203,8 +414,14 @@ struct EntryFormView: View {
     private var recurrenceSection: some View {
         Section(entry.category == .entertainment ? "Personal Habit (Display Only)" : "Recurrence") {
             Toggle("Repeats", isOn: $hasRecurrence)
+                .disabled(trackExpense && entry.category == .irl)
                 .onChange(of: hasRecurrence) { _, enabled in
                     if enabled {
+                        trackExpense = false
+                        entry.clearExpense(modelContext: modelContext)
+                        lineAmountTexts = [:]
+                        balanceAmountTexts = [:]
+                        splitNamesText = ""
                         if entry.recurrence == nil {
                             entry.recurrence = RecurrenceRule(frequency: .daily)
                             entry.recurrence?.entry = entry
@@ -287,16 +504,134 @@ struct EntryFormView: View {
         case .irl:
             entry.subCategory = nil
             entry.progress = nil
+            entry.clearEventType()
+            entry.clearSessionLog()
+            playedWithText = ""
             entry.isCompletable = false
         case .game:
             entry.gameSubCategory = .genshinImpact
             entry.progress = nil
+            entry.clearLocations(modelContext: modelContext)
+            entry.clearExpense(modelContext: modelContext)
+            trackExpense = false
+            lineAmountTexts = [:]
+            balanceAmountTexts = [:]
+            splitNamesText = ""
+            entry.clearSessionLog()
+            playedWithText = ""
             entry.isCompletable = true
         case .entertainment:
             entry.entertainmentSubCategory = .anime
             entry.progress = EntryProgress(unitLabel: EntertainmentSubCategory.anime.defaultUnitLabel)
+            entry.clearLocations(modelContext: modelContext)
+            entry.clearExpense(modelContext: modelContext)
+            trackExpense = false
+            lineAmountTexts = [:]
+            balanceAmountTexts = [:]
+            splitNamesText = ""
+            entry.clearEventType()
+            entry.clearSessionLog()
+            playedWithText = ""
             entry.isCompletable = false
             entry.notificationRules.removeAll()
+        }
+    }
+
+    private func addExpenseLine() {
+        let line = ExpenseLine(title: "", amount: 0)
+        line.entry = entry
+        entry.expenseLines.append(line)
+        lineAmountTexts[line.persistentModelID] = ""
+    }
+
+    private func addExpenseBalance() {
+        let balance = ExpenseBalance(personName: "", amount: 0)
+        balance.entry = entry
+        entry.expenseBalances.append(balance)
+        balanceAmountTexts[balance.persistentModelID] = ""
+    }
+
+    private func deleteExpenseLines(at offsets: IndexSet) {
+        for index in offsets {
+            let line = entry.expenseLines[index]
+            lineAmountTexts.removeValue(forKey: line.persistentModelID)
+            modelContext.delete(line)
+        }
+        entry.expenseLines.remove(atOffsets: offsets)
+    }
+
+    private func deleteExpenseBalances(at offsets: IndexSet) {
+        for index in offsets {
+            let balance = entry.expenseBalances[index]
+            balanceAmountTexts.removeValue(forKey: balance.persistentModelID)
+            modelContext.delete(balance)
+        }
+        entry.expenseBalances.remove(atOffsets: offsets)
+    }
+
+    private func lineAmountBinding(for line: ExpenseLine) -> Binding<String> {
+        Binding(
+            get: { lineAmountTexts[line.persistentModelID] ?? Self.formatAmount(line.amount) },
+            set: { newValue in
+                lineAmountTexts[line.persistentModelID] = newValue
+                line.amount = Self.parseAmount(newValue) ?? 0
+            }
+        )
+    }
+
+    private func balanceAmountBinding(for balance: ExpenseBalance) -> Binding<String> {
+        Binding(
+            get: { balanceAmountTexts[balance.persistentModelID] ?? Self.formatAmount(balance.amount) },
+            set: { newValue in
+                balanceAmountTexts[balance.persistentModelID] = newValue
+                balance.amount = Self.parseAmount(newValue) ?? 0
+            }
+        )
+    }
+
+    private func syncLineAmountsIntoModels() {
+        for line in entry.expenseLines {
+            if let text = lineAmountTexts[line.persistentModelID] {
+                line.amount = Self.parseAmount(text) ?? 0
+            }
+        }
+    }
+
+    private func pruneEmptyExpenseLines() {
+        let empties = entry.expenseLines.filter {
+            $0.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && $0.amount == 0
+        }
+        for line in empties {
+            lineAmountTexts.removeValue(forKey: line.persistentModelID)
+            modelContext.delete(line)
+            if let index = entry.expenseLines.firstIndex(where: { $0.persistentModelID == line.persistentModelID }) {
+                entry.expenseLines.remove(at: index)
+            }
+        }
+    }
+
+    private func pruneEmptyExpenseBalances() {
+        let empties = entry.expenseBalances.filter {
+            $0.personName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && $0.amount == 0
+        }
+        for balance in empties {
+            balanceAmountTexts.removeValue(forKey: balance.persistentModelID)
+            modelContext.delete(balance)
+            if let index = entry.expenseBalances.firstIndex(where: { $0.persistentModelID == balance.persistentModelID }) {
+                entry.expenseBalances.remove(at: index)
+            }
+        }
+    }
+
+    private func pruneEmptyLocations() {
+        let empties = entry.locations.filter {
+            $0.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+        for place in empties {
+            modelContext.delete(place)
+            if let index = entry.locations.firstIndex(where: { $0.persistentModelID == place.persistentModelID }) {
+                entry.locations.remove(at: index)
+            }
         }
     }
 
@@ -319,8 +654,55 @@ struct EntryFormView: View {
             modelContext.insert(entry)
         }
 
+        if trackExpense, entry.category == .irl, !hasRecurrence {
+            entry.trackExpense = true
+            syncLineAmountsIntoModels()
+            for balance in entry.expenseBalances {
+                if let text = balanceAmountTexts[balance.persistentModelID] {
+                    balance.amount = Self.parseAmount(text) ?? 0
+                }
+                balance.entry = entry
+            }
+            for line in entry.expenseLines {
+                line.entry = entry
+            }
+            pruneEmptyExpenseLines()
+            pruneEmptyExpenseBalances()
+            entry.expenseAmount = nil
+            entry.expenseCategory = nil
+        } else {
+            entry.clearExpense(modelContext: modelContext)
+            trackExpense = false
+        }
+
+        entry.playedWith = playedWithText
+            .split(separator: "\n")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+
+        if !entry.supportsEventType {
+            entry.clearEventType()
+        } else if entry.eventType == nil {
+            entry.eventType = .dailies
+        }
+
+        if !entry.supportsSessionLog {
+            entry.clearSessionLog()
+        }
+
+        if !entry.supportsLocation {
+            entry.clearLocations(modelContext: modelContext)
+        } else {
+            for place in entry.locations {
+                place.entry = entry
+            }
+            pruneEmptyLocations()
+        }
+
         if hasRecurrence, entry.recurrence != nil {
             entry.recurrence?.entry = entry
+            entry.clearExpense(modelContext: modelContext)
+            trackExpense = false
         }
 
         for rule in entry.notificationRules {
@@ -334,5 +716,15 @@ struct EntryFormView: View {
         try? modelContext.save()
         entryStore.save(entry: entry, modelContext: modelContext, allEntries: allEntries)
         dismiss()
+    }
+
+    private static func formatAmount(_ amount: Decimal) -> String {
+        NSDecimalNumber(decimal: amount).stringValue
+    }
+
+    private static func parseAmount(_ text: String) -> Decimal? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+        return Decimal(string: trimmed)
     }
 }

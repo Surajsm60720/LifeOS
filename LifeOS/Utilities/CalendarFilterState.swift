@@ -37,7 +37,15 @@ final class CalendarFilterState: ObservableObject {
         }
         let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !query.isEmpty else { return true }
-        let haystack = [entry.title, entry.notes ?? "", entry.subCategory ?? "", entry.location ?? ""]
+        let haystack = [
+            entry.title,
+            entry.notes ?? "",
+            entry.subCategory ?? "",
+            entry.locationSummary ?? "",
+            entry.plannedActivity ?? "",
+            entry.eventType?.displayName ?? "",
+            entry.playedWith.joined(separator: " ")
+        ]
             .joined(separator: " ")
             .lowercased()
         return haystack.contains(query.lowercased())

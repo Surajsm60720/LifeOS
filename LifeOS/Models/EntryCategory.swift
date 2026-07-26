@@ -35,6 +35,56 @@ enum GameSubCategory: String, Codable, CaseIterable, Identifiable {
     var defaultCompletable: Bool {
         self != .other
     }
+
+    var supportsEventType: Bool {
+        self != .other
+    }
+
+    var supportsSessionLog: Bool {
+        self == .other
+    }
+}
+
+enum GameEventType: String, Codable, CaseIterable, Identifiable {
+    case dailies
+    case weeklies
+    case mainQuestline
+    case worldQuests
+    case characterBuilding
+    case materialFarming
+    case mapExploration
+    case shopReset
+    case updateRelease
+    case preInstall
+    case livestream
+    case albumRelease
+    case bannerWindow
+    case battlePass
+    case endgameContent
+    case irlTieIn
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .dailies: "Dailies"
+        case .weeklies: "Weeklies"
+        case .mainQuestline: "Main Questline"
+        case .worldQuests: "World Quests"
+        case .characterBuilding: "Character Building"
+        case .materialFarming: "Material Farming"
+        case .mapExploration: "Map Exploration"
+        case .shopReset: "Shop Reset"
+        case .updateRelease: "Update Release"
+        case .preInstall: "Pre-Install"
+        case .livestream: "Livestream"
+        case .albumRelease: "Album Release"
+        case .bannerWindow: "Banner Window"
+        case .battlePass: "Battle Pass"
+        case .endgameContent: "Endgame Content"
+        case .irlTieIn: "IRL Tie-In"
+        }
+    }
 }
 
 enum EntertainmentSubCategory: String, Codable, CaseIterable, Identifiable {

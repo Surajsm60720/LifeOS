@@ -87,6 +87,19 @@ struct EntryTemplateDefinition: Identifiable, Hashable {
         entry.startDate = startDate
         entry.isCompletable = isCompletable
 
+        if category == .game, let gameSubCategory, gameSubCategory.supportsEventType {
+            switch id {
+            case "dailies":
+                entry.eventType = .dailies
+            case "weeklies":
+                entry.eventType = .weeklies
+            case "banner":
+                entry.eventType = .bannerWindow
+            default:
+                break
+            }
+        }
+
         if let frequency {
             let rule = RecurrenceRule(frequency: frequency, interval: interval)
             if frequency == .weekly {

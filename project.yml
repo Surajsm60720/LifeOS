@@ -39,6 +39,7 @@ targets:
       path: LifeOS/Info.plist
       properties:
         UIApplicationSupportsIndirectInputEvents: true
+        NSLocationWhenInUseUsageDescription: LifeOS can look up place names for IRL events. Your live location is not required for search.
   LifeOSTests:
     type: bundle.unit-test
     platform: iOS

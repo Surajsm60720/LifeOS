@@ -32,6 +32,10 @@ struct RecapExporter {
         var entertainmentUnits = 0
         var dailyCompletableDays = 0
         var dailyCompletableDoneDays = 0
+        var expenseTotal: Decimal = 0
+        var expenseEntryIDs = Set<UUID>()
+        var owedToYouTotal: Decimal = 0
+        var eventTypeCounts: [GameEventType: Int] = [:]
 
         for entry in entries {
             if entry.category == .irl && !options.includeIRL { continue }
@@ -40,6 +44,19 @@ struct RecapExporter {
 
             let occurrences = engine.occurrences(for: entry, in: range, calendar: calendar)
             guard !occurrences.isEmpty else { continue }
+
+            if entry.category == .irl,
+               entry.hasExpense,
+               expenseEntryIDs.insert(entry.id).inserted {
+                expenseTotal += entry.expenseTotal
+                if entry.expenseOwedToYou > 0 {
+                    owedToYouTotal += entry.expenseOwedToYou
+                }
+            }
+
+            if entry.category == .game, let eventType = entry.eventType {
+                eventTypeCounts[eventType, default: 0] += 1
+            }
 
             if entry.isCompletable, entry.recurrence?.frequency == .daily {
                 for occurrence in occurrences {
@@ -57,13 +74,54 @@ struct RecapExporter {
                 if entry.isCompletable {
                     line += completed ? " (completed)" : " (pending)"
                 }
-                if let progress = entry.progress {
-                    line += " — \(progress.currentUnit)"
-                    if let total = progress.totalUnits {
-                        line += "/\(total)"
+
+                switch entry.category {
+                case .irl:
+                    if let locations = entry.locationSummary {
+                        line += " @ \(locations)"
                     }
-                    line += " \(progress.unitLabel)"
+                    if entry.hasExpense {
+                        line += " — spend \(entry.expenseTotal)"
+                        let itemParts = entry.expenseLines
+                            .filter { !$0.title.isEmpty || $0.amount != 0 }
+                            .map { "\($0.title.isEmpty ? "item" : $0.title) \($0.amount)" }
+                        if !itemParts.isEmpty {
+                            line += " [" + itemParts.joined(separator: "; ") + "]"
+                        }
+                        if entry.expenseOwedToYou > 0 {
+                            let owedParts = entry.expenseBalances
+                                .filter { !$0.personName.isEmpty }
+                                .map { "\($0.personName) owes \($0.amount)" }
+                            if !owedParts.isEmpty {
+                                line += " — " + owedParts.joined(separator: "; ")
+                            }
+                        }
+                    }
+                case .game:
+                    if let eventType = entry.eventType {
+                        line += " [\(eventType.displayName)]"
+                    }
+                    if entry.supportsSessionLog {
+                        if let planned = entry.plannedActivity, !planned.isEmpty {
+                            line += " — planned: \(planned)"
+                        }
+                        if !entry.playedWith.isEmpty {
+                            line += " — with: \(entry.playedWith.joined(separator: ", "))"
+                        }
+                    }
+                case .entertainment:
+                    if let progress = entry.progress {
+                        line += " — \(progress.currentUnit)"
+                        if let total = progress.totalUnits {
+                            line += "/\(total)"
+                        }
+                        line += " \(progress.unitLabel)"
+                        if let target = progress.targetUnitsPerSession {
+                            line += " (target \(target)/session)"
+                        }
+                    }
                 }
+
                 if let notes = entry.notes, !notes.isEmpty {
                     line += " — \(notes)"
                 }
@@ -96,7 +154,22 @@ struct RecapExporter {
         var markdown = "# LifeOS Recap — \(start) to \(end)\n\n"
         markdown += "## Stats\n"
         markdown += "- IRL: \(irlCount) events, \(irlCompleted) completed (\(irlRate))\n"
+        if expenseEntryIDs.count > 0 {
+            markdown += "- IRL spend: \(expenseTotal) across \(expenseEntryIDs.count) event\(expenseEntryIDs.count == 1 ? "" : "s")\n"
+            if owedToYouTotal > 0 {
+                markdown += "- Owed to you: \(owedToYouTotal)\n"
+            }
+        }
         markdown += "- Games: \(gameCount) entries, \(gameCompleted) completed (\(gameRate))\n"
+        if !eventTypeCounts.isEmpty {
+            let parts = GameEventType.allCases.compactMap { type -> String? in
+                guard let count = eventTypeCounts[type], count > 0 else { return nil }
+                return "\(count) \(type.displayName.lowercased())"
+            }
+            if !parts.isEmpty {
+                markdown += "- Game event types: \(parts.joined(separator: ", "))\n"
+            }
+        }
         markdown += "- Entertainment: \(entertainmentCount) titles, \(entertainmentUnits) units logged\n"
         if dailyCompletableDays > 0 {
             markdown += "- Daily completable hit rate: \(dailyCompletableDoneDays)/\(dailyCompletableDays) (\(dailyRate))\n"

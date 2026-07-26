@@ -63,23 +63,8 @@ struct ContentView: View {
             }
         }
         .task {
-            prepareFreshStoreIfNeeded()
+            LifeOSDataMigration.runLaunchMigrations(modelContext: modelContext, entryStore: entryStore)
             refreshNotifications()
-        }
-    }
-
-    /// One-time wipe of sample/demo data so you can enter your own.
-    /// Seeding is disabled going forward.
-    private func prepareFreshStoreIfNeeded() {
-        let wipeKey = "lifeos.didWipeSampleData.v1"
-        if !UserDefaults.standard.bool(forKey: wipeKey) {
-            entryStore.deleteAll(modelContext: modelContext)
-            UserDefaults.standard.set(true, forKey: wipeKey)
-            // Prevent any legacy seed path from running again.
-            UserDefaults.standard.set(true, forKey: "lifeos.hasSeededSampleData")
-            Task {
-                await NotificationPlanner.refreshPendingNotifications(entries: [], force: true)
-            }
         }
     }
 

@@ -82,13 +82,27 @@ final class EntryStore: ObservableObject {
             subCategory: entry.subCategory,
             startDate: entry.startDate,
             duration: entry.duration,
-            location: entry.location,
             notes: entry.notes,
             isCompletable: entry.isCompletable,
-            colorOverrideHex: entry.colorOverrideHex
+            colorOverrideHex: entry.colorOverrideHex,
+            trackExpense: false,
+            eventTypeRaw: entry.eventTypeRaw,
+            plannedActivity: entry.plannedActivity,
+            playedWithRaw: entry.playedWithRaw
         )
+        // Expense ledger intentionally cleared — each hangout's spend is one-off.
 
-        if let recurrence = entry.recurrence {
+        for place in entry.locations {
+            let location = LocationEntry(
+                name: place.name,
+                latitude: place.latitude,
+                longitude: place.longitude
+            )
+            location.entry = copy
+            copy.locations.append(location)
+        }
+
+        if let recurrence = entry.recurrence, !copy.hasExpense {
             let rule = RecurrenceRule(
                 frequency: recurrence.frequency,
                 interval: recurrence.interval,
@@ -116,7 +130,8 @@ final class EntryStore: ObservableObject {
             let p = EntryProgress(
                 currentUnit: progress.currentUnit,
                 totalUnits: progress.totalUnits,
-                unitLabel: progress.unitLabel
+                unitLabel: progress.unitLabel,
+                targetUnitsPerSession: progress.targetUnitsPerSession
             )
             p.entry = copy
             copy.progress = p

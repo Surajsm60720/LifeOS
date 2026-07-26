@@ -52,8 +52,64 @@ struct EntryDetailView: View {
                     if let duration = entry.duration {
                         LabeledContent("Duration", value: "\(Int(duration / 60)) minutes")
                     }
-                    if let location = entry.location {
-                        LabeledContent("Location", value: location)
+                }
+
+                if entry.supportsLocation, !entry.locations.isEmpty {
+                    Section("Locations") {
+                        ForEach(entry.locations, id: \.persistentModelID) { place in
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(place.name)
+                                if place.hasCoordinates {
+                                    Text("\(place.latitude ?? 0), \(place.longitude ?? 0)")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
+                } else if let summary = entry.locationSummary {
+                    Section("Locations") {
+                        Text(summary)
+                    }
+                }
+
+                if entry.trackExpense || !entry.expenseLines.isEmpty {
+                    Section("Expenses") {
+                        ForEach(entry.expenseLines, id: \.persistentModelID) { line in
+                            LabeledContent(
+                                line.title.isEmpty ? "Item" : line.title,
+                                value: "\(line.amount)"
+                            )
+                        }
+                        LabeledContent("Total", value: "\(entry.expenseTotal)")
+                            .fontWeight(.semibold)
+                    }
+                }
+
+                if !entry.expenseBalances.isEmpty {
+                    Section("Settlements") {
+                        ForEach(entry.expenseBalances, id: \.persistentModelID) { balance in
+                            Text("\(balance.personName.isEmpty ? "Someone" : balance.personName) owes you \(balance.amount)")
+                        }
+                        LabeledContent("Owed to you", value: "\(entry.expenseOwedToYou)")
+                            .fontWeight(.semibold)
+                    }
+                }
+
+                if let eventType = entry.eventType {
+                    Section("Event Type") {
+                        LabeledContent("Type", value: eventType.displayName)
+                    }
+                }
+
+                if entry.supportsSessionLog {
+                    Section("Session") {
+                        if let planned = entry.plannedActivity, !planned.isEmpty {
+                            LabeledContent("Planned", value: planned)
+                        }
+                        if !entry.playedWith.isEmpty {
+                            LabeledContent("Played with", value: entry.playedWith.joined(separator: ", "))
+                        }
                     }
                 }
 
@@ -66,6 +122,9 @@ struct EntryDetailView: View {
                                 }
                             } else {
                                 LabeledContent("Current", value: "\(progress.currentUnit) \(progress.unitLabel)")
+                            }
+                            if let target = progress.targetUnitsPerSession {
+                                LabeledContent("Session target", value: "\(target) \(progress.unitLabel)")
                             }
                         } else {
                             Text("No progress yet")
@@ -164,6 +223,9 @@ struct EntryDetailView: View {
         var parts = [entry.category.displayName]
         if let sub = entry.subCategory {
             parts.append(sub)
+        }
+        if let eventType = entry.eventType {
+            parts.append(eventType.displayName)
         }
         return parts.joined(separator: " · ")
     }

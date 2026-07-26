@@ -24,6 +24,13 @@ final class RecapExporterTests: XCTestCase {
         let completion = EntryCompletion(occurrenceStart: date(2026, 7, 5))
         completion.entry = irl
         irl.completions = [completion]
+        irl.locations = [LocationEntry(name: "Clinic")]
+        irl.trackExpense = true
+        irl.expenseLines = [
+            ExpenseLine(title: "Consult", amount: Decimal(string: "50")!),
+            ExpenseLine(title: "Meds", amount: Decimal(string: "25.5")!)
+        ]
+        irl.expenseBalances = [ExpenseBalance(personName: "Alex", amount: Decimal(25))]
 
         let game = Entry(
             title: "Genshin Dailies",
@@ -33,6 +40,16 @@ final class RecapExporterTests: XCTestCase {
             isCompletable: true
         )
         game.recurrence = RecurrenceRule(frequency: .daily)
+        game.eventType = .dailies
+
+        let other = Entry(
+            title: "Couch Co-op",
+            category: .game,
+            subCategory: GameSubCategory.other.rawValue,
+            startDate: date(2026, 7, 3)
+        )
+        other.plannedActivity = "Boss rush"
+        other.playedWith = ["Alex"]
 
         let anime = Entry(
             title: "Sample Anime",
@@ -40,11 +57,16 @@ final class RecapExporterTests: XCTestCase {
             subCategory: EntertainmentSubCategory.anime.rawValue,
             startDate: date(2026, 7, 2)
         )
-        anime.progress = EntryProgress(currentUnit: 5, totalUnits: 12, unitLabel: "episode")
+        anime.progress = EntryProgress(
+            currentUnit: 5,
+            totalUnits: 12,
+            unitLabel: "episode",
+            targetUnitsPerSession: 2
+        )
 
         let exporter = RecapExporter()
         let result = exporter.export(
-            entries: [irl, game, anime],
+            entries: [irl, game, other, anime],
             range: date(2026, 7, 1)...date(2026, 7, 7, hour: 23),
             calendar: calendar
         )
@@ -55,9 +77,22 @@ final class RecapExporterTests: XCTestCase {
         XCTAssertTrue(result.markdown.contains("## Games"))
         XCTAssertTrue(result.markdown.contains("## Entertainment"))
         XCTAssertTrue(result.markdown.contains("Dentist"))
+        XCTAssertTrue(result.markdown.contains("@ Clinic"))
+        XCTAssertTrue(result.markdown.contains("spend 75.5"))
+        XCTAssertTrue(result.markdown.contains("Consult 50"))
+        XCTAssertTrue(result.markdown.contains("Meds 25.5"))
+        XCTAssertTrue(result.markdown.contains("Alex owes 25"))
+        XCTAssertTrue(result.markdown.contains("IRL spend:"))
+        XCTAssertTrue(result.markdown.contains("Owed to you:"))
         XCTAssertTrue(result.markdown.contains("(completed)"))
         XCTAssertTrue(result.markdown.contains("Genshin Dailies"))
+        XCTAssertTrue(result.markdown.contains("[Dailies]"))
+        XCTAssertTrue(result.markdown.contains("Game event types:"))
+        XCTAssertTrue(result.markdown.contains("Couch Co-op"))
+        XCTAssertTrue(result.markdown.contains("planned: Boss rush"))
+        XCTAssertTrue(result.markdown.contains("with: Alex"))
         XCTAssertTrue(result.markdown.contains("Sample Anime"))
+        XCTAssertTrue(result.markdown.contains("target 2/session"))
         XCTAssertTrue(result.suggestedFilename.hasSuffix(".md"))
     }
 
