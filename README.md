@@ -1,24 +1,29 @@
 # LifeOS
 
+**Version 0.2**
 
 A personal, calendar-centric iOS app for tracking day-to-day life, game events, and entertainment progress — locally, without accounts or third-party sync.
 
-LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and reading/watching logs into one entry model with recurrence, completion tracking, customizable local notifications, and Markdown recap export.
+LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and reading/watching logs into one entry model with recurrence, completion tracking, customizable local notifications, hangout expense ledgers, multi-stop locations, and Markdown recap export.
 
-> This is an early **v0.1** release. Core flows work; polish, sync, and deferred features are intentionally out of scope.
+> This is an early **v0.2** release. Core flows work; polish, sync, and deferred features (CloudKit, widgets, charts) are intentionally out of scope.
 
 ---
 
 ## Status
 
-| Area | v0.1 |
+| Area | v0.2 |
 |---|---|
 | Unified entry model (IRL / Games / Entertainment) | Included |
 | Day / Week / Month / Year calendar | Included |
 | Recurrence + occurrence-level completion | Included |
-| Local notification rules + presets | Included |
+| Local notification rules + presets (64-cap aware) | Included |
 | Today inbox, search / filters, templates | Included |
-| Markdown recap export | Included |
+| IRL multi-location + MapKit place search | Included |
+| Hangout expense ledger (lines, totals, who owes you) | Included |
+| Game event types (GI / HSR / WuWa) + Other session logs | Included |
+| Entertainment progress + session targets | Included |
+| Markdown recap export with stats | Included |
 
 ---
 
@@ -37,6 +42,7 @@ LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and re
 | Language / UI | Swift · SwiftUI (dark theme) |
 | Persistence | SwiftData |
 | Notifications | UserNotifications |
+| Places | MapKit (`MKLocalSearch`) |
 | Recurrence | Custom `Calendar` / `DateComponents` engine |
 | Project generation | XcodeGen |
 
@@ -59,17 +65,21 @@ Allow notification permission when prompted if you plan to use reminders.
 
 ---
 
-## What’s in v0.1
+## What’s in v0.2
 
-- **Calendar** — Day, Week, Month, Year views with category-aware styling  
-- **Entries** — Single model covering IRL, games (GI / HSR / WuWa / Other), and entertainment  
-- **Recurrence** — Daily, weekly (incl. weekday masks), monthly, every-N-months  
-- **Completion** — Per-occurrence done state; quick-complete from rows  
-- **Notifications** — Rule hub, presets, schedule-and-cancel planning (64 pending cap aware)  
+- **Calendar** — Day, Week, Month, Year with category-aware styling  
+- **Entries** — Unified model for IRL, games (GI / HSR / WuWa / Other), and entertainment  
+- **Recurrence** — Daily, weekly (weekday masks), monthly, every-N-months  
+- **Completion** — Per-occurrence done state; quick-complete from rows / Today inbox  
+- **Notifications** — Hub, presets, schedule-and-cancel planner (64 pending cap)  
 - **Today inbox** — Open completable items and upcoming reminders  
-- **Search & filters** — Title/notes search and category / game chips  
-- **Templates & duplicate** — Starter patterns from Settings; duplicate from detail  
-- **Export** — Date-range Markdown recap with stats (share or copy)  
+- **Search & filters** — Text search plus category / game chips  
+- **IRL locations** — Multi-stop places with MapKit search (name + coordinates)  
+- **Hangout expenses** — Freestyle line items + total; optional “who owes you”; equal split helper; mutually exclusive with recurrence; cleared on duplicate  
+- **Game event types** — Taxonomy for primary games; Other games use session logs (planned activity / played with)  
+- **Entertainment** — Progress tracking, optional session targets, display-only recurrence, no notifications  
+- **Templates & duplicate** — Built-in starters from Settings; duplicate from detail  
+- **Export** — Date-range Markdown recap with spend, event-type, and progress stats  
 - **Settings** — Export, templates, entry library, clear-all data  
 
 ---
@@ -85,7 +95,7 @@ xcodebuild test \
 
 Or in Xcode: **⌘U**.
 
-v0.1 includes unit coverage for recurrence, entry capabilities, notification logic helpers, and recap export formatting.
+Unit coverage includes recurrence, entry capabilities (incl. expense split), notification logic helpers, and recap export formatting.
 
 ---
 
@@ -94,8 +104,8 @@ v0.1 includes unit coverage for recurrence, entry capabilities, notification log
 ```
 LifeOS/
 ├── App/           App entry, SwiftData container
-├── Models/        Entry, recurrence, notifications, progress, completions
-├── Services/      RecurrenceEngine, NotificationPlanner, RecapExporter, templates
+├── Models/        Entry, locations, expenses, recurrence, notifications, progress
+├── Services/      Engine, planner, exporter, templates, migrations
 ├── Views/         Calendar, entries, notifications, settings, export
 ├── Utilities/     Theme, filters, date helpers
 └── Resources/     Assets (App Icon, AccentColor)
@@ -105,12 +115,13 @@ project.yml        XcodeGen definition
 
 ---
 
-## Design notes (v0.1)
+## Design notes (v0.2)
 
 - Dark theme only; neutral cool-gray accents  
 - Local-only data — no backend, no account login  
 - Entertainment logging is manual and notification-free by design  
-- Game event data is manual (no unofficial account scrapers)
+- Game event data is manual (no unofficial account scrapers)  
+- Expense tracking is hangout-scoped (no dedicated Expenses tab)
 
 ---
 

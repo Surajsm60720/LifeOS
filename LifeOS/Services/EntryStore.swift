@@ -92,6 +92,8 @@ final class EntryStore: ObservableObject {
         )
         // Expense ledger intentionally cleared — each hangout's spend is one-off.
 
+        modelContext.insert(copy)
+
         for place in entry.locations {
             let location = LocationEntry(
                 name: place.name,
@@ -100,6 +102,7 @@ final class EntryStore: ObservableObject {
             )
             location.entry = copy
             copy.locations.append(location)
+            modelContext.insert(location)
         }
 
         if let recurrence = entry.recurrence, !copy.hasExpense {
@@ -112,6 +115,7 @@ final class EntryStore: ObservableObject {
             )
             rule.entry = copy
             copy.recurrence = rule
+            modelContext.insert(rule)
         }
 
         for rule in entry.notificationRules {
@@ -124,6 +128,7 @@ final class EntryStore: ObservableObject {
             )
             note.entry = copy
             copy.notificationRules.append(note)
+            modelContext.insert(note)
         }
 
         if let progress = entry.progress {
@@ -135,9 +140,9 @@ final class EntryStore: ObservableObject {
             )
             p.entry = copy
             copy.progress = p
+            modelContext.insert(p)
         }
 
-        modelContext.insert(copy)
         try? modelContext.save()
         return copy
     }

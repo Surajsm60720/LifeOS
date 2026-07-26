@@ -57,10 +57,7 @@ struct SettingsView: View {
 
             Section("About") {
                 LabeledContent("App", value: "LifeOS")
-                LabeledContent("Version", value: "0.1")
-                Text("Personal life OS — local-only, dark theme, no account sync.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                LabeledContent("Version", value: "0.2")
             }
         }
         .navigationTitle("Settings")
