@@ -12,6 +12,8 @@ enum CalendarViewMode: String, CaseIterable, Identifiable {
     var title: String {
         rawValue.capitalized
     }
+
+    static let defaultStorageKey = "calendarDefaultMode"
 }
 
 struct CalendarRootView: View {
@@ -19,10 +21,12 @@ struct CalendarRootView: View {
     @ObservedObject var entryStore: EntryStore
     @StateObject private var filters = CalendarFilterState()
 
-    @State private var mode: CalendarViewMode = .month
+    @AppStorage(CalendarViewMode.defaultStorageKey) private var defaultModeRaw: String = CalendarViewMode.day.rawValue
+    @State private var mode: CalendarViewMode = .day
     @State private var anchorDate = Date()
     @State private var selectedOccurrence: CalendarEntryOccurrence?
     @State private var showFilters = false
+    @State private var didApplyStoredDefault = false
 
     private var filteredEntries: [Entry] {
         filters.filter(entries)
@@ -77,6 +81,25 @@ struct CalendarRootView: View {
         .background(LifeOSTheme.canvas.ignoresSafeArea())
         .sheet(item: $selectedOccurrence) { occurrence in
             EntryDetailView(entry: occurrence.entry, occurrenceDate: occurrence.occurrenceDate)
+        }
+        .onAppear {
+            applyStoredDefaultIfNeeded()
+        }
+        .onChange(of: defaultModeRaw) { _, newValue in
+            // Honor Settings changes while Calendar is already open.
+            if let preferred = CalendarViewMode(rawValue: newValue), preferred != mode {
+                mode = preferred
+            }
+        }
+    }
+
+    private func applyStoredDefaultIfNeeded() {
+        guard !didApplyStoredDefault else { return }
+        didApplyStoredDefault = true
+        if let preferred = CalendarViewMode(rawValue: defaultModeRaw) {
+            mode = preferred
+        } else {
+            mode = .day
         }
     }
 

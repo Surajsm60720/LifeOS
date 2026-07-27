@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UIKit
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
@@ -9,6 +10,9 @@ struct ContentView: View {
     @StateObject private var entryStore = EntryStore()
     @State private var showingCreateSheet = false
     @State private var selectedTab = 0
+
+    /// Tracks the alternate-icon selection used when we last rescheduled notifications.
+    @AppStorage("lastNotificationIconFingerprint") private var lastNotificationIconFingerprint: String = ""
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -70,8 +74,20 @@ struct ContentView: View {
 
     private func refreshNotifications() {
         Task {
+            let fingerprint = currentNotificationIconFingerprint()
+            if fingerprint != lastNotificationIconFingerprint {
+                lastNotificationIconFingerprint = fingerprint
+                await NotificationPlanner.rescheduleManagedNotificationsForIconUpdate(entries: entries)
+                return
+            }
             await NotificationPlanner.refreshPendingNotifications(entries: entries)
         }
+    }
+
+    /// Notification banners use the currently selected app icon.
+    /// Keying off the alternate-icon name is enough to detect Settings icon switches.
+    private func currentNotificationIconFingerprint() -> String {
+        UIApplication.shared.alternateIconName ?? "primary"
     }
 }
 

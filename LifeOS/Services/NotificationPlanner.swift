@@ -93,6 +93,22 @@ actor NotificationPlanner {
         await shared.refresh(snapshot: snap, now: now, force: force)
     }
 
+    /// Recreates managed notification requests so they pick up the current app icon.
+    ///
+    /// For safety, notifications that are about to fire are kept (protected window).
+    @MainActor
+    static func rescheduleManagedNotificationsForIconUpdate(entries: [Entry], now: Date = .now) async {
+        let snap = snapshot(from: entries)
+        await shared.rescheduleForIconUpdate(snapshot: snap, now: now)
+    }
+
+    /// Removes banners already shown in Notification Center.
+    /// Useful after an alternate-icon change on iOS 18+, where delivered glyphs can stay stale.
+    @MainActor
+    static func clearDeliveredNotifications() async {
+        await shared.clearDelivered()
+    }
+
     func requestAuthorizationIfNeeded() async -> Bool {
         let settings = await center.notificationSettings()
         switch settings.authorizationStatus {
@@ -163,6 +179,52 @@ actor NotificationPlanner {
         await task.value
     }
 
+    private func rescheduleForIconUpdate(snapshot: ScheduleSnapshot, now: Date) async {
+        guard await requestAuthorizationIfNeeded() else { return }
+        lastRefreshAt = now
+
+        let calendar = Calendar.current
+        let desired = buildDesiredRequests(snapshot: snapshot, now: now, calendar: calendar)
+        let desiredIDs = Set(desired.map(\.identifier))
+
+        let pending = await center.pendingNotificationRequests()
+        let managed = pending.filter { $0.identifier.hasPrefix(identifierPrefix) }
+
+        // Keep anything already scheduled that is about to fire — do not cancel/recreate it.
+        var protectedIDs = Set<String>()
+        for request in managed {
+            if let fire = nextFireDate(for: request), fire.timeIntervalSince(now) <= protectWindow, fire > now {
+                protectedIDs.insert(request.identifier)
+            }
+        }
+
+        let idsToRecreate = managed
+            .map(\.identifier)
+            .filter { !protectedIDs.contains($0) }
+            // If a managed request exists but isn't part of current desired schedule, don't bother recreating.
+            .filter { desiredIDs.contains($0) }
+
+        if !idsToRecreate.isEmpty {
+            center.removePendingNotificationRequests(withIdentifiers: idsToRecreate)
+        }
+
+        // Refresh pending after removals to compute the remaining slots accurately.
+        let remainingPending = await center.pendingNotificationRequests()
+        let remainingManaged = remainingPending.filter { $0.identifier.hasPrefix(identifierPrefix) }
+        let existingIDs = Set(remainingManaged.map(\.identifier))
+
+        let toAdd = desired
+            .filter { !existingIDs.contains($0.identifier) }
+            .filter { !protectedIDs.contains($0.identifier) }
+
+        let sortedAdd = toAdd.sorted { (nextFireDate(for: $0) ?? .distantFuture) < (nextFireDate(for: $1) ?? .distantFuture) }
+        let remainingSlots = max(0, maxPending - existingIDs.count)
+
+        for request in sortedAdd.prefix(remainingSlots) {
+            try? await center.add(request)
+        }
+    }
+
     func cancel(entryID: UUID, on date: Date = .now, calendar: Calendar = .current) async {
         let pending = await center.pendingNotificationRequests()
         let dayKey = dayKey(for: date, calendar: calendar)
@@ -177,6 +239,10 @@ actor NotificationPlanner {
             .map(\.identifier)
             .filter { $0.hasPrefix(identifierPrefix + entryID.uuidString) }
         center.removePendingNotificationRequests(withIdentifiers: ids)
+    }
+
+    func clearDelivered() async {
+        center.removeAllDeliveredNotifications()
     }
 
     // MARK: - Core sync

@@ -1,18 +1,94 @@
 import SwiftUI
 import SwiftData
+import UIKit
+
+private enum AppIconChoice: String, CaseIterable, Identifiable {
+    case primary
+    case geometric
+    case minimal
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .primary: return "Default"
+        case .geometric: return "Geometric"
+        case .minimal: return "Minimal"
+        }
+    }
+
+    /// The `UIApplication.setAlternateIconName` argument (nil means default icon).
+    /// Names must match the alternate-icon keys generated from the App Icon asset sets.
+    var alternateIconName: String? {
+        switch self {
+        case .primary: return nil
+        case .geometric: return "AppIconGeometric"
+        case .minimal: return "AppIconMinimal"
+        }
+    }
+
+    static func from(alternateIconName: String?) -> AppIconChoice {
+        switch alternateIconName {
+        case nil: return .primary
+        case "AppIconGeometric": return .geometric
+        case "AppIconMinimal": return .minimal
+        default: return .primary
+        }
+    }
+}
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Entry.startDate) private var entries: [Entry]
 
+    @AppStorage(CalendarViewMode.defaultStorageKey) private var defaultModeRaw: String = CalendarViewMode.day.rawValue
     @State private var showingExport = false
     @State private var showingTemplates = false
     @State private var showingLibrary = false
     @State private var confirmClearAll = false
     @StateObject private var entryStore = EntryStore()
 
+    @State private var selectedIconChoice: AppIconChoice = .primary
+    @State private var didLoadCurrentIcon = false
+
+    private var supportsAlternateIcons: Bool {
+        UIApplication.shared.supportsAlternateIcons
+    }
+
+    private var defaultModeBinding: Binding<CalendarViewMode> {
+        Binding(
+            get: { CalendarViewMode(rawValue: defaultModeRaw) ?? .day },
+            set: { defaultModeRaw = $0.rawValue }
+        )
+    }
+
     var body: some View {
         List {
+            Section {
+                Picker("App Icon", selection: $selectedIconChoice) {
+                    ForEach(AppIconChoice.allCases) { choice in
+                        Text(choice.label).tag(choice)
+                    }
+                }
+                .disabled(!supportsAlternateIcons)
+            } header: {
+                Text("App Icon")
+            } footer: {
+                Text("Home Screen updates right away. On iOS 18, Notification Center may keep the previous glyph until a device restart — that is an iOS cache limitation, not something LifeOS can force.")
+            }
+
+            Section {
+                Picker("Default View", selection: defaultModeBinding) {
+                    ForEach(CalendarViewMode.allCases) { mode in
+                        Text(mode.title).tag(mode)
+                    }
+                }
+            } header: {
+                Text("Calendar")
+            } footer: {
+                Text("LifeOS opens the Calendar tab in this view when you launch the app.")
+            }
+
             Section {
                 Button {
                     showingExport = true
@@ -57,7 +133,7 @@ struct SettingsView: View {
 
             Section("About") {
                 LabeledContent("App", value: "LifeOS")
-                LabeledContent("Version", value: "0.2")
+                LabeledContent("Version", value: "0.3")
             }
         }
         .navigationTitle("Settings")
@@ -87,6 +163,27 @@ struct SettingsView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("All \(entries.count) entries will be removed. You can add your own data afterward.")
+        }
+        .onAppear {
+            guard !didLoadCurrentIcon else { return }
+            selectedIconChoice = AppIconChoice.from(alternateIconName: UIApplication.shared.alternateIconName)
+            didLoadCurrentIcon = true
+        }
+        .onChange(of: selectedIconChoice) { _, newValue in
+            guard didLoadCurrentIcon, supportsAlternateIcons else { return }
+
+            UIApplication.shared.setAlternateIconName(newValue.alternateIconName) { error in
+                if let error {
+                    print("Alternate icon change failed: \(error)")
+                    return
+                }
+                Task {
+                    // Drop already-delivered banners that may still show the previous glyph
+                    // (iOS 18.1+ often caches notification icons separately from Home Screen).
+                    await NotificationPlanner.clearDeliveredNotifications()
+                    await NotificationPlanner.rescheduleManagedNotificationsForIconUpdate(entries: entries)
+                }
+            }
         }
     }
 

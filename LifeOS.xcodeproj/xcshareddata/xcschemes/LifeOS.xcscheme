@@ -35,6 +35,20 @@
                ReferencedContainer = "container:LifeOS.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "F416C705B05A08F9488EEA6E"
+               BuildableName = "LifeOSUITests.xctest"
+               BlueprintName = "LifeOSUITests"
+               ReferencedContainer = "container:LifeOS.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -61,6 +75,17 @@
                BlueprintIdentifier = "B6DC0030DCD7D810745068F6"
                BuildableName = "LifeOSTests.xctest"
                BlueprintName = "LifeOSTests"
+               ReferencedContainer = "container:LifeOS.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "F416C705B05A08F9488EEA6E"
+               BuildableName = "LifeOSUITests.xctest"
+               BlueprintName = "LifeOSUITests"
                ReferencedContainer = "container:LifeOS.xcodeproj">
             </BuildableReference>
          </TestableReference>

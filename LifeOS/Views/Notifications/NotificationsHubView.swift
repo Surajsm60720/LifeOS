@@ -134,7 +134,9 @@ struct NotificationsHubView: View {
             Button("Send Test in 5s") {
                 Task {
                     let ok = await NotificationPlanner.shared.scheduleTestNotification(after: 5)
-                    testStatus = ok ? "Test scheduled — leave the app or stay; banner should appear." : "Could not schedule test. Check permission."
+                    testStatus = ok
+                        ? "Test scheduled. Home Screen icon is current; if the banner glyph still looks old, restart the device once (known iOS 18 Notification Center cache issue)."
+                        : "Could not schedule test. Check permission."
                     await refreshStatus()
                 }
             }

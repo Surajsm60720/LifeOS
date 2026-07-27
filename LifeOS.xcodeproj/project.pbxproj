@@ -32,6 +32,7 @@
 		67B5E1E9BC252F9CB1DA7A28 /* PlaceSearchSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C460C4A8C45B9037D4936DB5 /* PlaceSearchSheet.swift */; };
 		6C60E17D94441268FA67ABA8 /* RecurrenceEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 148659ED96FA271DF673B091 /* RecurrenceEditorView.swift */; };
 		718DF278660A174E82C0210B /* LifeOSTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49CF777C21B2F0AAA0C349C5 /* LifeOSTheme.swift */; };
+		735D39A2E7904B030BFCBD1F /* NotificationIconUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A865737AE4A167BE8B9D69E1 /* NotificationIconUITests.swift */; };
 		74B07FC02CD6CF9EB41EE6A4 /* EntryCapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73EB0B26DD9A342BE1E3BDE7 /* EntryCapabilityTests.swift */; };
 		7B53B8B42D96EBC34D0780EF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37B4F56F34701BF54A19E9AD /* Assets.xcassets */; };
 		7FFD87FF676BD7A54EEBCA90 /* RecurrenceRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A1B928773E39C1A38AE8588 /* RecurrenceRule.swift */; };
@@ -58,6 +59,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		38D33F6D654E0B15060B93FE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 98645262B9197BD6057E1C1C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AD5DB9344CDCD6867ABB9D4E;
+			remoteInfo = LifeOS;
+		};
 		D5E8EA36E919372C49B2A420 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 98645262B9197BD6057E1C1C /* Project object */;
@@ -104,7 +112,9 @@
 		A174492506A456C88F0CF5F9 /* GameIdentity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameIdentity.swift; sourceTree = "<group>"; };
 		A270817C108490A6FFB5D04A /* Entry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Entry.swift; sourceTree = "<group>"; };
 		A5A21B9B225AAACBE2FC5E37 /* RecapExportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecapExportView.swift; sourceTree = "<group>"; };
+		A6A2AF638A2E362709559D07 /* LifeOSUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LifeOSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7B67B4E5EECE53252F9B882 /* LifeOSTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LifeOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A865737AE4A167BE8B9D69E1 /* NotificationIconUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationIconUITests.swift; sourceTree = "<group>"; };
 		ACD7716889526753148DEAC7 /* CalendarFilterState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarFilterState.swift; sourceTree = "<group>"; };
 		B699ECB2C7C6CA70EC1985A8 /* YearCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearCalendarView.swift; sourceTree = "<group>"; };
 		B97297AD78FF5ADABAE2C37D /* EntryDeleteModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryDeleteModifier.swift; sourceTree = "<group>"; };
@@ -140,6 +150,14 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		332AB764C9075AFD23E06787 /* LifeOSUITests */ = {
+			isa = PBXGroup;
+			children = (
+				A865737AE4A167BE8B9D69E1 /* NotificationIconUITests.swift */,
+			);
+			path = LifeOSUITests;
+			sourceTree = "<group>";
+		};
 		58CC69282F0DA56E238CC737 /* LifeOSTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -156,6 +174,7 @@
 			children = (
 				E865D330E9C7C91599A676D7 /* LifeOS.app */,
 				A7B67B4E5EECE53252F9B882 /* LifeOSTests.xctest */,
+				A6A2AF638A2E362709559D07 /* LifeOSUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -261,6 +280,7 @@
 			children = (
 				B89422FB6DE20924CDA8C2E2 /* LifeOS */,
 				58CC69282F0DA56E238CC737 /* LifeOSTests */,
+				332AB764C9075AFD23E06787 /* LifeOSUITests */,
 				6BBD885734BE07D038423D8A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -330,6 +350,24 @@
 			productReference = A7B67B4E5EECE53252F9B882 /* LifeOSTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		F416C705B05A08F9488EEA6E /* LifeOSUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7777C3D2EB57491FCF37B9E3 /* Build configuration list for PBXNativeTarget "LifeOSUITests" */;
+			buildPhases = (
+				542B98C9E5988AB7949EDBB6 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D4ABE35C26F756972E481D7D /* PBXTargetDependency */,
+			);
+			name = LifeOSUITests;
+			packageProductDependencies = (
+			);
+			productName = LifeOSUITests;
+			productReference = A6A2AF638A2E362709559D07 /* LifeOSUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -341,6 +379,9 @@
 				TargetAttributes = {
 					AD5DB9344CDCD6867ABB9D4E = {
 						ProvisioningStyle = Automatic;
+					};
+					F416C705B05A08F9488EEA6E = {
+						TestTargetID = AD5DB9344CDCD6867ABB9D4E;
 					};
 				};
 			};
@@ -359,6 +400,7 @@
 			targets = (
 				AD5DB9344CDCD6867ABB9D4E /* LifeOS */,
 				B6DC0030DCD7D810745068F6 /* LifeOSTests */,
+				F416C705B05A08F9488EEA6E /* LifeOSUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -375,6 +417,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		542B98C9E5988AB7949EDBB6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				735D39A2E7904B030BFCBD1F /* NotificationIconUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D03757CBEFA78CB7E3BD7900 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -444,6 +494,11 @@
 			target = AD5DB9344CDCD6867ABB9D4E /* LifeOS */;
 			targetProxy = D5E8EA36E919372C49B2A420 /* PBXContainerItemProxy */;
 		};
+		D4ABE35C26F756972E481D7D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AD5DB9344CDCD6867ABB9D4E /* LifeOS */;
+			targetProxy = 38D33F6D654E0B15060B93FE /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
@@ -452,6 +507,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -468,13 +524,47 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.2;
+				MARKETING_VERSION = 0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
+		};
+		1C12A4BCB387BC2EA8D90AA6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = LifeOS;
+			};
+			name = Debug;
+		};
+		1E58ACE8B2567627272DAC35 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = LifeOS;
+			};
+			name = Release;
 		};
 		64FE656AAB2D633C7DA1C24C /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -619,6 +709,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -635,7 +726,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.2;
+				MARKETING_VERSION = 0.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -677,6 +768,15 @@
 			buildConfigurations = (
 				D82250F72DA7A5A6BB14E9FF /* Debug */,
 				C61B578950EC2ABCE012D94B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		7777C3D2EB57491FCF37B9E3 /* Build configuration list for PBXNativeTarget "LifeOSUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1C12A4BCB387BC2EA8D90AA6 /* Debug */,
+				1E58ACE8B2567627272DAC35 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

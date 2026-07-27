@@ -28,10 +28,11 @@ targets:
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         GENERATE_INFOPLIST_FILE: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: YES
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         SWIFT_EMIT_LOC_STRINGS: YES
         CURRENT_PROJECT_VERSION: 1
-        MARKETING_VERSION: "0.2"
+        MARKETING_VERSION: "0.3"
         DEVELOPMENT_TEAM: ""
         CODE_SIGN_STYLE: Automatic
         ENABLE_PREVIEWS: YES
@@ -53,14 +54,28 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/LifeOS.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LifeOS"
         BUNDLE_LOADER: "$(TEST_HOST)"
+  LifeOSUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: LifeOSUITests
+    dependencies:
+      - target: LifeOS
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.surajmenon.lifeos.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: LifeOS
 schemes:
   LifeOS:
     build:
       targets:
         LifeOS: all
         LifeOSTests: [test]
+        LifeOSUITests: [test]
     test:
       targets:
         - LifeOSTests
+        - LifeOSUITests
     run:
       config: Debug
