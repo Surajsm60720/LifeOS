@@ -10,12 +10,16 @@
 		00EDD9275011A8E003DC3C69 /* EntryCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D4AFE259B3579BE2DF1CA74 /* EntryCompletion.swift */; };
 		030C829A7A92427C1F0B8387 /* EntryTemplatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5780184484E563F48426715B /* EntryTemplatesView.swift */; };
 		09E8DC891CEE3799DF6A8685 /* EntryRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12D2D2C436742AE4BCEACE37 /* EntryRowView.swift */; };
+		0B8ED4457DA746EC85E1CD9D /* LifeOSSharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2855A78ACD7386FB777CB2D7 /* LifeOSSharedStore.swift */; };
 		0D5A4B098FE6D1E29886B603 /* NotificationPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFABDE036EFB7C1C882E3262 /* NotificationPlanner.swift */; };
 		1161FEA66E88F1D1158037B8 /* NotificationPreset.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1922ABC9D8812D858744722 /* NotificationPreset.swift */; };
 		164CA5F30B29051738460D76 /* CategoryColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17940F7D9B9485F0F20B6DF /* CategoryColors.swift */; };
+		191514C4806D8C9402BCE7D0 /* RecurrenceRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A1B928773E39C1A38AE8588 /* RecurrenceRule.swift */; };
 		1C074F9A18BC7007695AAF87 /* YearCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B699ECB2C7C6CA70EC1985A8 /* YearCalendarView.swift */; };
+		1C16C8F16181578E4ACAAEBB /* LiveActivityScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C0F3969CB5CA84CCF10EF /* LiveActivityScope.swift */; };
 		1FEB25DE5FA1C18B85976CF9 /* DayCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77FA985FFB5285651B6D093F /* DayCalendarView.swift */; };
 		2056E099A4D8F71808551C89 /* EntryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D0D1C2BC50D670C5226278 /* EntryDetailView.swift */; };
+		21FEE31651037961ABDF8962 /* LifeOSLiveActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A4A88769FEC111F67BC5F1 /* LifeOSLiveActivityAttributes.swift */; };
 		24462DE6FB5141342D0F5D0C /* CalendarFilterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD7716889526753148DEAC7 /* CalendarFilterState.swift */; };
 		2B75E741C54A9553531491D0 /* LifeOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B41F187BAFD79954082EDBD /* LifeOSApp.swift */; };
 		2BFB06466988F02933575B4C /* WeekCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FFF8D5BDEC2B8015A014DD /* WeekCalendarView.swift */; };
@@ -23,8 +27,17 @@
 		32ACB89FCB3A54EE0110DAC9 /* ExpenseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8850455795888D8A4365D053 /* ExpenseModels.swift */; };
 		33BD0BC4E4D61BA25D0B3071 /* RecapExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033148D5E32473FC5708FFD5 /* RecapExporter.swift */; };
 		34D9EB4510B9BC92D0CD6610 /* RecurrenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0D8D8EAC4881BDDE8AA0BD /* RecurrenceEngine.swift */; };
+		3575ECC8F6C6D7992C1B7C03 /* SetLiveActivityScopeIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5E35F7EAE92FFC8340A6F7 /* SetLiveActivityScopeIntent.swift */; };
+		425C4CFC722C995808AEB806 /* LifeOSLiveActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A4A88769FEC111F67BC5F1 /* LifeOSLiveActivityAttributes.swift */; };
 		4324A24D6A8F738AE45B239E /* CalendarFilterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DFD7FCCAD12A7801DFBD696 /* CalendarFilterBar.swift */; };
+		45B7B3777830B128283F400F /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E37250F6712EFCC59150AE /* LiveActivityManager.swift */; };
+		498C1780863FE6D81841C1B7 /* RecurrenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0D8D8EAC4881BDDE8AA0BD /* RecurrenceEngine.swift */; };
+		515CB8E23B2815237E911BC2 /* LifeOSLiveActivityWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 63EB69C179C5446E0ECACAF3 /* LifeOSLiveActivityWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		569202E9ED4991AB9E3947BF /* LifeOSTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49CF777C21B2F0AAA0C349C5 /* LifeOSTheme.swift */; };
 		57C7E10B14025587243DFF75 /* LifeOSNotificationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51216926CD8B2FE7DA6B2700 /* LifeOSNotificationDelegate.swift */; };
+		5BFFC7ECFBDD534244701C27 /* LifeOSSharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2855A78ACD7386FB777CB2D7 /* LifeOSSharedStore.swift */; };
+		5C0E73AB9A9615055CD39E88 /* SetLiveActivityScopeIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5E35F7EAE92FFC8340A6F7 /* SetLiveActivityScopeIntent.swift */; };
+		5E7F041F5411517CAAF6883D /* CategoryColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17940F7D9B9485F0F20B6DF /* CategoryColors.swift */; };
 		5F65E79A8BBF60EA768BF2F9 /* MonthCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B86071F98096A57E9DFEEB5 /* MonthCalendarView.swift */; };
 		6045343D15C51552040B405C /* EntryFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112E55BA567B0F9AF4F84870 /* EntryFormView.swift */; };
 		6426E3E48A61E51D45EF1001 /* EntryTemplates.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9203422281A0C49F000459F6 /* EntryTemplates.swift */; };
@@ -37,28 +50,48 @@
 		7B53B8B42D96EBC34D0780EF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37B4F56F34701BF54A19E9AD /* Assets.xcassets */; };
 		7FFD87FF676BD7A54EEBCA90 /* RecurrenceRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A1B928773E39C1A38AE8588 /* RecurrenceRule.swift */; };
 		821570C425015FD462CB472D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35DAE3032AE0E83EE7877E79 /* ContentView.swift */; };
+		8E5CB7C2864D3A7BCD299541 /* EntryCompletion.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D4AFE259B3579BE2DF1CA74 /* EntryCompletion.swift */; };
+		8FF584D013529D78164FD360 /* ExpenseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8850455795888D8A4365D053 /* ExpenseModels.swift */; };
 		915C71D7054A80BB17848FAA /* EntryLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F8F4319605D673AA3736CF9 /* EntryLibraryView.swift */; };
+		969B2C86BFAB6F2E62872BC9 /* LiveActivityModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A8CE5C33EBBE71B27EE864C /* LiveActivityModels.swift */; };
 		98B18D162D72D9730DD66433 /* EntryProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F53D73630EB13B11DAE3BF1 /* EntryProgress.swift */; };
 		9A30CD52062529B79B084E43 /* GameIdentity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A174492506A456C88F0CF5F9 /* GameIdentity.swift */; };
 		9C4F9719FB552C7B276A2AB5 /* LocationEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B728ECA39DCA23F15C8AD0 /* LocationEntry.swift */; };
+		A25FE3E7E10B92B47A3F08FB /* LocationEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0B728ECA39DCA23F15C8AD0 /* LocationEntry.swift */; };
 		A5F7B1A14791E9A3936216AC /* EntryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64B7261B8D62DBF3E403F711 /* EntryStore.swift */; };
 		A7354B113F116422480DC16C /* RecapExporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4E97E83DA782ADB8C62777 /* RecapExporterTests.swift */; };
 		A7A187A995EE533516D84DCA /* NotificationRuleEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D26AD0186BE55701186C79 /* NotificationRuleEditor.swift */; };
+		A7C3EB88203F1E8F7A055F06 /* NotificationRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD11AB3DAD814570410AB48D /* NotificationRule.swift */; };
 		AA75135F11EDF3293A290BAA /* NotificationPlannerLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53165DB57257DDAFBE960DC /* NotificationPlannerLogicTests.swift */; };
 		AE84670EA551FDDF73976045 /* RecurrenceEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28F766EF19BF9EED6C4898BC /* RecurrenceEngineTests.swift */; };
 		AF8F74B3EE6E7EAA5E23AD09 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9886A546B818C51CF32A74 /* SettingsView.swift */; };
 		B0DF2EADB78712CD52E1A6CA /* EntryCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058EF6D364266DBE592F6B37 /* EntryCategory.swift */; };
+		B2BDDEE2ECBB5A7CC4D32D7E /* LiveActivityModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A8CE5C33EBBE71B27EE864C /* LiveActivityModels.swift */; };
 		B584E0AF657C543A08E21CA2 /* CalendarRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 190E11EDAA6404EE8FA89ED0 /* CalendarRootView.swift */; };
 		B5973E7963FB76712D39D9D3 /* DateFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71A82A890B38CAEC50446231 /* DateFormatting.swift */; };
+		BA231FC2F0E8848CEA802445 /* EntryProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F53D73630EB13B11DAE3BF1 /* EntryProgress.swift */; };
+		BB282ABA3C588FD866BF15D8 /* Entry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A270817C108490A6FFB5D04A /* Entry.swift */; };
 		BC3723CCC2CA1BD309D0520A /* EntryDeleteModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97297AD78FF5ADABAE2C37D /* EntryDeleteModifier.swift */; };
+		CAA7FB93866E141F4CE81DF2 /* EntryCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058EF6D364266DBE592F6B37 /* EntryCategory.swift */; };
+		CF40B4BCEB37F288AA5D0109 /* LifeOSLiveActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7797977488E566C82B3C53FD /* LifeOSLiveActivityWidget.swift */; };
 		CF4D87046969E476CC008DE5 /* TodayInboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11A96F8DDBD0A30705FF2B4 /* TodayInboxView.swift */; };
 		D224721F6AA8AE076501A027 /* RecapExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A21B9B225AAACBE2FC5E37 /* RecapExportView.swift */; };
+		D31C0B49A5F0C669E5185FC7 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E37250F6712EFCC59150AE /* LiveActivityManager.swift */; };
 		D65C6735B3676CD30D0A42CB /* NotificationRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD11AB3DAD814570410AB48D /* NotificationRule.swift */; };
+		DAE55D55C6DC3113E24E400B /* LiveActivityScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C0F3969CB5CA84CCF10EF /* LiveActivityScope.swift */; };
 		DCBA4449F26562E0D2B72A42 /* Entry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A270817C108490A6FFB5D04A /* Entry.swift */; };
 		E55E853D78110C75393F30E8 /* NotificationRuleFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CF326F1D71A8DB9F35265A /* NotificationRuleFormView.swift */; };
+		EBC9861EF558A24D86DBB706 /* DateFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71A82A890B38CAEC50446231 /* DateFormatting.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		18B5E6846C63B3F553F3EC27 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 98645262B9197BD6057E1C1C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9CF116BE7ED9BD6E1B799277;
+			remoteInfo = LifeOSLiveActivityWidget;
+		};
 		38D33F6D654E0B15060B93FE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 98645262B9197BD6057E1C1C /* Project object */;
@@ -75,6 +108,20 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		E5D4C75E3F96682C3C2D10AF /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				515CB8E23B2815237E911BC2 /* LifeOSLiveActivityWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		033148D5E32473FC5708FFD5 /* RecapExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecapExporter.swift; sourceTree = "<group>"; };
 		04CE830A9F4DCE6CEDFF8293 /* NotificationsHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsHubView.swift; sourceTree = "<group>"; };
@@ -87,7 +134,9 @@
 		190E11EDAA6404EE8FA89ED0 /* CalendarRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarRootView.swift; sourceTree = "<group>"; };
 		1B0D09A2C324DDD8331EA19D /* LifeOSDataMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeOSDataMigration.swift; sourceTree = "<group>"; };
 		1F8F4319605D673AA3736CF9 /* EntryLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryLibraryView.swift; sourceTree = "<group>"; };
+		2855A78ACD7386FB777CB2D7 /* LifeOSSharedStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeOSSharedStore.swift; sourceTree = "<group>"; };
 		28F766EF19BF9EED6C4898BC /* RecurrenceEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceEngineTests.swift; sourceTree = "<group>"; };
+		2A8CE5C33EBBE71B27EE864C /* LiveActivityModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityModels.swift; sourceTree = "<group>"; };
 		35DAE3032AE0E83EE7877E79 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		37B4F56F34701BF54A19E9AD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3F53D73630EB13B11DAE3BF1 /* EntryProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryProgress.swift; sourceTree = "<group>"; };
@@ -99,9 +148,11 @@
 		5780184484E563F48426715B /* EntryTemplatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryTemplatesView.swift; sourceTree = "<group>"; };
 		5D4AFE259B3579BE2DF1CA74 /* EntryCompletion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryCompletion.swift; sourceTree = "<group>"; };
 		5DFD7FCCAD12A7801DFBD696 /* CalendarFilterBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarFilterBar.swift; sourceTree = "<group>"; };
+		63EB69C179C5446E0ECACAF3 /* LifeOSLiveActivityWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LifeOSLiveActivityWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		64B7261B8D62DBF3E403F711 /* EntryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryStore.swift; sourceTree = "<group>"; };
 		71A82A890B38CAEC50446231 /* DateFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatting.swift; sourceTree = "<group>"; };
 		73EB0B26DD9A342BE1E3BDE7 /* EntryCapabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryCapabilityTests.swift; sourceTree = "<group>"; };
+		7797977488E566C82B3C53FD /* LifeOSLiveActivityWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeOSLiveActivityWidget.swift; sourceTree = "<group>"; };
 		77FA985FFB5285651B6D093F /* DayCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayCalendarView.swift; sourceTree = "<group>"; };
 		7A4E97E83DA782ADB8C62777 /* RecapExporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecapExporterTests.swift; sourceTree = "<group>"; };
 		8850455795888D8A4365D053 /* ExpenseModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseModels.swift; sourceTree = "<group>"; };
@@ -116,18 +167,23 @@
 		A7B67B4E5EECE53252F9B882 /* LifeOSTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LifeOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A865737AE4A167BE8B9D69E1 /* NotificationIconUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationIconUITests.swift; sourceTree = "<group>"; };
 		ACD7716889526753148DEAC7 /* CalendarFilterState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarFilterState.swift; sourceTree = "<group>"; };
+		B5AC025B82C113A324B16A4C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B699ECB2C7C6CA70EC1985A8 /* YearCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearCalendarView.swift; sourceTree = "<group>"; };
 		B97297AD78FF5ADABAE2C37D /* EntryDeleteModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryDeleteModifier.swift; sourceTree = "<group>"; };
 		C11A96F8DDBD0A30705FF2B4 /* TodayInboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInboxView.swift; sourceTree = "<group>"; };
 		C460C4A8C45B9037D4936DB5 /* PlaceSearchSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceSearchSheet.swift; sourceTree = "<group>"; };
 		C8D26AD0186BE55701186C79 /* NotificationRuleEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRuleEditor.swift; sourceTree = "<group>"; };
+		CF5E35F7EAE92FFC8340A6F7 /* SetLiveActivityScopeIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetLiveActivityScopeIntent.swift; sourceTree = "<group>"; };
 		D17940F7D9B9485F0F20B6DF /* CategoryColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryColors.swift; sourceTree = "<group>"; };
 		D1922ABC9D8812D858744722 /* NotificationPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPreset.swift; sourceTree = "<group>"; };
 		DE9886A546B818C51CF32A74 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		DE9C0F3969CB5CA84CCF10EF /* LiveActivityScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityScope.swift; sourceTree = "<group>"; };
 		E0B728ECA39DCA23F15C8AD0 /* LocationEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationEntry.swift; sourceTree = "<group>"; };
 		E865D330E9C7C91599A676D7 /* LifeOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LifeOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E9E37250F6712EFCC59150AE /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
 		EFABDE036EFB7C1C882E3262 /* NotificationPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPlanner.swift; sourceTree = "<group>"; };
 		F53165DB57257DDAFBE960DC /* NotificationPlannerLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPlannerLogicTests.swift; sourceTree = "<group>"; };
+		F6A4A88769FEC111F67BC5F1 /* LifeOSLiveActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeOSLiveActivityAttributes.swift; sourceTree = "<group>"; };
 		FD11AB3DAD814570410AB48D /* NotificationRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRule.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -158,6 +214,15 @@
 			path = LifeOSUITests;
 			sourceTree = "<group>";
 		};
+		58C538FBBFAABC764A686B84 /* LiveActivityWidget */ = {
+			isa = PBXGroup;
+			children = (
+				B5AC025B82C113A324B16A4C /* Info.plist */,
+				7797977488E566C82B3C53FD /* LifeOSLiveActivityWidget.swift */,
+			);
+			path = LiveActivityWidget;
+			sourceTree = "<group>";
+		};
 		58CC69282F0DA56E238CC737 /* LifeOSTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -169,10 +234,24 @@
 			path = LifeOSTests;
 			sourceTree = "<group>";
 		};
+		5ADD58DF3E716E6BEFE19584 /* LiveActivity */ = {
+			isa = PBXGroup;
+			children = (
+				F6A4A88769FEC111F67BC5F1 /* LifeOSLiveActivityAttributes.swift */,
+				2855A78ACD7386FB777CB2D7 /* LifeOSSharedStore.swift */,
+				E9E37250F6712EFCC59150AE /* LiveActivityManager.swift */,
+				2A8CE5C33EBBE71B27EE864C /* LiveActivityModels.swift */,
+				DE9C0F3969CB5CA84CCF10EF /* LiveActivityScope.swift */,
+				CF5E35F7EAE92FFC8340A6F7 /* SetLiveActivityScopeIntent.swift */,
+			);
+			path = LiveActivity;
+			sourceTree = "<group>";
+		};
 		6BBD885734BE07D038423D8A /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				E865D330E9C7C91599A676D7 /* LifeOS.app */,
+				63EB69C179C5446E0ECACAF3 /* LifeOSLiveActivityWidget.appex */,
 				A7B67B4E5EECE53252F9B882 /* LifeOSTests.xctest */,
 				A6A2AF638A2E362709559D07 /* LifeOSUITests.xctest */,
 			);
@@ -228,6 +307,8 @@
 			children = (
 				52617622A597E2C13239A0DC /* Info.plist */,
 				2E0322BCBC8B9BACE4DA49E6 /* App */,
+				5ADD58DF3E716E6BEFE19584 /* LiveActivity */,
+				58C538FBBFAABC764A686B84 /* LiveActivityWidget */,
 				E13C984A8900053511997CBC /* Models */,
 				AE2ED6ED17A79A17538542FC /* Resources */,
 				9D144708726D0BEC82983359 /* Services */,
@@ -314,16 +395,35 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		9CF116BE7ED9BD6E1B799277 /* LifeOSLiveActivityWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 12052C35B0EAA26119542177 /* Build configuration list for PBXNativeTarget "LifeOSLiveActivityWidget" */;
+			buildPhases = (
+				2F930A3F095574D99EFF1F07 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LifeOSLiveActivityWidget;
+			packageProductDependencies = (
+			);
+			productName = LifeOSLiveActivityWidget;
+			productReference = 63EB69C179C5446E0ECACAF3 /* LifeOSLiveActivityWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		AD5DB9344CDCD6867ABB9D4E /* LifeOS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = CF739040176A16175E0B5AE2 /* Build configuration list for PBXNativeTarget "LifeOS" */;
 			buildPhases = (
 				FC4407E4CCF14240FD08AF3D /* Sources */,
 				A5B7CA9DF3738241124E2135 /* Resources */,
+				E5D4C75E3F96682C3C2D10AF /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				00F9F9B73DAC4B928F487682 /* PBXTargetDependency */,
 			);
 			name = LifeOS;
 			packageProductDependencies = (
@@ -377,6 +477,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
+					9CF116BE7ED9BD6E1B799277 = {
+						ProvisioningStyle = Automatic;
+					};
 					AD5DB9344CDCD6867ABB9D4E = {
 						ProvisioningStyle = Automatic;
 					};
@@ -399,6 +502,7 @@
 			projectRoot = "";
 			targets = (
 				AD5DB9344CDCD6867ABB9D4E /* LifeOS */,
+				9CF116BE7ED9BD6E1B799277 /* LifeOSLiveActivityWidget */,
 				B6DC0030DCD7D810745068F6 /* LifeOSTests */,
 				F416C705B05A08F9488EEA6E /* LifeOSUITests */,
 			);
@@ -417,6 +521,32 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		2F930A3F095574D99EFF1F07 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5E7F041F5411517CAAF6883D /* CategoryColors.swift in Sources */,
+				EBC9861EF558A24D86DBB706 /* DateFormatting.swift in Sources */,
+				BB282ABA3C588FD866BF15D8 /* Entry.swift in Sources */,
+				CAA7FB93866E141F4CE81DF2 /* EntryCategory.swift in Sources */,
+				8E5CB7C2864D3A7BCD299541 /* EntryCompletion.swift in Sources */,
+				BA231FC2F0E8848CEA802445 /* EntryProgress.swift in Sources */,
+				8FF584D013529D78164FD360 /* ExpenseModels.swift in Sources */,
+				425C4CFC722C995808AEB806 /* LifeOSLiveActivityAttributes.swift in Sources */,
+				CF40B4BCEB37F288AA5D0109 /* LifeOSLiveActivityWidget.swift in Sources */,
+				0B8ED4457DA746EC85E1CD9D /* LifeOSSharedStore.swift in Sources */,
+				569202E9ED4991AB9E3947BF /* LifeOSTheme.swift in Sources */,
+				D31C0B49A5F0C669E5185FC7 /* LiveActivityManager.swift in Sources */,
+				969B2C86BFAB6F2E62872BC9 /* LiveActivityModels.swift in Sources */,
+				1C16C8F16181578E4ACAAEBB /* LiveActivityScope.swift in Sources */,
+				A25FE3E7E10B92B47A3F08FB /* LocationEntry.swift in Sources */,
+				A7C3EB88203F1E8F7A055F06 /* NotificationRule.swift in Sources */,
+				498C1780863FE6D81841C1B7 /* RecurrenceEngine.swift in Sources */,
+				191514C4806D8C9402BCE7D0 /* RecurrenceRule.swift in Sources */,
+				5C0E73AB9A9615055CD39E88 /* SetLiveActivityScopeIntent.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		542B98C9E5988AB7949EDBB6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -463,8 +593,13 @@
 				9A30CD52062529B79B084E43 /* GameIdentity.swift in Sources */,
 				2B75E741C54A9553531491D0 /* LifeOSApp.swift in Sources */,
 				2C24D07F7D708D126B4E2DE6 /* LifeOSDataMigration.swift in Sources */,
+				21FEE31651037961ABDF8962 /* LifeOSLiveActivityAttributes.swift in Sources */,
 				57C7E10B14025587243DFF75 /* LifeOSNotificationDelegate.swift in Sources */,
+				5BFFC7ECFBDD534244701C27 /* LifeOSSharedStore.swift in Sources */,
 				718DF278660A174E82C0210B /* LifeOSTheme.swift in Sources */,
+				45B7B3777830B128283F400F /* LiveActivityManager.swift in Sources */,
+				B2BDDEE2ECBB5A7CC4D32D7E /* LiveActivityModels.swift in Sources */,
+				DAE55D55C6DC3113E24E400B /* LiveActivityScope.swift in Sources */,
 				9C4F9719FB552C7B276A2AB5 /* LocationEntry.swift in Sources */,
 				5F65E79A8BBF60EA768BF2F9 /* MonthCalendarView.swift in Sources */,
 				0D5A4B098FE6D1E29886B603 /* NotificationPlanner.swift in Sources */,
@@ -479,6 +614,7 @@
 				6C60E17D94441268FA67ABA8 /* RecurrenceEditorView.swift in Sources */,
 				34D9EB4510B9BC92D0CD6610 /* RecurrenceEngine.swift in Sources */,
 				7FFD87FF676BD7A54EEBCA90 /* RecurrenceRule.swift in Sources */,
+				3575ECC8F6C6D7992C1B7C03 /* SetLiveActivityScopeIntent.swift in Sources */,
 				AF8F74B3EE6E7EAA5E23AD09 /* SettingsView.swift in Sources */,
 				CF4D87046969E476CC008DE5 /* TodayInboxView.swift in Sources */,
 				2BFB06466988F02933575B4C /* WeekCalendarView.swift in Sources */,
@@ -489,6 +625,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		00F9F9B73DAC4B928F487682 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9CF116BE7ED9BD6E1B799277 /* LifeOSLiveActivityWidget */;
+			targetProxy = 18B5E6846C63B3F553F3EC27 /* PBXContainerItemProxy */;
+		};
 		CCEEA3F472B0DA6ACDEE6BB7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = AD5DB9344CDCD6867ABB9D4E /* LifeOS */;
@@ -524,8 +665,29 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.3;
+				MARKETING_VERSION = 0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		0B263D7433136DE4625BE6BB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DFNJK22KYY;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LifeOS/LiveActivityWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.4;
+				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos.liveactivity;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -563,6 +725,27 @@
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = LifeOS;
+			};
+			name = Release;
+		};
+		3D0B79706DA0E3687670C2E3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DFNJK22KYY;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LifeOS/LiveActivityWidget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 0.4;
+				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos.liveactivity;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -726,7 +909,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.3;
+				MARKETING_VERSION = 0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -754,6 +937,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		12052C35B0EAA26119542177 /* Build configuration list for PBXNativeTarget "LifeOSLiveActivityWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0B263D7433136DE4625BE6BB /* Debug */,
+				3D0B79706DA0E3687670C2E3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		247914A072CBD281CD338E5E /* Build configuration list for PBXNativeTarget "LifeOSTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

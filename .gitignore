@@ -9,6 +9,7 @@ xcuserdata/
 *.ipa
 *.dSYM.zip
 *.dSYM
+*.derivedData
 
 # macOS
 .DS_Store

@@ -18,6 +18,7 @@ targets:
       - path: LifeOS
         excludes:
           - "**/.DS_Store"
+          - "**/LiveActivityWidget/**"
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.surajmenon.lifeos
@@ -32,7 +33,7 @@ targets:
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         SWIFT_EMIT_LOC_STRINGS: YES
         CURRENT_PROJECT_VERSION: 1
-        MARKETING_VERSION: "0.3"
+        MARKETING_VERSION: "0.4"
         DEVELOPMENT_TEAM: ""
         CODE_SIGN_STYLE: Automatic
         ENABLE_PREVIEWS: YES
@@ -40,7 +41,10 @@ targets:
       path: LifeOS/Info.plist
       properties:
         UIApplicationSupportsIndirectInputEvents: true
+        NSSupportsLiveActivities: true
         NSLocationWhenInUseUsageDescription: LifeOS can look up place names for IRL events. Your live location is not required for search.
+    dependencies:
+      - target: LifeOSLiveActivityWidget
   LifeOSTests:
     type: bundle.unit-test
     platform: iOS
@@ -66,6 +70,42 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.surajmenon.lifeos.uitests
         GENERATE_INFOPLIST_FILE: YES
         TEST_TARGET_NAME: LifeOS
+  LifeOSLiveActivityWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: LifeOS/LiveActivity
+      - path: LifeOS/LiveActivityWidget
+      - path: LifeOS/Models
+      - path: LifeOS/Utilities
+        excludes:
+          - "**/CalendarFilterState.swift"
+          - "**/EntryDeleteModifier.swift"
+          - "**/GameIdentity.swift"
+          - "**/NotificationPreset.swift"
+      - path: LifeOS/Services
+        excludes:
+          - "**/EntryTemplates.swift"
+          - "**/EntryStore.swift"
+          - "**/NotificationPlanner.swift"
+          - "**/LifeOSDataMigration.swift"
+          - "**/RecapExporter.swift"
+          - "**/LifeOSNotificationDelegate.swift"
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.surajmenon.lifeos.liveactivity
+        TARGETED_DEVICE_FAMILY: "1,2"
+        GENERATE_INFOPLIST_FILE: NO
+        SWIFT_EMIT_LOC_STRINGS: YES
+        CURRENT_PROJECT_VERSION: 1
+        MARKETING_VERSION: "0.4"
+        CODE_SIGN_STYLE: Automatic
+    info:
+      path: LifeOS/LiveActivityWidget/Info.plist
+      properties:
+        CFBundleDisplayName: LifeOS Live Activity
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
 schemes:
   LifeOS:
     build:

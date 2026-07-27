@@ -42,6 +42,8 @@ struct SettingsView: View {
     @Query(sort: \Entry.startDate) private var entries: [Entry]
 
     @AppStorage(CalendarViewMode.defaultStorageKey) private var defaultModeRaw: String = CalendarViewMode.day.rawValue
+    @AppStorage(LiveActivityManager.enabledStorageKey) private var liveActivityEnabled: Bool = false
+    @AppStorage(LiveActivityManager.defaultScopeStorageKey) private var liveActivityScopeRaw: String = LiveActivityScope.day.rawValue
     @State private var showingExport = false
     @State private var showingTemplates = false
     @State private var showingLibrary = false
@@ -59,6 +61,13 @@ struct SettingsView: View {
         Binding(
             get: { CalendarViewMode(rawValue: defaultModeRaw) ?? .day },
             set: { defaultModeRaw = $0.rawValue }
+        )
+    }
+
+    private var liveActivityScopeBinding: Binding<LiveActivityScope> {
+        Binding(
+            get: { LiveActivityScope(rawValue: liveActivityScopeRaw) ?? .day },
+            set: { liveActivityScopeRaw = $0.rawValue }
         )
     }
 
@@ -87,6 +96,21 @@ struct SettingsView: View {
                 Text("Calendar")
             } footer: {
                 Text("LifeOS opens the Calendar tab in this view when you launch the app.")
+            }
+
+            Section {
+                Toggle("Live Activity (Dynamic Island)", isOn: $liveActivityEnabled)
+
+                Picker("Default Scope", selection: liveActivityScopeBinding) {
+                    ForEach(LiveActivityScope.allCases) { scope in
+                        Text(scope.title).tag(scope)
+                    }
+                }
+                .disabled(!liveActivityEnabled)
+            } header: {
+                Text("Dynamic Island")
+            } footer: {
+                Text("When enabled, LifeOS shows remaining to-dos for Day/Week/Month/Year directly on the Dynamic Island (system limits how long it stays visible).")
             }
 
             Section {
@@ -133,7 +157,7 @@ struct SettingsView: View {
 
             Section("About") {
                 LabeledContent("App", value: "LifeOS")
-                LabeledContent("Version", value: "0.3")
+                LabeledContent("Version", value: "0.4")
             }
         }
         .navigationTitle("Settings")
@@ -168,6 +192,8 @@ struct SettingsView: View {
             guard !didLoadCurrentIcon else { return }
             selectedIconChoice = AppIconChoice.from(alternateIconName: UIApplication.shared.alternateIconName)
             didLoadCurrentIcon = true
+
+            Task { await LiveActivityManager.syncActiveActivity(modelContext: modelContext) }
         }
         .onChange(of: selectedIconChoice) { _, newValue in
             guard didLoadCurrentIcon, supportsAlternateIcons else { return }
@@ -184,6 +210,13 @@ struct SettingsView: View {
                     await NotificationPlanner.rescheduleManagedNotificationsForIconUpdate(entries: entries)
                 }
             }
+        }
+        .onChange(of: liveActivityEnabled) { _, _ in
+            Task { await LiveActivityManager.syncActiveActivity(modelContext: modelContext) }
+        }
+        .onChange(of: liveActivityScopeRaw) { _, _ in
+            let scope = LiveActivityScope(rawValue: liveActivityScopeRaw) ?? .day
+            Task { await LiveActivityManager.syncActiveActivity(modelContext: modelContext, scopeOverride: scope) }
         }
     }
 

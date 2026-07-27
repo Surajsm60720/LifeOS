@@ -30,6 +30,9 @@ final class EntryStore: ObservableObject {
                 let entries = fetchAllEntries(modelContext: modelContext)
                 await NotificationPlanner.refreshPendingNotifications(entries: entries, force: true)
             }
+
+            // Keep the Dynamic Island snapshot in sync with completion changes.
+            await LiveActivityManager.syncActiveActivity(modelContext: modelContext)
         }
     }
 

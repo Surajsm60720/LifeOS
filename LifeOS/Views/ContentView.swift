@@ -64,11 +64,13 @@ struct ContentView: View {
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
                 refreshNotifications()
+                Task { await LiveActivityManager.syncActiveActivity(modelContext: modelContext) }
             }
         }
         .task {
             LifeOSDataMigration.runLaunchMigrations(modelContext: modelContext, entryStore: entryStore)
             refreshNotifications()
+            await LiveActivityManager.syncActiveActivity(modelContext: modelContext)
         }
     }
 

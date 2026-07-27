@@ -8,31 +8,12 @@ struct LifeOSApp: App {
         UNUserNotificationCenter.current().delegate = LifeOSNotificationDelegate.shared
     }
 
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Entry.self,
-            LocationEntry.self,
-            ExpenseLine.self,
-            ExpenseBalance.self,
-            RecurrenceRule.self,
-            NotificationRule.self,
-            EntryProgress.self,
-            EntryCompletion.self,
-        ])
-        let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-        do {
-            return try ModelContainer(for: schema, configurations: [configuration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
-
     var body: some Scene {
         WindowGroup {
             ContentView()
                 .preferredColorScheme(.dark)
         }
-        .modelContainer(sharedModelContainer)
+        .modelContainer(LifeOSSharedStore.container)
     }
 }
 

@@ -1,23 +1,24 @@
 # LifeOS
 
-**Version 0.3**
+**Version 0.4**
 
 A personal, calendar-centric iOS app for tracking day-to-day life, game events, and entertainment progress — locally, without accounts or third-party sync.
 
-LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and reading/watching logs into one entry model with recurrence, completion tracking, customizable local notifications, hangout expense ledgers, multi-stop locations, and Markdown recap export.
+LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and reading/watching logs into one entry model with recurrence, completion tracking, customizable local notifications, hangout expense ledgers, multi-stop locations, Markdown recap export, and a Dynamic Island Live Activity for remaining to-dos.
 
-> This is an early **v0.3** release. Core flows work; polish, sync, and deferred features (CloudKit, widgets, charts) are intentionally out of scope.
+> This is an early **v0.4** release. Core flows work; polish, sync, and deferred features (CloudKit, home-screen widgets, charts) are intentionally out of scope.
 
 ---
 
 ## Status
 
-| Area | v0.3 |
+| Area | v0.4 |
 |---|---|
 | Unified entry model (IRL / Games / Entertainment) | Included |
 | Day / Week / Month / Year calendar | Included |
 | Configurable default calendar view (Day default) | Included |
 | Alternate app icons (Default / Geometric / Minimal) + light/dark appearances | Included |
+| Live Activity / Dynamic Island (Day–Year remaining to-dos) | Included |
 | Recurrence + occurrence-level completion | Included |
 | Local notification rules + presets (64-cap aware) | Included |
 | Today inbox, search / filters, templates | Included |
@@ -34,6 +35,7 @@ LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and re
 - macOS with **Xcode** (iOS 18.0+ deployment target)
 - [XcodeGen](https://github.com/yonaskolb/XcodeGen) (to regenerate the project from `project.yml`)
 - An Apple ID for device signing (Simulator works without a paid membership)
+- A physical iPhone with Dynamic Island to try Live Activities end-to-end (Simulator support is limited)
 
 ---
 
@@ -44,6 +46,7 @@ LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and re
 | Language / UI | Swift · SwiftUI (dark theme) |
 | Persistence | SwiftData |
 | Notifications | UserNotifications |
+| Live Activities | ActivityKit · WidgetKit extension · App Intents |
 | Places | MapKit (`MKLocalSearch`) |
 | Recurrence | Custom `Calendar` / `DateComponents` engine |
 | Project generation | XcodeGen |
@@ -60,27 +63,29 @@ open LifeOS.xcodeproj
 
 1. Select the **LifeOS** scheme.
 2. Choose an **iOS Simulator** or a connected device.
-3. For a physical device: enable **Automatically manage signing** and select your Team.
+3. For a physical device: enable **Automatically manage signing** and select your Team (for both **LifeOS** and **LifeOSLiveActivityWidget**).
 4. Run (**⌘R**).
 
 Allow notification permission when prompted if you plan to use reminders.
 
 ---
 
-## What’s in v0.3
+## What’s in v0.4
 
-Everything from v0.2, plus:
+Everything from v0.3, plus:
 
-- **Default calendar view** — App opens on **Day** by default; Settings → Calendar lets you choose Day / Week / Month / Year as the launch view  
-- **App icons** — Three selectable styles in Settings → App Icon:
-  - **Default** — playful illustrated calendar  
-  - **Geometric** — modern geometric calendar  
-  - **Minimal** — simple line-art calendar  
-  Each icon includes light and dark appearance variants for Home Screen  
-- **Icon change + notifications** — Switching icons clears delivered banners and reschedules pending reminders. Home Screen updates immediately. On **iOS 18**, Notification Center may keep the previous glyph until a **device restart** (known system cache limitation)
+- **Live Activity (Dynamic Island)** — Optional in Settings → Dynamic Island. When enabled, LifeOS shows a compact remaining-count pulse on the Dynamic Island / Lock Screen  
+- **Expanded island container** — Hold the Live Activity to see:
+  - Day / Week / Month / Year scope buttons (switch **without opening the app**)  
+  - Up to **8** open completable items (`isCompletable && !isCompleted`)  
+  - Footer when more exist: `...N more for this day/week/month/year — open LifeOS`  
+- **Kept in sync** — Snapshot refreshes on enable/disable, default-scope change, completion toggles, app launch, and foreground  
 
 ### Still included from earlier releases
 
+- **Default calendar view** — App opens on **Day** by default; Settings → Calendar lets you choose Day / Week / Month / Year as the launch view  
+- **App icons** — Three selectable styles in Settings → App Icon (Default / Geometric / Minimal), each with light and dark Home Screen appearances  
+- **Icon change + notifications** — Switching icons clears delivered banners and reschedules pending reminders. On **iOS 18**, Notification Center may keep the previous glyph until a **device restart**  
 - **Calendar** — Day, Week, Month, Year with category-aware styling  
 - **Entries** — Unified model for IRL, games (GI / HSR / WuWa / Other), and entertainment  
 - **Recurrence** — Daily, weekly (weekday masks), monthly, every-N-months  
@@ -94,7 +99,7 @@ Everything from v0.2, plus:
 - **Entertainment** — Progress tracking, optional session targets, display-only recurrence, no notifications  
 - **Templates & duplicate** — Built-in starters from Settings; duplicate from detail  
 - **Export** — Date-range Markdown recap with spend, event-type, and progress stats  
-- **Settings** — App icon, default calendar view, export, templates, entry library, clear-all data  
+- **Settings** — App icon, default calendar view, Live Activity, export, templates, entry library, clear-all data  
 
 ---
 
@@ -111,30 +116,36 @@ Or in Xcode: **⌘U**.
 
 Unit coverage includes recurrence, entry capabilities (incl. expense split), notification logic helpers, and recap export formatting. UI tests include a notification-banner icon smoke check (`LifeOSUITests`).
 
+Live Activity UI and Dynamic Island scope switching should be verified manually on a real device.
+
 ---
 
 ## Project layout
 
 ```
 LifeOS/
-├── App/           App entry, SwiftData container
-├── Models/        Entry, locations, expenses, recurrence, notifications, progress
-├── Services/      Engine, planner, exporter, templates, migrations
-├── Views/         Calendar, entries, notifications, settings, export
-├── Utilities/     Theme, filters, date helpers
-└── Resources/     Assets (App Icons + AccentColor)
-LifeOSTests/       Unit tests
-LifeOSUITests/     UI tests
-project.yml        XcodeGen definition
+├── App/                 App entry, SwiftData container
+├── LiveActivity/        Shared ActivityKit models, manager, LiveActivityIntent
+├── LiveActivityWidget/  Dynamic Island / Lock Screen Live Activity UI (extension)
+├── Models/              Entry, locations, expenses, recurrence, notifications, progress
+├── Services/            Engine, planner, exporter, templates, migrations
+├── Views/               Calendar, entries, notifications, settings, export
+├── Utilities/           Theme, filters, date helpers
+└── Resources/           Assets (App Icons + AccentColor)
+LifeOSTests/             Unit tests
+LifeOSUITests/           UI tests
+project.yml              XcodeGen definition
 ```
 
 ---
 
-## Design notes (v0.3)
+## Design notes (v0.4)
 
 - Dark theme only in-app; neutral cool-gray accents  
 - App icons support system light/dark Home Screen appearances  
 - Local-only data — no backend, no account login  
+- Live Activities are time-limited by iOS; reopening/foregrounding LifeOS re-syncs the snapshot  
+- Dynamic Island interactivity is limited to App Intents (scope switching); deep lists still live in the app  
 - Entertainment logging is manual and notification-free by design  
 - Game event data is manual (no unofficial account scrapers)  
 - Expense tracking is hangout-scoped (no dedicated Expenses tab)
