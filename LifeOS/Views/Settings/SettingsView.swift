@@ -164,7 +164,7 @@ struct SettingsView: View {
 
             Section("About") {
                 LabeledContent("App", value: "LifeOS")
-                LabeledContent("Version", value: "0.5")
+                LabeledContent("Version", value: "0.6")
             }
         }
         .navigationTitle("Settings")

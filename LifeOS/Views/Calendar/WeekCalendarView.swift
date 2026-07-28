@@ -1,13 +1,27 @@
 import SwiftUI
 
-struct WeekCalendarView: View {
+struct WeekCalendarView<Leading: View>: View {
     let date: Date
     let entries: [Entry]
     @ObservedObject var entryStore: EntryStore
-    var embedded: Bool = false
+    @ViewBuilder var leading: () -> Leading
 
     @Environment(\.modelContext) private var modelContext
     @State private var selectedOccurrence: CalendarEntryOccurrence?
+    @State private var pendingDelete: CalendarEntryOccurrence?
+    @State private var notCompletableMessage: String?
+
+    init(
+        date: Date,
+        entries: [Entry],
+        entryStore: EntryStore,
+        @ViewBuilder leading: @escaping () -> Leading = { EmptyView() }
+    ) {
+        self.date = date
+        self.entries = entries
+        self.entryStore = entryStore
+        self.leading = leading
+    }
 
     private var weekInterval: DateInterval {
         DateFormatting.weekInterval(containing: date)
@@ -25,29 +39,63 @@ struct WeekCalendarView: View {
     }
 
     var body: some View {
-        Group {
-            if embedded {
-                contentStack
-            } else {
-                ScrollView { contentStack }
+        List {
+            Section {
+                leading()
+                    .listRowInsets(EdgeInsets(top: 8, leading: 20, bottom: 8, trailing: 20))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
             }
-        }
-        .sheet(item: $selectedOccurrence) { occurrence in
-            EntryDetailView(entry: occurrence.entry, occurrenceDate: occurrence.occurrenceDate)
-        }
-    }
 
-    private var contentStack: some View {
-        LazyVStack(alignment: .leading, spacing: 22) {
             ForEach(days, id: \.self) { day in
                 daySection(day)
             }
+
+            Section {
+                EmptyView()
+            } 
         }
-        .padding(.horizontal, 20)
-        .padding(.vertical, 12)
-        .padding(.bottom, embedded ? 0 : 24)
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .sheet(item: $selectedOccurrence) { occurrence in
+            EntryDetailView(entry: occurrence.entry, occurrenceDate: occurrence.occurrenceDate)
+        }
+        .confirmationDialog(
+            pendingDelete.map { "Delete “\($0.entry.title)”?" } ?? "Delete entry?",
+            isPresented: Binding(
+                get: { pendingDelete != nil },
+                set: { if !$0 { pendingDelete = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Delete Entry", role: .destructive) {
+                if let pendingDelete {
+                    entryStore.delete(entry: pendingDelete.entry, modelContext: modelContext)
+                }
+                pendingDelete = nil
+            }
+            Button("Cancel", role: .cancel) {
+                pendingDelete = nil
+            }
+        } message: {
+            Text("This removes the entry, its recurrence, completions, and notification rules.")
+        }
+        .alert(
+            "Can’t mark complete",
+            isPresented: Binding(
+                get: { notCompletableMessage != nil },
+                set: { if !$0 { notCompletableMessage = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) {
+                notCompletableMessage = nil
+            }
+        } message: {
+            Text(notCompletableMessage ?? "")
+        }
     }
 
+    @ViewBuilder
     private func daySection(_ day: Date) -> some View {
         let dayOccurrences = entryStore.occurrences(
             for: entries,
@@ -55,7 +103,41 @@ struct WeekCalendarView: View {
         )
         let isToday = Calendar.current.isDateInToday(day)
 
-        return VStack(alignment: .leading, spacing: 10) {
+        Section {
+            if dayOccurrences.isEmpty {
+                Text("Open")
+                    .font(.system(.caption, design: .rounded))
+                    .foregroundStyle(LifeOSTheme.softText.opacity(0.7))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+            } else {
+                ForEach(dayOccurrences) { occurrence in
+                    CalendarOccurrenceSwipeRow(
+                        occurrence: occurrence,
+                        isCompleted: occurrence.entry.isCompleted(on: occurrence.occurrenceDate),
+                        onOpen: { selectedOccurrence = occurrence },
+                        onToggleComplete: {
+                            entryStore.toggleCompletion(
+                                for: occurrence.entry,
+                                on: occurrence.occurrenceDate,
+                                modelContext: modelContext
+                            )
+                        },
+                        onNotCompletable: {
+                            notCompletableMessage =
+                                "“\(occurrence.entry.title)” isn’t marked completable, so it can’t be completed."
+                        },
+                        onRequestDelete: { pendingDelete = occurrence },
+                        onIncrementProgress: occurrence.entry.supportsProgress ? {
+                            entryStore.incrementProgress(for: occurrence.entry, modelContext: modelContext)
+                        } : nil
+                    )
+                    .listRowInsets(EdgeInsets(top: 5, leading: 20, bottom: 5, trailing: 20))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                }
+            }
+        } header: {
             HStack(alignment: .firstTextBaseline, spacing: 10) {
                 Text(DateFormatting.weekdayShort.string(from: day).uppercased())
                     .font(.system(.caption, design: .rounded, weight: .semibold))
@@ -81,37 +163,8 @@ struct WeekCalendarView: View {
                     .font(.system(.caption, design: .rounded, weight: .medium))
                     .foregroundStyle(LifeOSTheme.softText)
             }
-
-            if dayOccurrences.isEmpty {
-                Text("Open")
-                    .font(.system(.caption, design: .rounded))
-                    .foregroundStyle(LifeOSTheme.softText.opacity(0.7))
-                    .padding(.leading, 2)
-            } else {
-                ForEach(dayOccurrences) { occurrence in
-                    EntryRowView(
-                        occurrence: occurrence,
-                        isCompleted: occurrence.entry.isCompleted(on: occurrence.occurrenceDate),
-                        onToggleComplete: occurrence.entry.isCompletable ? {
-                            entryStore.toggleCompletion(
-                                for: occurrence.entry,
-                                on: occurrence.occurrenceDate,
-                                modelContext: modelContext
-                            )
-                        } : nil,
-                        onIncrementProgress: occurrence.entry.supportsProgress ? {
-                            entryStore.incrementProgress(for: occurrence.entry, modelContext: modelContext)
-                        } : nil
-                    )
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        selectedOccurrence = occurrence
-                    }
-                    .entryDeleteMenu(title: occurrence.entry.title) {
-                        entryStore.delete(entry: occurrence.entry, modelContext: modelContext)
-                    }
-                }
-            }
+            .textCase(nil)
+            .padding(.top, 4)
         }
     }
 }

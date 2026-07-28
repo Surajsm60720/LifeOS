@@ -16,6 +16,8 @@
 		164CA5F30B29051738460D76 /* CategoryColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17940F7D9B9485F0F20B6DF /* CategoryColors.swift */; };
 		191514C4806D8C9402BCE7D0 /* RecurrenceRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A1B928773E39C1A38AE8588 /* RecurrenceRule.swift */; };
 		1C074F9A18BC7007695AAF87 /* YearCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B699ECB2C7C6CA70EC1985A8 /* YearCalendarView.swift */; };
+		C8E10001A001B001C001E002 /* CalendarGridSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E10001A001B001C001E001 /* CalendarGridSupport.swift */; };
+		C8E10001A001B001C001F002 /* CalendarOccurrenceSwipeRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E10001A001B001C001F001 /* CalendarOccurrenceSwipeRow.swift */; };
 		1C16C8F16181578E4ACAAEBB /* LiveActivityScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C0F3969CB5CA84CCF10EF /* LiveActivityScope.swift */; };
 		1FEB25DE5FA1C18B85976CF9 /* DayCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77FA985FFB5285651B6D093F /* DayCalendarView.swift */; };
 		2056E099A4D8F71808551C89 /* EntryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D0D1C2BC50D670C5226278 /* EntryDetailView.swift */; };
@@ -139,6 +141,8 @@
 		04CE830A9F4DCE6CEDFF8293 /* NotificationsHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsHubView.swift; sourceTree = "<group>"; };
 		058EF6D364266DBE592F6B37 /* EntryCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryCategory.swift; sourceTree = "<group>"; };
 		0B86071F98096A57E9DFEEB5 /* MonthCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthCalendarView.swift; sourceTree = "<group>"; };
+		C8E10001A001B001C001E001 /* CalendarGridSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarGridSupport.swift; sourceTree = "<group>"; };
+		C8E10001A001B001C001F001 /* CalendarOccurrenceSwipeRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarOccurrenceSwipeRow.swift; sourceTree = "<group>"; };
 		112E55BA567B0F9AF4F84870 /* EntryFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryFormView.swift; sourceTree = "<group>"; };
 		12D2D2C436742AE4BCEACE37 /* EntryRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryRowView.swift; sourceTree = "<group>"; };
 		148659ED96FA271DF673B091 /* RecurrenceEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceEditorView.swift; sourceTree = "<group>"; };
@@ -388,6 +392,8 @@
 			isa = PBXGroup;
 			children = (
 				5DFD7FCCAD12A7801DFBD696 /* CalendarFilterBar.swift */,
+				C8E10001A001B001C001E001 /* CalendarGridSupport.swift */,
+				C8E10001A001B001C001F001 /* CalendarOccurrenceSwipeRow.swift */,
 				190E11EDAA6404EE8FA89ED0 /* CalendarRootView.swift */,
 				77FA985FFB5285651B6D093F /* DayCalendarView.swift */,
 				12D2D2C436742AE4BCEACE37 /* EntryRowView.swift */,
@@ -594,6 +600,8 @@
 				24462DE6FB5141342D0F5D0C /* CalendarFilterState.swift in Sources */,
 				B584E0AF657C543A08E21CA2 /* CalendarRootView.swift in Sources */,
 				164CA5F30B29051738460D76 /* CategoryColors.swift in Sources */,
+				C8E10001A001B001C001E002 /* CalendarGridSupport.swift in Sources */,
+				C8E10001A001B001C001F002 /* CalendarOccurrenceSwipeRow.swift in Sources */,
 				821570C425015FD462CB472D /* ContentView.swift in Sources */,
 				B5973E7963FB76712D39D9D3 /* DateFormatting.swift in Sources */,
 				1FEB25DE5FA1C18B85976CF9 /* DayCalendarView.swift in Sources */,
@@ -689,7 +697,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.5;
+				MARKETING_VERSION = 0.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -710,7 +718,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.5;
+				MARKETING_VERSION = 0.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos.liveactivity;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -765,7 +773,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.5;
+				MARKETING_VERSION = 0.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos.liveactivity;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -933,7 +941,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.5;
+				MARKETING_VERSION = 0.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;

@@ -86,8 +86,6 @@ struct NotificationsHubView: View {
                     }
                 } header: {
                     Text("Rules")
-                } footer: {
-                    Text("Swipe left to delete, swipe right to enable/disable. Tap a row to edit.")
                 }
             }
         }

@@ -1,13 +1,27 @@
 import SwiftUI
 
-struct DayCalendarView: View {
+struct DayCalendarView<Leading: View>: View {
     let date: Date
     let entries: [Entry]
     @ObservedObject var entryStore: EntryStore
-    var embedded: Bool = false
+    @ViewBuilder var leading: () -> Leading
 
     @Environment(\.modelContext) private var modelContext
     @State private var selectedOccurrence: CalendarEntryOccurrence?
+    @State private var pendingDelete: CalendarEntryOccurrence?
+    @State private var notCompletableMessage: String?
+
+    init(
+        date: Date,
+        entries: [Entry],
+        entryStore: EntryStore,
+        @ViewBuilder leading: @escaping () -> Leading = { EmptyView() }
+    ) {
+        self.date = date
+        self.entries = entries
+        self.entryStore = entryStore
+        self.leading = leading
+    }
 
     private var occurrences: [CalendarEntryOccurrence] {
         let interval = DateInterval(start: DateFormatting.startOfDay(date), duration: 86_400)
@@ -15,56 +29,92 @@ struct DayCalendarView: View {
     }
 
     var body: some View {
-        Group {
-            if embedded {
-                contentStack
-            } else {
-                ScrollView { contentStack }
+        List {
+            Section {
+                leading()
+                    .listRowInsets(EdgeInsets(top: 8, leading: 20, bottom: 8, trailing: 20))
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
             }
-        }
-        .sheet(item: $selectedOccurrence) { occurrence in
-            EntryDetailView(entry: occurrence.entry, occurrenceDate: occurrence.occurrenceDate)
-        }
-    }
 
-    private var contentStack: some View {
-        LazyVStack(spacing: 10) {
             if occurrences.isEmpty {
-                emptyState
-                    .padding(.top, embedded ? 12 : 48)
+                Section {
+                    emptyState
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
+                }
             } else {
-                ForEach(occurrences) { occurrence in
-                    row(for: occurrence)
-                        .padding(.horizontal, 20)
+                Section {
+                    ForEach(occurrences) { occurrence in
+                        row(for: occurrence)
+                            .listRowInsets(EdgeInsets(top: 5, leading: 20, bottom: 5, trailing: 20))
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                    }
                 }
             }
         }
-        .padding(.vertical, 8)
-        .padding(.bottom, embedded ? 0 : 24)
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .sheet(item: $selectedOccurrence) { occurrence in
+            EntryDetailView(entry: occurrence.entry, occurrenceDate: occurrence.occurrenceDate)
+        }
+        .confirmationDialog(
+            pendingDelete.map { "Delete “\($0.entry.title)”?" } ?? "Delete entry?",
+            isPresented: Binding(
+                get: { pendingDelete != nil },
+                set: { if !$0 { pendingDelete = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Delete Entry", role: .destructive) {
+                if let pendingDelete {
+                    entryStore.delete(entry: pendingDelete.entry, modelContext: modelContext)
+                }
+                pendingDelete = nil
+            }
+            Button("Cancel", role: .cancel) {
+                pendingDelete = nil
+            }
+        } message: {
+            Text("This removes the entry, its recurrence, completions, and notification rules.")
+        }
+        .alert(
+            "Can’t mark complete",
+            isPresented: Binding(
+                get: { notCompletableMessage != nil },
+                set: { if !$0 { notCompletableMessage = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) {
+                notCompletableMessage = nil
+            }
+        } message: {
+            Text(notCompletableMessage ?? "")
+        }
     }
 
     private func row(for occurrence: CalendarEntryOccurrence) -> some View {
-        EntryRowView(
+        CalendarOccurrenceSwipeRow(
             occurrence: occurrence,
             isCompleted: occurrence.entry.isCompleted(on: occurrence.occurrenceDate),
-            onToggleComplete: occurrence.entry.isCompletable ? {
+            onOpen: { selectedOccurrence = occurrence },
+            onToggleComplete: {
                 entryStore.toggleCompletion(
                     for: occurrence.entry,
                     on: occurrence.occurrenceDate,
                     modelContext: modelContext
                 )
-            } : nil,
+            },
+            onNotCompletable: {
+                notCompletableMessage =
+                    "“\(occurrence.entry.title)” isn’t marked completable, so it can’t be completed."
+            },
+            onRequestDelete: { pendingDelete = occurrence },
             onIncrementProgress: occurrence.entry.supportsProgress ? {
                 entryStore.incrementProgress(for: occurrence.entry, modelContext: modelContext)
             } : nil
         )
-        .contentShape(Rectangle())
-        .onTapGesture {
-            selectedOccurrence = occurrence
-        }
-        .entryDeleteMenu(title: occurrence.entry.title) {
-            entryStore.delete(entry: occurrence.entry, modelContext: modelContext)
-        }
     }
 
     private var emptyState: some View {

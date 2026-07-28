@@ -13,6 +13,8 @@ struct NotificationRuleFormView: View {
 
     let mode: NotificationRuleFormMode
     var preferredEntryID: UUID? = nil
+    /// Unsaved entry from New Entry form — included as an eligible target without inserting a default rule early.
+    var draftEntry: Entry? = nil
 
     @State private var selectedEntryID: UUID?
     @State private var triggerKind: NotificationTriggerKind = .ifNotCompletedBy
@@ -22,8 +24,12 @@ struct NotificationRuleFormView: View {
     @State private var isActive: Bool = true
 
     private var eligibleEntries: [Entry] {
-        entries.filter(\.supportsNotifications)
-            .sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+        var list = entries.filter(\.supportsNotifications)
+        if let draftEntry, draftEntry.supportsNotifications,
+           !list.contains(where: { $0.id == draftEntry.id }) {
+            list.append(draftEntry)
+        }
+        return list.sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
     }
 
     private var selectedEntry: Entry? {
@@ -64,7 +70,7 @@ struct NotificationRuleFormView: View {
                     } footer: {
                         Text(isEditing
                              ? "Rules stay attached to the entry they were created for."
-                             : "Only IRL and priority-game entries can receive notifications.")
+                             : "Only IRL and priority-game entries can receive notifications. You can use a preset or build a fully custom trigger.")
                     }
 
                     if !isEditing {
@@ -218,7 +224,11 @@ struct NotificationRuleFormView: View {
             )
             rule.entry = entry
             entry.notificationRules.append(rule)
-            modelContext.insert(rule)
+            // Only insert into the store when the entry is already persisted.
+            // Draft entries (New Entry form) keep the rule in-memory until the entry is saved.
+            if entry.modelContext != nil {
+                modelContext.insert(rule)
+            }
         case .edit(let existing):
             rule = existing
             rule.triggerKind = triggerKind
@@ -235,10 +245,11 @@ struct NotificationRuleFormView: View {
             rule.triggerDate = nil
         }
 
-        try? modelContext.save()
-
-        Task {
-            await NotificationPlanner.refreshPendingNotifications(entries: entries, force: true)
+        if entry.modelContext != nil {
+            try? modelContext.save()
+            Task {
+                await NotificationPlanner.refreshPendingNotifications(entries: entries, force: true)
+            }
         }
 
         dismiss()

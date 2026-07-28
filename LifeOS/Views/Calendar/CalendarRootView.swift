@@ -52,30 +52,26 @@ struct CalendarRootView: View {
         VStack(spacing: 0) {
             calendarChrome
 
-            ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    TodayInboxView(
-                        entries: filteredEntries,
-                        entryStore: entryStore,
-                        onOpenOccurrence: { selectedOccurrence = $0 },
-                        onJumpToToday: {
-                            withAnimation(.easeOut(duration: 0.25)) {
-                                anchorDate = .now
-                                mode = .day
-                            }
-                        }
-                    )
-                    .padding(.horizontal, 20)
-
-                    if showFilters {
-                        CalendarFilterBar(filters: filters)
-                            .padding(.horizontal, 20)
-                    }
-
-                    calendarBody
+            switch mode {
+            case .day:
+                DayCalendarView(date: anchorDate, entries: filteredEntries, entryStore: entryStore) {
+                    calendarListHeader
                 }
-                .padding(.top, 4)
-                .padding(.bottom, 28)
+            case .week:
+                WeekCalendarView(date: anchorDate, entries: filteredEntries, entryStore: entryStore) {
+                    calendarListHeader
+                }
+            case .month, .year:
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 14) {
+                        calendarListHeader
+                            .padding(.horizontal, 20)
+
+                        calendarBody
+                    }
+                    .padding(.top, 4)
+                    .padding(.bottom, 28)
+                }
             }
         }
         .background(LifeOSTheme.canvas.ignoresSafeArea())
@@ -86,9 +82,29 @@ struct CalendarRootView: View {
             applyStoredDefaultIfNeeded()
         }
         .onChange(of: defaultModeRaw) { _, newValue in
-            // Honor Settings changes while Calendar is already open.
             if let preferred = CalendarViewMode(rawValue: newValue), preferred != mode {
                 mode = preferred
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var calendarListHeader: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            TodayInboxView(
+                entries: filteredEntries,
+                entryStore: entryStore,
+                onOpenOccurrence: { selectedOccurrence = $0 },
+                onJumpToToday: {
+                    withAnimation(.easeOut(duration: 0.25)) {
+                        anchorDate = .now
+                        mode = .day
+                    }
+                }
+            )
+
+            if showFilters {
+                CalendarFilterBar(filters: filters)
             }
         }
     }
@@ -106,10 +122,8 @@ struct CalendarRootView: View {
     @ViewBuilder
     private var calendarBody: some View {
         switch mode {
-        case .day:
-            DayCalendarView(date: anchorDate, entries: filteredEntries, entryStore: entryStore, embedded: true)
-        case .week:
-            WeekCalendarView(date: anchorDate, entries: filteredEntries, entryStore: entryStore, embedded: true)
+        case .day, .week:
+            EmptyView()
         case .month:
             MonthCalendarView(
                 date: $anchorDate,
@@ -191,7 +205,11 @@ struct CalendarRootView: View {
             let count = entryStore.occurrences(for: filteredEntries, in: DateFormatting.monthInterval(containing: anchorDate)).count
             return "\(count) this month" + suffix
         case .year:
-            return "\(filteredEntries.count) entries tracked" + suffix
+            let count = entryStore.occurrences(
+                for: filteredEntries,
+                in: DateFormatting.yearInterval(containing: anchorDate)
+            ).count
+            return "\(count) across the year" + suffix
         }
     }
 

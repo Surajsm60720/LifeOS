@@ -110,7 +110,11 @@ struct EntryFormView: View {
                 }
             }
             .sheet(isPresented: $showingAddNotification) {
-                NotificationRuleFormView(mode: .create, preferredEntryID: entry.id)
+                NotificationRuleFormView(
+                    mode: .create,
+                    preferredEntryID: entry.id,
+                    draftEntry: entry
+                )
             }
             .sheet(item: $editingNotification) { rule in
                 NotificationRuleFormView(mode: .edit(rule))
@@ -476,16 +480,12 @@ struct EntryFormView: View {
             }
 
             Button("Add Notification Rule") {
-                if isEditing {
-                    showingAddNotification = true
-                } else {
-                    addNotificationRuleInline()
-                }
+                showingAddNotification = true
             }
         } header: {
             Text("Notifications")
         } footer: {
-            Text("Full create/edit lives in the Notifications tab. Rules added here before first save stay on this entry.")
+            Text("Opens the rule editor. Nothing is attached until you tap Save there — Cancel leaves this entry unchanged. Custom triggers and presets both work for new or existing events.")
         }
     }
 
@@ -633,20 +633,6 @@ struct EntryFormView: View {
                 entry.locations.remove(at: index)
             }
         }
-    }
-
-    private func addNotificationRuleInline() {
-        Task {
-            _ = await NotificationPlanner.shared.requestAuthorizationIfNeeded()
-        }
-        let rule = NotificationRule(
-            triggerKind: .ifNotCompletedBy,
-            triggerDate: Calendar.current.date(bySettingHour: 21, minute: 0, second: 0, of: .now),
-            messageTemplate: "Still open: {title}"
-        )
-        rule.entry = entry
-        entry.notificationRules.append(rule)
-        editingNotification = rule
     }
 
     private func save() {
