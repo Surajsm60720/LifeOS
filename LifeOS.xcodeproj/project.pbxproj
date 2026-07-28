@@ -75,6 +75,12 @@
 		CAA7FB93866E141F4CE81DF2 /* EntryCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 058EF6D364266DBE592F6B37 /* EntryCategory.swift */; };
 		CF40B4BCEB37F288AA5D0109 /* LifeOSLiveActivityWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7797977488E566C82B3C53FD /* LifeOSLiveActivityWidget.swift */; };
 		CF4D87046969E476CC008DE5 /* TodayInboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C11A96F8DDBD0A30705FF2B4 /* TodayInboxView.swift */; };
+		C8E10001A001B001C001D002 /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E10001A001B001C001D001 /* BackupService.swift */; };
+		C8E10001A001B001C001D004 /* ExpenseShareFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E10001A001B001C001D003 /* ExpenseShareFormatter.swift */; };
+		C8E10001A001B001C001D006 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E10001A001B001C001D005 /* ShareSheet.swift */; };
+		C8E10001A001B001C001D008 /* BackupRestoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E10001A001B001C001D007 /* BackupRestoreView.swift */; };
+		C8E10001A001B001C001D00A /* BackupServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E10001A001B001C001D009 /* BackupServiceTests.swift */; };
+		C8E10001A001B001C001D00C /* ExpenseShareFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E10001A001B001C001D00B /* ExpenseShareFormatterTests.swift */; };
 		D224721F6AA8AE076501A027 /* RecapExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A21B9B225AAACBE2FC5E37 /* RecapExportView.swift */; };
 		D31C0B49A5F0C669E5185FC7 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E37250F6712EFCC59150AE /* LiveActivityManager.swift */; };
 		D65C6735B3676CD30D0A42CB /* NotificationRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD11AB3DAD814570410AB48D /* NotificationRule.swift */; };
@@ -124,6 +130,12 @@
 
 /* Begin PBXFileReference section */
 		033148D5E32473FC5708FFD5 /* RecapExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecapExporter.swift; sourceTree = "<group>"; };
+		C8E10001A001B001C001D001 /* BackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupService.swift; sourceTree = "<group>"; };
+		C8E10001A001B001C001D003 /* ExpenseShareFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseShareFormatter.swift; sourceTree = "<group>"; };
+		C8E10001A001B001C001D005 /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
+		C8E10001A001B001C001D007 /* BackupRestoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupRestoreView.swift; sourceTree = "<group>"; };
+		C8E10001A001B001C001D009 /* BackupServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupServiceTests.swift; sourceTree = "<group>"; };
+		C8E10001A001B001C001D00B /* ExpenseShareFormatterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpenseShareFormatterTests.swift; sourceTree = "<group>"; };
 		04CE830A9F4DCE6CEDFF8293 /* NotificationsHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsHubView.swift; sourceTree = "<group>"; };
 		058EF6D364266DBE592F6B37 /* EntryCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryCategory.swift; sourceTree = "<group>"; };
 		0B86071F98096A57E9DFEEB5 /* MonthCalendarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonthCalendarView.swift; sourceTree = "<group>"; };
@@ -226,7 +238,9 @@
 		58CC69282F0DA56E238CC737 /* LifeOSTests */ = {
 			isa = PBXGroup;
 			children = (
+				C8E10001A001B001C001D009 /* BackupServiceTests.swift */,
 				73EB0B26DD9A342BE1E3BDE7 /* EntryCapabilityTests.swift */,
+				C8E10001A001B001C001D00B /* ExpenseShareFormatterTests.swift */,
 				F53165DB57257DDAFBE960DC /* NotificationPlannerLogicTests.swift */,
 				7A4E97E83DA782ADB8C62777 /* RecapExporterTests.swift */,
 				28F766EF19BF9EED6C4898BC /* RecurrenceEngineTests.swift */,
@@ -261,7 +275,9 @@
 		84ABD581B99A9AD7B5BE4531 /* Export */ = {
 			isa = PBXGroup;
 			children = (
+				C8E10001A001B001C001D007 /* BackupRestoreView.swift */,
 				A5A21B9B225AAACBE2FC5E37 /* RecapExportView.swift */,
+				C8E10001A001B001C001D005 /* ShareSheet.swift */,
 			);
 			path = Export;
 			sourceTree = "<group>";
@@ -283,8 +299,10 @@
 		9D144708726D0BEC82983359 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				C8E10001A001B001C001D001 /* BackupService.swift */,
 				64B7261B8D62DBF3E403F711 /* EntryStore.swift */,
 				9203422281A0C49F000459F6 /* EntryTemplates.swift */,
+				C8E10001A001B001C001D003 /* ExpenseShareFormatter.swift */,
 				1B0D09A2C324DDD8331EA19D /* LifeOSDataMigration.swift */,
 				51216926CD8B2FE7DA6B2700 /* LifeOSNotificationDelegate.swift */,
 				EFABDE036EFB7C1C882E3262 /* NotificationPlanner.swift */,
@@ -560,6 +578,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				74B07FC02CD6CF9EB41EE6A4 /* EntryCapabilityTests.swift in Sources */,
+				C8E10001A001B001C001D00A /* BackupServiceTests.swift in Sources */,
+				C8E10001A001B001C001D00C /* ExpenseShareFormatterTests.swift in Sources */,
 				AA75135F11EDF3293A290BAA /* NotificationPlannerLogicTests.swift in Sources */,
 				A7354B113F116422480DC16C /* RecapExporterTests.swift in Sources */,
 				AE84670EA551FDDF73976045 /* RecurrenceEngineTests.swift in Sources */,
@@ -589,7 +609,10 @@
 				A5F7B1A14791E9A3936216AC /* EntryStore.swift in Sources */,
 				6426E3E48A61E51D45EF1001 /* EntryTemplates.swift in Sources */,
 				030C829A7A92427C1F0B8387 /* EntryTemplatesView.swift in Sources */,
+				C8E10001A001B001C001D002 /* BackupService.swift in Sources */,
+				C8E10001A001B001C001D008 /* BackupRestoreView.swift in Sources */,
 				32ACB89FCB3A54EE0110DAC9 /* ExpenseModels.swift in Sources */,
+				C8E10001A001B001C001D004 /* ExpenseShareFormatter.swift in Sources */,
 				9A30CD52062529B79B084E43 /* GameIdentity.swift in Sources */,
 				2B75E741C54A9553531491D0 /* LifeOSApp.swift in Sources */,
 				2C24D07F7D708D126B4E2DE6 /* LifeOSDataMigration.swift in Sources */,
@@ -616,6 +639,7 @@
 				7FFD87FF676BD7A54EEBCA90 /* RecurrenceRule.swift in Sources */,
 				3575ECC8F6C6D7992C1B7C03 /* SetLiveActivityScopeIntent.swift in Sources */,
 				AF8F74B3EE6E7EAA5E23AD09 /* SettingsView.swift in Sources */,
+				C8E10001A001B001C001D006 /* ShareSheet.swift in Sources */,
 				CF4D87046969E476CC008DE5 /* TodayInboxView.swift in Sources */,
 				2BFB06466988F02933575B4C /* WeekCalendarView.swift in Sources */,
 				1C074F9A18BC7007695AAF87 /* YearCalendarView.swift in Sources */,
@@ -665,7 +689,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.4;
+				MARKETING_VERSION = 0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -686,7 +710,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.4;
+				MARKETING_VERSION = 0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos.liveactivity;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -741,7 +765,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.4;
+				MARKETING_VERSION = 0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos.liveactivity;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -909,7 +933,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.4;
+				MARKETING_VERSION = 0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;

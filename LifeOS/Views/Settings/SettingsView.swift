@@ -45,6 +45,7 @@ struct SettingsView: View {
     @AppStorage(LiveActivityManager.enabledStorageKey) private var liveActivityEnabled: Bool = false
     @AppStorage(LiveActivityManager.defaultScopeStorageKey) private var liveActivityScopeRaw: String = LiveActivityScope.day.rawValue
     @State private var showingExport = false
+    @State private var showingBackup = false
     @State private var showingTemplates = false
     @State private var showingLibrary = false
     @State private var confirmClearAll = false
@@ -121,6 +122,12 @@ struct SettingsView: View {
                 }
 
                 Button {
+                    showingBackup = true
+                } label: {
+                    Label("Backup & Restore", systemImage: "externaldrive")
+                }
+
+                Button {
                     showingTemplates = true
                 } label: {
                     Label("Entry Templates", systemImage: "doc.on.doc")
@@ -134,7 +141,7 @@ struct SettingsView: View {
             } header: {
                 Text("Data")
             } footer: {
-                Text("Export builds Markdown for LLM recaps. Templates create starter entries. Manage individual deletes in All Entries.")
+                Text("Recap builds Markdown for LLM summaries. Backup exports JSON you can restore after a wipe or reinstall (Replace or Merge). Templates create starter entries.")
             }
 
             Section("Library") {
@@ -157,7 +164,7 @@ struct SettingsView: View {
 
             Section("About") {
                 LabeledContent("App", value: "LifeOS")
-                LabeledContent("Version", value: "0.4")
+                LabeledContent("Version", value: "0.5")
             }
         }
         .navigationTitle("Settings")
@@ -166,6 +173,9 @@ struct SettingsView: View {
         .background(LifeOSTheme.canvas)
         .sheet(isPresented: $showingExport) {
             RecapExportView(entries: entries)
+        }
+        .sheet(isPresented: $showingBackup) {
+            BackupRestoreView(entries: entries)
         }
         .sheet(isPresented: $showingTemplates) {
             EntryTemplatesView()

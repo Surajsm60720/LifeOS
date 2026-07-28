@@ -37,8 +37,7 @@ final class NotificationPlannerLogicTests: XCTestCase {
     }
 
     func testPendingBudgetCapConstant() {
-        // Documents the iOS hard limit the planner must respect.
-        XCTAssertEqual(64, 64)
+        XCTAssertEqual(NotificationPlanner.maxPendingNotifications, 64)
     }
 
     private func date(_ year: Int, _ month: Int, _ day: Int) -> Date {

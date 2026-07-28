@@ -1,18 +1,18 @@
 # LifeOS
 
-**Version 0.4**
+**Version 0.5**
 
 A personal, calendar-centric iOS app for tracking day-to-day life, game events, and entertainment progress — locally, without accounts or third-party sync.
 
-LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and reading/watching logs into one entry model with recurrence, completion tracking, customizable local notifications, hangout expense ledgers, multi-stop locations, Markdown recap export, and a Dynamic Island Live Activity for remaining to-dos.
+LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and reading/watching logs into one entry model with recurrence, completion tracking, customizable local notifications, hangout expense ledgers, multi-stop locations, Markdown recap export, full-app JSON backup/restore, and a Dynamic Island Live Activity for remaining to-dos.
 
-> This is an early **v0.4** release. Core flows work; polish, sync, and deferred features (CloudKit, home-screen widgets, charts) are intentionally out of scope.
+> This is an early **v0.5** release. Core flows work; polish, sync, and deferred features (CloudKit, home-screen widgets, charts) are intentionally out of scope.
 
 ---
 
 ## Status
 
-| Area | v0.4 |
+| Area | v0.5 |
 |---|---|
 | Unified entry model (IRL / Games / Entertainment) | Included |
 | Day / Week / Month / Year calendar | Included |
@@ -21,12 +21,15 @@ LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and re
 | Live Activity / Dynamic Island (Day–Year remaining to-dos) | Included |
 | Recurrence + occurrence-level completion | Included |
 | Local notification rules + presets (64-cap aware) | Included |
+| Notification budget (scheduled / remaining / firing today) | Included |
 | Today inbox, search / filters, templates | Included |
 | IRL multi-location + MapKit place search | Included |
 | Hangout expense ledger (lines, totals, who owes you) | Included |
+| Expense settlement share & clipboard copy | Included |
 | Game event types (GI / HSR / WuWa) + Other session logs | Included |
 | Entertainment progress + session targets | Included |
 | Markdown recap export with stats | Included |
+| JSON backup & restore (Replace or Merge) | Included |
 
 ---
 
@@ -70,19 +73,21 @@ Allow notification permission when prompted if you plan to use reminders.
 
 ---
 
-## What’s in v0.4
+## What’s in v0.5
 
-Everything from v0.3, plus:
+Everything from v0.4, plus:
 
-- **Live Activity (Dynamic Island)** — Optional in Settings → Dynamic Island. When enabled, LifeOS shows a compact remaining-count pulse on the Dynamic Island / Lock Screen  
-- **Expanded island container** — Hold the Live Activity to see:
-  - Day / Week / Month / Year scope buttons (switch **without opening the app**)  
-  - Up to **8** open completable items (`isCompletable && !isCompleted`)  
-  - Footer when more exist: `...N more for this day/week/month/year — open LifeOS`  
-- **Kept in sync** — Snapshot refreshes on enable/disable, default-scope change, completion toggles, app launch, and foreground  
+- **JSON backup & restore** — Settings → Backup & Restore exports a full-app snapshot (`LifeOS-Backup-YYYY-MM-DD.json`) covering entries, expenses, locations, recurrence, notification rules, progress, completions, and key preferences. Import supports:
+  - **Replace All** — wipe current data, then load the backup (with confirmation)
+  - **Merge** — keep existing entries; add new IDs and update matching IDs (notification rules upsert by `ruleID`; completions merge by occurrence start)
+- **Notification budget** — Notifications hub shows **Scheduled**, **Remaining** (against the iOS 64 pending cap), and **Firing Today** so you can plan daily reminder load
+- **Expense settlement share** — From an IRL hangout with expenses, **Share Settlement** or **Copy Settlement** produces a detailed plain-text breakdown (items, total, who owes you, your share, notes)
+
+Markdown **Generate Recap** remains separate — for LLM-friendly period summaries, not restore.
 
 ### Still included from earlier releases
 
+- **Live Activity (Dynamic Island)** — Optional in Settings → Dynamic Island. Remaining-count pulse; hold to switch Day / Week / Month / Year scope and see open items  
 - **Default calendar view** — App opens on **Day** by default; Settings → Calendar lets you choose Day / Week / Month / Year as the launch view  
 - **App icons** — Three selectable styles in Settings → App Icon (Default / Geometric / Minimal), each with light and dark Home Screen appearances  
 - **Icon change + notifications** — Switching icons clears delivered banners and reschedules pending reminders. On **iOS 18**, Notification Center may keep the previous glyph until a **device restart**  
@@ -99,7 +104,7 @@ Everything from v0.3, plus:
 - **Entertainment** — Progress tracking, optional session targets, display-only recurrence, no notifications  
 - **Templates & duplicate** — Built-in starters from Settings; duplicate from detail  
 - **Export** — Date-range Markdown recap with spend, event-type, and progress stats  
-- **Settings** — App icon, default calendar view, Live Activity, export, templates, entry library, clear-all data  
+- **Settings** — App icon, default calendar view, Live Activity, recap, backup/restore, templates, entry library, clear-all data  
 
 ---
 
@@ -114,7 +119,7 @@ xcodebuild test \
 
 Or in Xcode: **⌘U**.
 
-Unit coverage includes recurrence, entry capabilities (incl. expense split), notification logic helpers, and recap export formatting. UI tests include a notification-banner icon smoke check (`LifeOSUITests`).
+Unit coverage includes recurrence, entry capabilities (incl. expense split), notification budget helpers, recap export formatting, backup encode/decode + replace/merge, and expense settlement text. UI tests include a notification-banner icon smoke check (`LifeOSUITests`).
 
 Live Activity UI and Dynamic Island scope switching should be verified manually on a real device.
 
@@ -128,8 +133,8 @@ LifeOS/
 ├── LiveActivity/        Shared ActivityKit models, manager, LiveActivityIntent
 ├── LiveActivityWidget/  Dynamic Island / Lock Screen Live Activity UI (extension)
 ├── Models/              Entry, locations, expenses, recurrence, notifications, progress
-├── Services/            Engine, planner, exporter, templates, migrations
-├── Views/               Calendar, entries, notifications, settings, export
+├── Services/            Engine, planner, exporter, backup, expense share, templates, migrations
+├── Views/               Calendar, entries, notifications, settings, export / backup
 ├── Utilities/           Theme, filters, date helpers
 └── Resources/           Assets (App Icons + AccentColor)
 LifeOSTests/             Unit tests
@@ -139,16 +144,17 @@ project.yml              XcodeGen definition
 
 ---
 
-## Design notes (v0.4)
+## Design notes (v0.5)
 
 - Dark theme only in-app; neutral cool-gray accents  
 - App icons support system light/dark Home Screen appearances  
 - Local-only data — no backend, no account login  
+- Backup is device file share / import (JSON); Markdown recap is for LLM summaries only  
 - Live Activities are time-limited by iOS; reopening/foregrounding LifeOS re-syncs the snapshot  
 - Dynamic Island interactivity is limited to App Intents (scope switching); deep lists still live in the app  
 - Entertainment logging is manual and notification-free by design  
 - Game event data is manual (no unofficial account scrapers)  
-- Expense tracking is hangout-scoped (no dedicated Expenses tab)
+- Expense tracking is hangout-scoped (no dedicated Expenses tab); share text has no currency symbol yet  
 
 ---
 

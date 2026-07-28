@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UIKit
 
 struct EntryDetailView: View {
     @Environment(\.dismiss) private var dismiss
@@ -10,6 +11,9 @@ struct EntryDetailView: View {
 
     @State private var showingEditSheet = false
     @State private var showDeleteConfirm = false
+    @State private var showingExpenseShare = false
+    @State private var expenseShareText = ""
+    @State private var copyConfirmation: String?
     @StateObject private var entryStore = EntryStore()
 
     private var isCompleted: Bool {
@@ -83,6 +87,33 @@ struct EntryDetailView: View {
                         }
                         LabeledContent("Total", value: "\(entry.expenseTotal)")
                             .fontWeight(.semibold)
+
+                        Button {
+                            expenseShareText = ExpenseShareFormatter.plainSettlement(
+                                for: entry,
+                                occurrenceDate: occurrenceDate
+                            )
+                            showingExpenseShare = true
+                        } label: {
+                            Label("Share Settlement", systemImage: "square.and.arrow.up")
+                        }
+
+                        Button {
+                            let text = ExpenseShareFormatter.plainSettlement(
+                                for: entry,
+                                occurrenceDate: occurrenceDate
+                            )
+                            UIPasteboard.general.string = text
+                            copyConfirmation = "Settlement copied"
+                        } label: {
+                            Label("Copy Settlement", systemImage: "doc.on.doc")
+                        }
+
+                        if let copyConfirmation {
+                            Text(copyConfirmation)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
 
@@ -202,6 +233,9 @@ struct EntryDetailView: View {
             }
             .sheet(isPresented: $showingEditSheet) {
                 EntryFormView(mode: .edit(entry))
+            }
+            .sheet(isPresented: $showingExpenseShare) {
+                ShareSheet(items: [expenseShareText])
             }
             .confirmationDialog(
                 "Delete “\(entry.title)”?",

@@ -10,6 +10,8 @@ struct NotificationsHubView: View {
     @State private var editingRule: NotificationRule?
     @State private var authorizationDenied = false
     @State private var pendingCount = 0
+    @State private var remainingCount = 0
+    @State private var firingTodayCount = 0
     @State private var pendingSummaries: [String] = []
     @State private var testStatus: String?
 
@@ -130,6 +132,14 @@ struct NotificationsHubView: View {
                 Text("\(pendingCount)")
                     .foregroundStyle(.secondary)
             }
+            LabeledContent("Remaining") {
+                Text("\(remainingCount)")
+                    .foregroundStyle(.secondary)
+            }
+            LabeledContent("Firing Today") {
+                Text("\(firingTodayCount)")
+                    .foregroundStyle(.secondary)
+            }
 
             Button("Send Test in 5s") {
                 Task {
@@ -157,7 +167,7 @@ struct NotificationsHubView: View {
         } header: {
             Text("Status")
         } footer: {
-            Text("Pull to refresh scheduling. If Scheduled stays at 0, the fire time may already be past or the entry doesn’t occur in the next 7 days.")
+            Text("iOS allows \(NotificationPlanner.maxPendingNotifications) pending local notifications per app. LifeOS fills soonest-first over the next 7 days. Pull to refresh. If Scheduled stays at 0, the fire time may already be past or the entry doesn’t occur in the next 7 days.")
         }
 
         if !pendingSummaries.isEmpty {
@@ -197,7 +207,10 @@ struct NotificationsHubView: View {
         authorizationDenied = !granted
 
         await NotificationPlanner.refreshPendingNotifications(entries: entries, force: true)
-        pendingCount = await NotificationPlanner.shared.pendingManagedCount()
+        let budget = await NotificationPlanner.shared.pendingBudget()
+        pendingCount = budget.scheduled
+        remainingCount = budget.remaining
+        firingTodayCount = budget.firingToday
         pendingSummaries = await NotificationPlanner.shared.pendingManagedSummaries()
     }
 }

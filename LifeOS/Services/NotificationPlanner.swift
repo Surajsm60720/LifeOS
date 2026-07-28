@@ -9,10 +9,20 @@ actor NotificationPlanner {
 
     private let center = UNUserNotificationCenter.current()
     private let engine = RecurrenceEngine.shared
-    private let maxPending = 64
+    private let maxPending = NotificationPlanner.maxPendingNotifications
     private let identifierPrefix = "lifeos-entry-"
     private let testPrefix = "lifeos-test-"
     private let protectWindow: TimeInterval = 120
+
+    /// iOS hard limit for pending local notification requests per app.
+    static let maxPendingNotifications = 64
+
+    struct PendingBudget: Sendable, Equatable {
+        let scheduled: Int
+        let remaining: Int
+        let firingToday: Int
+        let maxPending: Int
+    }
 
     private var refreshTask: Task<Void, Never>?
     private var lastRefreshAt: Date = .distantPast
@@ -130,6 +140,22 @@ actor NotificationPlanner {
     func pendingManagedCount() async -> Int {
         let pending = await center.pendingNotificationRequests()
         return pending.filter { $0.identifier.hasPrefix(identifierPrefix) }.count
+    }
+
+    func pendingBudget(now: Date = .now, calendar: Calendar = .current) async -> PendingBudget {
+        let pending = await center.pendingNotificationRequests()
+        let managed = pending.filter { $0.identifier.hasPrefix(identifierPrefix) }
+        let scheduled = managed.count
+        let firingToday = managed.reduce(into: 0) { count, request in
+            guard let fire = nextFireDate(for: request), calendar.isDate(fire, inSameDayAs: now) else { return }
+            count += 1
+        }
+        return PendingBudget(
+            scheduled: scheduled,
+            remaining: max(0, maxPending - scheduled),
+            firingToday: firingToday,
+            maxPending: maxPending
+        )
     }
 
     func pendingManagedSummaries() async -> [String] {
