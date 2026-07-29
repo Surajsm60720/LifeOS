@@ -12,6 +12,7 @@ struct LifeOSApp: App {
         WindowGroup {
             ContentView()
                 .preferredColorScheme(.dark)
+                .tint(LifeOSTheme.accent)
         }
         .modelContainer(LifeOSSharedStore.container)
     }

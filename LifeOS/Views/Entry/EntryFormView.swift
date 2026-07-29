@@ -92,17 +92,24 @@ struct EntryFormView: View {
                         }
                     }
                 }
-            }
-            .navigationTitle(isEditing ? "Edit Entry" : "New Entry")
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+        }
+        .tint(LifeOSTheme.accent)
+        .navigationTitle(isEditing ? "Edit Entry" : "New Entry")
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") {
+                    Haptics.light()
+                    dismiss()
                 }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { save() }
-                        .disabled(entry.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                }
             }
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Save") {
+                    Haptics.success()
+                    save()
+                }
+                .disabled(entry.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+        }
             .confirmationDialog("Delete this entry?", isPresented: $showDeleteConfirmation) {
                 Button("Delete", role: .destructive) {
                     entryStore.delete(entry: entry, modelContext: modelContext)
@@ -160,27 +167,20 @@ struct EntryFormView: View {
             ))
 
             if entry.duration != nil {
-                Stepper(
-                    "Duration: \(Int(entry.duration ?? 0) / 60) min",
-                    value: Binding(
-                        get: { Int(entry.duration ?? 3600) },
-                        set: { entry.duration = TimeInterval($0) }
-                    ),
-                    in: 900...86_400,
-                    step: 900
-                )
+                durationEditor
             }
 
             Toggle("Track Completion", isOn: $entry.isCompletable)
         }
     }
 
+    @ViewBuilder
     private var categorySection: some View {
-        Section("Category Details") {
-            switch entry.category {
-            case .irl:
-                EmptyView()
-            case .game:
+        switch entry.category {
+        case .irl:
+            EmptyView()
+        case .game:
+            Section {
                 Picker("Game", selection: Binding(
                     get: { entry.gameSubCategory ?? .genshinImpact },
                     set: { newValue in
@@ -203,7 +203,9 @@ struct EntryFormView: View {
                         Text(game.rawValue).tag(game)
                     }
                 }
-            case .entertainment:
+            }
+        case .entertainment:
+            Section {
                 Picker("Type", selection: Binding(
                     get: { entry.entertainmentSubCategory ?? .anime },
                     set: { newValue in
@@ -223,6 +225,67 @@ struct EntryFormView: View {
         }
     }
 
+    private var durationEditor: some View {
+        Group {
+            Stepper(
+                "Hours: \(durationHours)",
+                value: Binding(
+                    get: { durationHours },
+                    set: { setDuration(hours: $0, minutes: durationMinutes) }
+                ),
+                in: 0...23
+            )
+            Stepper(
+                "Minutes: \(durationMinutes)",
+                value: Binding(
+                    get: { durationMinutes },
+                    set: { setDuration(hours: durationHours, minutes: $0) }
+                ),
+                in: 0...59
+            )
+            LabeledContent("Total", value: durationSummary)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach([5, 15, 30, 45, 60, 90, 120], id: \.self) { minutes in
+                        Button("\(minutes)m") {
+                            entry.duration = TimeInterval(minutes * 60)
+                        }
+                        .font(.caption.weight(.semibold))
+                        .buttonStyle(.bordered)
+                    }
+                }
+            }
+        }
+    }
+
+    private var durationHours: Int {
+        Int((entry.duration ?? 0) / 3600)
+    }
+
+    private var durationMinutes: Int {
+        Int(((entry.duration ?? 0).truncatingRemainder(dividingBy: 3600)) / 60)
+    }
+
+    private var durationSummary: String {
+        let total = Int((entry.duration ?? 0) / 60)
+        if durationHours == 0 {
+            return "\(total) min"
+        }
+        if durationMinutes == 0 {
+            return "\(durationHours) hr"
+        }
+        return "\(durationHours) hr \(durationMinutes) min"
+    }
+
+    private func setDuration(hours: Int, minutes: Int) {
+        var totalMinutes = max(0, hours) * 60 + max(0, minutes)
+        if totalMinutes == 0 {
+            totalMinutes = 1
+        }
+        entry.duration = TimeInterval(min(totalMinutes, 24 * 60) * 60)
+    }
+
     private var locationSection: some View {
         Section {
             if entry.locations.isEmpty {
@@ -236,36 +299,37 @@ struct EntryFormView: View {
                             set: { place.name = $0 }
                         ))
                         HStack {
-                            Button("Search Place") {
+                            Button("Change Place") {
                                 locationSearchIndex = index
                             }
                             Spacer()
                             if place.hasCoordinates {
-                                Text("Pinned")
+                                Label("On map", systemImage: "mappin.circle.fill")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
+                                    .accessibilityLabel("Location pinned on the map")
                             }
+                            Button("Remove", role: .destructive) {
+                                removeLocation(at: index)
+                            }
+                            .font(.caption.weight(.semibold))
                         }
                     }
                 }
                 .onDelete { offsets in
-                    for index in offsets {
-                        let place = entry.locations[index]
-                        modelContext.delete(place)
+                    for index in offsets.sorted(by: >) {
+                        removeLocation(at: index)
                     }
-                    entry.locations.remove(atOffsets: offsets)
                 }
             }
 
-            Button("Add Location") {
-                let place = LocationEntry(name: "")
-                place.entry = entry
-                entry.locations.append(place)
+            addActionButton("Add Location", systemImage: "mappin.and.ellipse") {
+                addLocationAndSearch()
             }
         } header: {
             Text("Locations")
         } footer: {
-            Text("Multi-stop hangouts can list several places in order.")
+            Text("Multi-stop hangouts can list several places in order. Add Location opens Find Place right away. “On map” means that place has GPS coordinates from Find Place.")
         }
     }
 
@@ -302,7 +366,7 @@ struct EntryFormView: View {
                 }
                 .onDelete(perform: deleteExpenseLines)
 
-                Button("Add Expense Line") {
+                addActionButton("Add Expense Line", systemImage: "plus.circle.fill") {
                     addExpenseLine()
                 }
 
@@ -323,7 +387,7 @@ struct EntryFormView: View {
                 }
                 .onDelete(perform: deleteExpenseBalances)
 
-                Button("Add Person Who Owes You") {
+                addActionButton("Add Person Who Owes You", systemImage: "person.badge.plus") {
                     addExpenseBalance()
                 }
 
@@ -379,13 +443,14 @@ struct EntryFormView: View {
     }
 
     private var progressSection: some View {
-        Section("Progress") {
+        Section {
             if entry.progress == nil {
-                Button("Add Progress Tracking") {
+                addActionButton("Add Progress Tracking", systemImage: "chart.bar.fill") {
                     entry.progress = EntryProgress(unitLabel: entry.entertainmentSubCategory?.defaultUnitLabel ?? "episode")
                 }
             } else if let progress = entry.progress {
                 Stepper("Current: \(progress.currentUnit)", value: Bindable(progress).currentUnit, in: 0...10_000)
+                    .sensoryFeedback(.selection, trigger: progress.currentUnit)
                 Toggle("Known Total", isOn: Binding(
                     get: { progress.totalUnits != nil },
                     set: { enabled in progress.totalUnits = enabled ? 12 : nil }
@@ -395,6 +460,7 @@ struct EntryFormView: View {
                         get: { progress.totalUnits ?? 12 },
                         set: { progress.totalUnits = $0 }
                     ), in: 1...10_000)
+                    .sensoryFeedback(.selection, trigger: progress.totalUnits ?? 0)
                 }
                 Toggle("Session Target", isOn: Binding(
                     get: { progress.targetUnitsPerSession != nil },
@@ -410,13 +476,17 @@ struct EntryFormView: View {
                         in: 1...500
                     )
                 }
-                TextField("Unit Label", text: Bindable(progress).unitLabel)
+                TextField("Counting by (e.g. episode, chapter, page)", text: Bindable(progress).unitLabel)
             }
+        } header: {
+            Text("Progress")
+        } footer: {
+            Text("“Episode” (or chapter/page) is just the unit you count progress in — rename it anytime.")
         }
     }
 
     private var recurrenceSection: some View {
-        Section(entry.category == .entertainment ? "Personal Habit (Display Only)" : "Recurrence") {
+        Section {
             Toggle("Repeats", isOn: $hasRecurrence)
                 .disabled(trackExpense && entry.category == .irl)
                 .onChange(of: hasRecurrence) { _, enabled in
@@ -438,6 +508,12 @@ struct EntryFormView: View {
             if hasRecurrence, let rule = entry.recurrence {
                 RecurrenceEditorView(rule: rule)
             }
+        } header: {
+            Text(entry.category == .entertainment ? "Repeat Schedule" : "Recurrence")
+        } footer: {
+            if entry.category == .entertainment {
+                Text("Optional. Marks how often you usually watch or read this — for your calendar view, not reminders. Add a notification rule if you want alerts.")
+            }
         }
     }
 
@@ -453,16 +529,19 @@ struct EntryFormView: View {
                     } label: {
                         VStack(alignment: .leading, spacing: 4) {
                             HStack {
-                                Text(rule.triggerKind.displayName)
+                                Text(rule.triggerSummary)
                                     .foregroundStyle(.primary)
                                 Spacer()
                                 Text(rule.isActive ? "On" : "Off")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
-                            Text(rule.triggerSummary)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                            ForEach(Array(rule.detailLines(for: entry).dropFirst().prefix(3).enumerated()), id: \.offset) { _, line in
+                                Text(line)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .multilineTextAlignment(.leading)
+                            }
                             Text(rule.messageTemplate)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
@@ -479,7 +558,7 @@ struct EntryFormView: View {
                 }
             }
 
-            Button("Add Notification Rule") {
+            addActionButton("Add Notification Rule", systemImage: "bell.badge.fill") {
                 showingAddNotification = true
             }
         } header: {
@@ -487,6 +566,20 @@ struct EntryFormView: View {
         } footer: {
             Text("Opens the rule editor. Nothing is attached until you tap Save there — Cancel leaves this entry unchanged. Custom triggers and presets both work for new or existing events.")
         }
+    }
+
+    private func addActionButton(
+        _ title: String,
+        systemImage: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: systemImage)
+                .font(.body.weight(.semibold))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, 4)
+        }
+        .foregroundStyle(LifeOSTheme.accent)
     }
 
     private var notesSection: some View {
@@ -534,6 +627,27 @@ struct EntryFormView: View {
             playedWithText = ""
             entry.isCompletable = false
             entry.notificationRules.removeAll()
+        }
+    }
+
+    private func addLocationAndSearch() {
+        let place = LocationEntry(name: "")
+        place.entry = entry
+        entry.locations.append(place)
+        locationSearchIndex = entry.locations.count - 1
+    }
+
+    private func removeLocation(at index: Int) {
+        guard entry.locations.indices.contains(index) else { return }
+        let place = entry.locations[index]
+        modelContext.delete(place)
+        entry.locations.remove(at: index)
+        if let searchIndex = locationSearchIndex {
+            if searchIndex == index {
+                locationSearchIndex = nil
+            } else if searchIndex > index {
+                locationSearchIndex = searchIndex - 1
+            }
         }
     }
 

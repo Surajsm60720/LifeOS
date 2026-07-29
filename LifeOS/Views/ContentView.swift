@@ -21,6 +21,7 @@ struct ContentView: View {
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             Button {
+                                Haptics.medium()
                                 showingCreateSheet = true
                             } label: {
                                 Image(systemName: "plus")
@@ -60,6 +61,7 @@ struct ContentView: View {
         .preferredColorScheme(.dark)
         .sheet(isPresented: $showingCreateSheet) {
             EntryFormView(mode: .create(category: .irl))
+                .tint(LifeOSTheme.accent)
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {

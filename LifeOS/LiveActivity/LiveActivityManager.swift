@@ -6,20 +6,19 @@ import SwiftUI
 @MainActor
 final class LiveActivityManager {
     static let enabledStorageKey = "liveActivityEnabled"
-    static let defaultScopeStorageKey = "liveActivityDefaultScope"
 
-    private static func defaultScope() -> LiveActivityScope {
-        let raw = UserDefaults.standard.string(forKey: defaultScopeStorageKey) ?? LiveActivityScope.day.rawValue
-        return LiveActivityScope(rawValue: raw) ?? .day
-    }
+    /// Live Activities render as fixed, non-scrolling snapshots, so the content payload
+    /// only ever needs enough rows to cover the largest surface (Lock Screen).
+    static let maxDisplayedItems = 8
 
     static func isEnabled() -> Bool {
         UserDefaults.standard.bool(forKey: enabledStorageKey)
     }
 
-    /// Computes the content state for the given scope using current SwiftData models.
+    /// Computes today's content state using current SwiftData models.
+    /// The Live Activity always tracks "today" — no Week/Month/Year switching —
+    /// to keep the Dynamic Island and Lock Screen experience simple and fast to read.
     static func snapshot(
-        for scope: LiveActivityScope,
         modelContext: ModelContext,
         calendar: Calendar = .current
     ) -> LifeOSLiveActivityAttributes.ContentState {
@@ -27,30 +26,25 @@ final class LiveActivityManager {
         let entries = (try? modelContext.fetch(descriptor)) ?? []
 
         let now = Date()
-        let interval: DateInterval
-        switch scope {
-        case .day:
-            interval = DateInterval(start: DateFormatting.startOfDay(now, calendar: calendar), duration: 86_400)
-        case .week:
-            interval = DateFormatting.weekInterval(containing: now, calendar: calendar)
-        case .month:
-            interval = DateFormatting.monthInterval(containing: now, calendar: calendar)
-        case .year:
-            interval = DateFormatting.yearInterval(containing: now, calendar: calendar)
-        }
+        let interval = DateInterval(start: DateFormatting.startOfDay(now, calendar: calendar), duration: 86_400)
 
+        // Every entry happening today, not just completable to-dos — a finished to-do
+        // drops off the list once it's checked off, everything else (including plain
+        // calendar events with no completion tracking) stays visible all day.
         let occurrences = RecurrenceEngine.shared.expandEntries(entries, in: interval, calendar: calendar)
-        let open = occurrences.filter { occ in
-            occ.entry.isCompletable && !occ.entry.isCompleted(on: occ.occurrenceDate, calendar: calendar)
+        let visible = occurrences.filter { occ in
+            !(occ.entry.isCompletable && occ.entry.isCompleted(on: occ.occurrenceDate, calendar: calendar))
         }
-        let sorted = open.sorted { a, b in
+        let sorted = visible.sorted { a, b in
             if a.occurrenceDate != b.occurrenceDate {
                 return a.occurrenceDate < b.occurrenceDate
             }
             return a.entry.title.localizedCaseInsensitiveCompare(b.entry.title) == .orderedAscending
         }
 
-        let items = sorted.prefix(8).map { occ in
+        // Dynamic Island / Lock Screen Live Activities cannot scroll, so we only ever
+        // hand over as many rows as the widget will actually lay out at once.
+        let items = sorted.prefix(LiveActivityManager.maxDisplayedItems).map { occ in
             let fallbackHex = "C8CCD4"
             let derivedHex = occ.entry.displayColor.hexString ?? fallbackHex
             let colorHex = occ.entry.colorOverrideHex ?? derivedHex
@@ -58,25 +52,19 @@ final class LiveActivityManager {
         }
 
         return LifeOSLiveActivityAttributes.ContentState(
-            scope: scope,
-            remainingCount: sorted.count,
+            itemCount: sorted.count,
             items: Array(items)
         )
     }
 
     /// Ensures the live activity exists (if enabled) and has up-to-date content.
-    static func syncActiveActivity(modelContext: ModelContext, scopeOverride: LiveActivityScope? = nil) async {
+    static func syncActiveActivity(modelContext: ModelContext) async {
         guard isEnabled() else {
             await stopAllActivities()
             return
         }
 
-        let scope = scopeOverride ?? defaultScope()
-        await syncActiveActivity(modelContext: modelContext, scope: scope)
-    }
-
-    static func syncActiveActivity(modelContext: ModelContext, scope: LiveActivityScope) async {
-        let contentState = snapshot(for: scope, modelContext: modelContext)
+        let contentState = snapshot(modelContext: modelContext)
         let attributes = LifeOSLiveActivityAttributes()
         let content = ActivityContent(state: contentState, staleDate: nil)
 
@@ -103,10 +91,7 @@ final class LiveActivityManager {
     }
 
     /// Convenience for intents / contexts without an injected ModelContext.
-    static func syncActiveActivity(scopeOverride: LiveActivityScope? = nil) async {
-        await syncActiveActivity(
-            modelContext: LifeOSSharedStore.container.mainContext,
-            scopeOverride: scopeOverride
-        )
+    static func syncActiveActivity() async {
+        await syncActiveActivity(modelContext: LifeOSSharedStore.container.mainContext)
     }
 }

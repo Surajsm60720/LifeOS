@@ -18,18 +18,17 @@
 		1C074F9A18BC7007695AAF87 /* YearCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B699ECB2C7C6CA70EC1985A8 /* YearCalendarView.swift */; };
 		C8E10001A001B001C001E002 /* CalendarGridSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E10001A001B001C001E001 /* CalendarGridSupport.swift */; };
 		C8E10001A001B001C001F002 /* CalendarOccurrenceSwipeRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E10001A001B001C001F001 /* CalendarOccurrenceSwipeRow.swift */; };
-		1C16C8F16181578E4ACAAEBB /* LiveActivityScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C0F3969CB5CA84CCF10EF /* LiveActivityScope.swift */; };
 		1FEB25DE5FA1C18B85976CF9 /* DayCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77FA985FFB5285651B6D093F /* DayCalendarView.swift */; };
 		2056E099A4D8F71808551C89 /* EntryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D0D1C2BC50D670C5226278 /* EntryDetailView.swift */; };
 		21FEE31651037961ABDF8962 /* LifeOSLiveActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A4A88769FEC111F67BC5F1 /* LifeOSLiveActivityAttributes.swift */; };
 		24462DE6FB5141342D0F5D0C /* CalendarFilterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACD7716889526753148DEAC7 /* CalendarFilterState.swift */; };
+		A1B2C3D4E5F60718293A4B5C /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A60718293A4B5C /* Haptics.swift */; };
 		2B75E741C54A9553531491D0 /* LifeOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B41F187BAFD79954082EDBD /* LifeOSApp.swift */; };
 		2BFB06466988F02933575B4C /* WeekCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16FFF8D5BDEC2B8015A014DD /* WeekCalendarView.swift */; };
 		2C24D07F7D708D126B4E2DE6 /* LifeOSDataMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B0D09A2C324DDD8331EA19D /* LifeOSDataMigration.swift */; };
 		32ACB89FCB3A54EE0110DAC9 /* ExpenseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8850455795888D8A4365D053 /* ExpenseModels.swift */; };
 		33BD0BC4E4D61BA25D0B3071 /* RecapExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 033148D5E32473FC5708FFD5 /* RecapExporter.swift */; };
 		34D9EB4510B9BC92D0CD6610 /* RecurrenceEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0D8D8EAC4881BDDE8AA0BD /* RecurrenceEngine.swift */; };
-		3575ECC8F6C6D7992C1B7C03 /* SetLiveActivityScopeIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5E35F7EAE92FFC8340A6F7 /* SetLiveActivityScopeIntent.swift */; };
 		425C4CFC722C995808AEB806 /* LifeOSLiveActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6A4A88769FEC111F67BC5F1 /* LifeOSLiveActivityAttributes.swift */; };
 		4324A24D6A8F738AE45B239E /* CalendarFilterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DFD7FCCAD12A7801DFBD696 /* CalendarFilterBar.swift */; };
 		45B7B3777830B128283F400F /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E37250F6712EFCC59150AE /* LiveActivityManager.swift */; };
@@ -38,7 +37,6 @@
 		569202E9ED4991AB9E3947BF /* LifeOSTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49CF777C21B2F0AAA0C349C5 /* LifeOSTheme.swift */; };
 		57C7E10B14025587243DFF75 /* LifeOSNotificationDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51216926CD8B2FE7DA6B2700 /* LifeOSNotificationDelegate.swift */; };
 		5BFFC7ECFBDD534244701C27 /* LifeOSSharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2855A78ACD7386FB777CB2D7 /* LifeOSSharedStore.swift */; };
-		5C0E73AB9A9615055CD39E88 /* SetLiveActivityScopeIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF5E35F7EAE92FFC8340A6F7 /* SetLiveActivityScopeIntent.swift */; };
 		5E7F041F5411517CAAF6883D /* CategoryColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17940F7D9B9485F0F20B6DF /* CategoryColors.swift */; };
 		5F65E79A8BBF60EA768BF2F9 /* MonthCalendarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B86071F98096A57E9DFEEB5 /* MonthCalendarView.swift */; };
 		6045343D15C51552040B405C /* EntryFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112E55BA567B0F9AF4F84870 /* EntryFormView.swift */; };
@@ -86,7 +84,6 @@
 		D224721F6AA8AE076501A027 /* RecapExportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5A21B9B225AAACBE2FC5E37 /* RecapExportView.swift */; };
 		D31C0B49A5F0C669E5185FC7 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E37250F6712EFCC59150AE /* LiveActivityManager.swift */; };
 		D65C6735B3676CD30D0A42CB /* NotificationRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD11AB3DAD814570410AB48D /* NotificationRule.swift */; };
-		DAE55D55C6DC3113E24E400B /* LiveActivityScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9C0F3969CB5CA84CCF10EF /* LiveActivityScope.swift */; };
 		DCBA4449F26562E0D2B72A42 /* Entry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A270817C108490A6FFB5D04A /* Entry.swift */; };
 		E55E853D78110C75393F30E8 /* NotificationRuleFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CF326F1D71A8DB9F35265A /* NotificationRuleFormView.swift */; };
 		EBC9861EF558A24D86DBB706 /* DateFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71A82A890B38CAEC50446231 /* DateFormatting.swift */; };
@@ -157,6 +154,7 @@
 		37B4F56F34701BF54A19E9AD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3F53D73630EB13B11DAE3BF1 /* EntryProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryProgress.swift; sourceTree = "<group>"; };
 		49CF777C21B2F0AAA0C349C5 /* LifeOSTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeOSTheme.swift; sourceTree = "<group>"; };
+		B1C2D3E4F5A60718293A4B5C /* Haptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Haptics.swift; sourceTree = "<group>"; };
 		4A1B928773E39C1A38AE8588 /* RecurrenceRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecurrenceRule.swift; sourceTree = "<group>"; };
 		51216926CD8B2FE7DA6B2700 /* LifeOSNotificationDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeOSNotificationDelegate.swift; sourceTree = "<group>"; };
 		52617622A597E2C13239A0DC /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -189,11 +187,9 @@
 		C11A96F8DDBD0A30705FF2B4 /* TodayInboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInboxView.swift; sourceTree = "<group>"; };
 		C460C4A8C45B9037D4936DB5 /* PlaceSearchSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceSearchSheet.swift; sourceTree = "<group>"; };
 		C8D26AD0186BE55701186C79 /* NotificationRuleEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRuleEditor.swift; sourceTree = "<group>"; };
-		CF5E35F7EAE92FFC8340A6F7 /* SetLiveActivityScopeIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetLiveActivityScopeIntent.swift; sourceTree = "<group>"; };
 		D17940F7D9B9485F0F20B6DF /* CategoryColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryColors.swift; sourceTree = "<group>"; };
 		D1922ABC9D8812D858744722 /* NotificationPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPreset.swift; sourceTree = "<group>"; };
 		DE9886A546B818C51CF32A74 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		DE9C0F3969CB5CA84CCF10EF /* LiveActivityScope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityScope.swift; sourceTree = "<group>"; };
 		E0B728ECA39DCA23F15C8AD0 /* LocationEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationEntry.swift; sourceTree = "<group>"; };
 		E865D330E9C7C91599A676D7 /* LifeOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LifeOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E9E37250F6712EFCC59150AE /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
@@ -259,8 +255,6 @@
 				2855A78ACD7386FB777CB2D7 /* LifeOSSharedStore.swift */,
 				E9E37250F6712EFCC59150AE /* LiveActivityManager.swift */,
 				2A8CE5C33EBBE71B27EE864C /* LiveActivityModels.swift */,
-				DE9C0F3969CB5CA84CCF10EF /* LiveActivityScope.swift */,
-				CF5E35F7EAE92FFC8340A6F7 /* SetLiveActivityScopeIntent.swift */,
 			);
 			path = LiveActivity;
 			sourceTree = "<group>";
@@ -294,6 +288,7 @@
 				71A82A890B38CAEC50446231 /* DateFormatting.swift */,
 				B97297AD78FF5ADABAE2C37D /* EntryDeleteModifier.swift */,
 				A174492506A456C88F0CF5F9 /* GameIdentity.swift */,
+				B1C2D3E4F5A60718293A4B5C /* Haptics.swift */,
 				49CF777C21B2F0AAA0C349C5 /* LifeOSTheme.swift */,
 				D1922ABC9D8812D858744722 /* NotificationPreset.swift */,
 			);
@@ -562,12 +557,10 @@
 				569202E9ED4991AB9E3947BF /* LifeOSTheme.swift in Sources */,
 				D31C0B49A5F0C669E5185FC7 /* LiveActivityManager.swift in Sources */,
 				969B2C86BFAB6F2E62872BC9 /* LiveActivityModels.swift in Sources */,
-				1C16C8F16181578E4ACAAEBB /* LiveActivityScope.swift in Sources */,
 				A25FE3E7E10B92B47A3F08FB /* LocationEntry.swift in Sources */,
 				A7C3EB88203F1E8F7A055F06 /* NotificationRule.swift in Sources */,
 				498C1780863FE6D81841C1B7 /* RecurrenceEngine.swift in Sources */,
 				191514C4806D8C9402BCE7D0 /* RecurrenceRule.swift in Sources */,
-				5C0E73AB9A9615055CD39E88 /* SetLiveActivityScopeIntent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -622,6 +615,7 @@
 				32ACB89FCB3A54EE0110DAC9 /* ExpenseModels.swift in Sources */,
 				C8E10001A001B001C001D004 /* ExpenseShareFormatter.swift in Sources */,
 				9A30CD52062529B79B084E43 /* GameIdentity.swift in Sources */,
+				A1B2C3D4E5F60718293A4B5C /* Haptics.swift in Sources */,
 				2B75E741C54A9553531491D0 /* LifeOSApp.swift in Sources */,
 				2C24D07F7D708D126B4E2DE6 /* LifeOSDataMigration.swift in Sources */,
 				21FEE31651037961ABDF8962 /* LifeOSLiveActivityAttributes.swift in Sources */,
@@ -630,7 +624,6 @@
 				718DF278660A174E82C0210B /* LifeOSTheme.swift in Sources */,
 				45B7B3777830B128283F400F /* LiveActivityManager.swift in Sources */,
 				B2BDDEE2ECBB5A7CC4D32D7E /* LiveActivityModels.swift in Sources */,
-				DAE55D55C6DC3113E24E400B /* LiveActivityScope.swift in Sources */,
 				9C4F9719FB552C7B276A2AB5 /* LocationEntry.swift in Sources */,
 				5F65E79A8BBF60EA768BF2F9 /* MonthCalendarView.swift in Sources */,
 				0D5A4B098FE6D1E29886B603 /* NotificationPlanner.swift in Sources */,
@@ -645,7 +638,6 @@
 				6C60E17D94441268FA67ABA8 /* RecurrenceEditorView.swift in Sources */,
 				34D9EB4510B9BC92D0CD6610 /* RecurrenceEngine.swift in Sources */,
 				7FFD87FF676BD7A54EEBCA90 /* RecurrenceRule.swift in Sources */,
-				3575ECC8F6C6D7992C1B7C03 /* SetLiveActivityScopeIntent.swift in Sources */,
 				AF8F74B3EE6E7EAA5E23AD09 /* SettingsView.swift in Sources */,
 				C8E10001A001B001C001D006 /* ShareSheet.swift in Sources */,
 				CF4D87046969E476CC008DE5 /* TodayInboxView.swift in Sources */,

@@ -199,12 +199,26 @@ struct EntryDetailView: View {
                 if !entry.notificationRules.isEmpty {
                     Section("Notifications") {
                         ForEach(entry.notificationRules) { rule in
-                            VStack(alignment: .leading) {
-                                Text(rule.triggerKind.displayName)
-                                Text(rule.messageTemplate)
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack {
+                                    Text(rule.triggerSummary)
+                                        .font(.subheadline.weight(.medium))
+                                    Spacer()
+                                    Text(rule.isActive ? "On" : "Off")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                ForEach(Array(rule.detailLines(for: entry).dropFirst().prefix(3).enumerated()), id: \.offset) { _, line in
+                                    Text(line)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Text(rule.renderedMessage(for: entry))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
+                                    .lineLimit(2)
                             }
+                            .padding(.vertical, 2)
                         }
                     }
                 }
@@ -223,16 +237,24 @@ struct EntryDetailView: View {
                 }
             }
             .navigationTitle("Entry")
+            .tint(LifeOSTheme.accent)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Edit") { showingEditSheet = true }
+                    Button("Edit") {
+                        Haptics.light()
+                        showingEditSheet = true
+                    }
                 }
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Done") { dismiss() }
+                    Button("Done") {
+                        Haptics.light()
+                        dismiss()
+                    }
                 }
             }
             .sheet(isPresented: $showingEditSheet) {
                 EntryFormView(mode: .edit(entry))
+                    .tint(LifeOSTheme.accent)
             }
             .sheet(isPresented: $showingExpenseShare) {
                 ShareSheet(items: [expenseShareText])

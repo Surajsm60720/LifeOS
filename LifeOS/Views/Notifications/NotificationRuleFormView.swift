@@ -53,7 +53,7 @@ struct NotificationRuleFormView: View {
                         ContentUnavailableView(
                             "No Eligible Entries",
                             systemImage: "bell.slash",
-                            description: Text("Create an IRL event or a Genshin Impact / HSR / Wuthering Waves game entry from the Calendar tab first. Entertainment and Other games cannot have notifications.")
+                            description: Text("Notification rules must attach to an existing IRL event or a Genshin Impact / HSR / Wuthering Waves game entry. Entertainment and Other games cannot have notifications.")
                         )
                     }
                 } else {
@@ -132,19 +132,31 @@ struct NotificationRuleFormView: View {
             }
             .navigationTitle(isEditing ? "Edit Notification" : "New Notification")
             .navigationBarTitleDisplayMode(.inline)
+            .tint(LifeOSTheme.accent)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Cancel") {
+                        Haptics.light()
+                        dismiss()
+                    }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { save() }
-                        .disabled(!canSave)
+                    Button("Save") {
+                        Haptics.success()
+                        save()
+                    }
+                    .disabled(!canSave)
                 }
             }
             .onAppear {
                 hydrateFromMode()
                 Task {
                     _ = await NotificationPlanner.shared.requestAuthorizationIfNeeded()
+                }
+            }
+            .onChange(of: eligibleEntries.map(\.id)) { _, ids in
+                if selectedEntryID == nil, let first = ids.first {
+                    selectedEntryID = first
                 }
             }
         }

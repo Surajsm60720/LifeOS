@@ -4,22 +4,33 @@ struct CalendarFilterBar: View {
     @ObservedObject var filters: CalendarFilterState
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundStyle(LifeOSTheme.softText)
-                TextField("Search titles, notes…", text: $filters.searchText)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline) {
+                Label("Search & Filter", systemImage: "magnifyingglass")
+                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.92))
+                Spacer()
                 if filters.isActive {
-                    Button("Clear") { filters.clear() }
+                    Button("Clear all") { filters.clear() }
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(LifeOSTheme.accent)
                 }
             }
+
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundStyle(LifeOSTheme.softText)
+                TextField("Search titles, notes, places…", text: $filters.searchText)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+            }
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
             .background(LifeOSTheme.elevated, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+            Text("Filter by category")
+                .font(.system(.caption, design: .rounded, weight: .medium))
+                .foregroundStyle(LifeOSTheme.softText)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
@@ -45,6 +56,12 @@ struct CalendarFilterBar: View {
                 }
             }
         }
+        .padding(14)
+        .background(LifeOSTheme.elevated.opacity(0.55), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(LifeOSTheme.stroke, lineWidth: 1)
+        )
     }
 
     private func filterChip(_ title: String, selected: Bool, action: @escaping () -> Void) -> some View {

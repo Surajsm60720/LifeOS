@@ -48,13 +48,13 @@ struct NotificationsHubView: View {
                     .padding(.vertical, 24)
 
                     Button {
+                        Haptics.medium()
                         showingCreateSheet = true
                     } label: {
                         Text(eligibleEntryCount == 0 ? "Create Notification Rule" : "Add Notification Rule")
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(LifeOSTheme.accent)
+                    .buttonStyle(.bordered)
                 }
             } else {
                 Section {
@@ -89,11 +89,13 @@ struct NotificationsHubView: View {
                 }
             }
         }
+        .tint(LifeOSTheme.accent)
         .navigationTitle("Notifications")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
+                    Haptics.medium()
                     showingCreateSheet = true
                 } label: {
                     Image(systemName: "plus")
@@ -103,9 +105,11 @@ struct NotificationsHubView: View {
         }
         .sheet(isPresented: $showingCreateSheet) {
             NotificationRuleFormView(mode: .create)
+                .tint(LifeOSTheme.accent)
         }
         .sheet(item: $editingRule) { rule in
             NotificationRuleFormView(mode: .edit(rule))
+                .tint(LifeOSTheme.accent)
         }
         .task {
             await refreshStatus()
@@ -224,30 +228,39 @@ private struct NotificationRuleRow: View {
                 .frame(width: 10, height: 10)
                 .padding(.top, 6)
 
-            VStack(alignment: .leading, spacing: 4) {
-                HStack {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .firstTextBaseline) {
                     Text(entry.title)
                         .font(.headline)
                         .foregroundStyle(.primary)
                     Spacer()
-                    if !rule.isActive {
-                        Text("Off")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 2)
-                            .background(Color.secondary.opacity(0.2), in: Capsule())
-                    }
+                    Text(rule.isActive ? "On" : "Off")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(rule.isActive ? LifeOSTheme.accent : .secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background(
+                            (rule.isActive ? LifeOSTheme.accent : Color.secondary).opacity(0.18),
+                            in: Capsule()
+                        )
                 }
 
                 Text(rule.triggerSummary)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.primary)
+
+                ForEach(Array(rule.detailLines(for: entry).dropFirst().enumerated()), id: \.offset) { _, line in
+                    Text(line)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
 
                 Text(rule.renderedMessage(for: entry))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
+                    .padding(.top, 2)
 
                 Text(entry.category.displayName + (entry.subCategory.map { " · \($0)" } ?? ""))
                     .font(.caption2)

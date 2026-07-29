@@ -171,11 +171,16 @@ struct CalendarRootView: View {
                 Spacer()
 
                 HStack(spacing: 8) {
-                    chromeButton(systemName: showFilters || filters.isActive ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle") {
+                    chromeButton(
+                        systemName: showFilters || filters.isActive
+                            ? "magnifyingglass.circle.fill"
+                            : "magnifyingglass.circle",
+                        accessibilityLabel: "Search and filter"
+                    ) {
                         withAnimation(.easeOut(duration: 0.2)) { showFilters.toggle() }
                     }
-                    chromeButton(systemName: "chevron.left") { shift(-1) }
-                    chromeButton(systemName: "chevron.right") { shift(1) }
+                    chromeButton(systemName: "chevron.left", accessibilityLabel: "Previous") { shift(-1) }
+                    chromeButton(systemName: "chevron.right", accessibilityLabel: "Next") { shift(1) }
                 }
             }
 
@@ -213,7 +218,11 @@ struct CalendarRootView: View {
         }
     }
 
-    private func chromeButton(systemName: String, action: @escaping () -> Void) -> some View {
+    private func chromeButton(
+        systemName: String,
+        accessibilityLabel: String? = nil,
+        action: @escaping () -> Void
+    ) -> some View {
         Button(action: action) {
             Image(systemName: systemName)
                 .font(.system(size: 14, weight: .semibold))
@@ -223,6 +232,7 @@ struct CalendarRootView: View {
                 .overlay(Circle().stroke(LifeOSTheme.stroke, lineWidth: 1))
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel ?? systemName)
     }
 
     private func shift(_ direction: Int) {

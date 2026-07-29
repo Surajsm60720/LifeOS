@@ -50,4 +50,38 @@ final class RecurrenceRule {
             raw.split(separator: ",").compactMap { Int($0) }.compactMap(Weekday.init(rawValue:))
         )
     }
+
+    /// Human-readable schedule for lists (e.g. "Weekly · Mon, Wed · 10 occurrences").
+    var summaryDescription: String {
+        var parts: [String] = []
+
+        switch frequency {
+        case .daily:
+            parts.append(interval == 1 ? "Daily" : "Every \(interval) days")
+        case .weekly:
+            parts.append(interval == 1 ? "Weekly" : "Every \(interval) weeks")
+        case .monthly:
+            parts.append(interval == 1 ? "Monthly" : "Every \(interval) months")
+        case .everyNMonths:
+            parts.append("Every \(max(interval, 1)) months")
+        }
+
+        if frequency == .weekly, let days = daysOfWeek, !days.isEmpty {
+            let ordered = Weekday.allCases.filter { days.contains($0) }
+            parts.append(ordered.map(\.shortName).joined(separator: ", "))
+        }
+
+        if let occurrenceCount {
+            parts.append(occurrenceCount == 1 ? "1 occurrence" : "\(occurrenceCount) occurrences")
+        }
+
+        if let endDate {
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            formatter.timeStyle = .none
+            parts.append("until \(formatter.string(from: endDate))")
+        }
+
+        return parts.joined(separator: " · ")
+    }
 }

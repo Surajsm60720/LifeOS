@@ -181,7 +181,9 @@ enum BackupService {
         PreferencesDTO(
             calendarDefaultMode: UserDefaults.standard.string(forKey: CalendarViewMode.defaultStorageKey),
             liveActivityEnabled: UserDefaults.standard.object(forKey: LiveActivityManager.enabledStorageKey) as? Bool,
-            liveActivityDefaultScope: UserDefaults.standard.string(forKey: LiveActivityManager.defaultScopeStorageKey)
+            // Retained only so older backup files (format version 1) still decode cleanly;
+            // the Live Activity is Day-only now, so this preference is no longer read anywhere.
+            liveActivityDefaultScope: nil
         )
     }
 
@@ -192,9 +194,7 @@ enum BackupService {
         if let enabled = preferences.liveActivityEnabled {
             UserDefaults.standard.set(enabled, forKey: LiveActivityManager.enabledStorageKey)
         }
-        if let scope = preferences.liveActivityDefaultScope {
-            UserDefaults.standard.set(scope, forKey: LiveActivityManager.defaultScopeStorageKey)
-        }
+        // preferences.liveActivityDefaultScope is intentionally ignored (see currentPreferences).
     }
 
     // MARK: - Import

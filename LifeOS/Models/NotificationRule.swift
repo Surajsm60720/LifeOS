@@ -56,4 +56,30 @@ final class NotificationRule {
             return "\(triggerKind.displayName) · \(sign)\(minutes) min"
         }
     }
+
+    /// Extra lines for list/detail UIs (timing behavior, recurrence, completion needs).
+    func detailLines(for entry: Entry) -> [String] {
+        var lines: [String] = [triggerSummary, triggerKind.helpText]
+
+        if triggerKind == .ifNotCompletedBy {
+            lines.append(
+                entry.isCompletable
+                    ? "Skips the day once the entry is marked complete"
+                    : "Needs Track Completion on the entry to fire"
+            )
+        }
+
+        if let recurrence = entry.recurrence {
+            lines.append("Repeats: \(recurrence.summaryDescription)")
+        } else {
+            lines.append("One-time entry (no repeat schedule)")
+        }
+
+        let startFormatter = DateFormatter()
+        startFormatter.dateStyle = .medium
+        startFormatter.timeStyle = .short
+        lines.append("Entry start: \(startFormatter.string(from: entry.startDate))")
+
+        return lines
+    }
 }

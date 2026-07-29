@@ -11,6 +11,7 @@ struct RecurrenceEditorView: View {
         }
 
         Stepper("Every \(rule.interval)", value: $rule.interval, in: 1...52)
+            .sensoryFeedback(.selection, trigger: rule.interval)
 
         if rule.frequency == .weekly {
             weekdayPicker
@@ -46,19 +47,20 @@ struct RecurrenceEditorView: View {
                 ),
                 in: 1...365
             )
+            .sensoryFeedback(.selection, trigger: rule.occurrenceCount ?? 0)
         }
     }
 
     private var weekdayPicker: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("Days of Week")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
-            HStack {
+            HStack(spacing: 6) {
                 ForEach(Weekday.allCases) { weekday in
                     let selected = rule.daysOfWeek?.contains(weekday) ?? false
-                    Button(weekday.shortName) {
+                    Button {
                         var days = rule.daysOfWeek ?? []
                         if selected {
                             days.remove(weekday)
@@ -66,9 +68,26 @@ struct RecurrenceEditorView: View {
                             days.insert(weekday)
                         }
                         rule.daysOfWeek = days.isEmpty ? nil : days
+                        Haptics.selection()
+                    } label: {
+                        Text(weekday.shortName)
+                            .font(.system(.caption, design: .rounded, weight: .semibold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 36)
+                            .foregroundStyle(selected ? LifeOSTheme.canvas : .white.opacity(0.85))
+                            .background(
+                                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                    .fill(selected ? LifeOSTheme.accent : LifeOSTheme.elevated)
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                    .stroke(selected ? Color.clear : LifeOSTheme.stroke, lineWidth: 1)
+                            )
                     }
-                    .buttonStyle(.bordered)
-                    .tint(selected ? LifeOSTheme.accent : LifeOSTheme.softText)
+                    .buttonStyle(.plain)
+                    .accessibilityAddTraits(selected ? .isSelected : [])
                 }
             }
         }

@@ -1,18 +1,18 @@
 # LifeOS
 
-**Version 0.6**
+**Version 0.7**
 
 A personal, calendar-centric iOS app for tracking day-to-day life, game events, and entertainment progress — locally, without accounts or third-party sync.
 
-LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and reading/watching logs into one entry model with recurrence, completion tracking, customizable local notifications, hangout expense ledgers, multi-stop locations, Markdown recap export, full-app JSON backup/restore, and a Dynamic Island Live Activity for remaining to-dos.
+LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and reading/watching logs into one entry model with recurrence, completion tracking, customizable local notifications, hangout expense ledgers, multi-stop locations, Markdown recap export, full-app JSON backup/restore, and a Dynamic Island Live Activity for today's events at a glance.
 
-> This is an early **v0.6** release. Core flows work; polish, sync, and deferred features (CloudKit, home-screen widgets, charts) are intentionally out of scope.
+> This is an early **v0.7** release. Core flows work; polish, sync, and deferred features (CloudKit, home-screen widgets, charts) are intentionally out of scope.
 
 ---
 
 ## Status
 
-| Area | v0.6 |
+| Area | v0.7 |
 |---|---|
 | Unified entry model (IRL / Games / Entertainment) | Included |
 | Day / Week / Month / Year calendar | Included |
@@ -20,7 +20,7 @@ LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and re
 | Swipe complete / delete on Day, Week, Month rows | Included |
 | Configurable default calendar view (Day default) | Included |
 | Alternate app icons (Default / Geometric / Minimal) + light/dark appearances | Included |
-| Live Activity / Dynamic Island (Day–Year remaining to-dos) | Included |
+| Live Activity / Dynamic Island (day-only, count + event list) | Included |
 | Recurrence + occurrence-level completion | Included |
 | Local notification rules + presets (64-cap aware) | Included |
 | Notification budget (scheduled / remaining / firing today) | Included |
@@ -33,6 +33,7 @@ LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and re
 | Entertainment progress + session targets | Included |
 | Markdown recap export with stats | Included |
 | JSON backup & restore (Replace or Merge) | Included |
+| Haptic feedback across the app | Included |
 
 ---
 
@@ -52,7 +53,7 @@ LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and re
 | Language / UI | Swift · SwiftUI (dark theme) |
 | Persistence | SwiftData |
 | Notifications | UserNotifications |
-| Live Activities | ActivityKit · WidgetKit extension · App Intents |
+| Live Activities | ActivityKit · WidgetKit extension |
 | Places | MapKit (`MKLocalSearch`) |
 | Recurrence | Custom `Calendar` / `DateComponents` engine |
 | Project generation | XcodeGen |
@@ -76,7 +77,52 @@ Allow notification permission when prompted if you plan to use reminders.
 
 ---
 
-## What’s in v0.6
+## What's new in v0.7
+
+### Live Activity / Dynamic Island redesign
+
+- **Day-only scope** — The Live Activity now always tracks today; the Week/Month/Year scope switcher has been removed for a simpler, faster-to-read experience
+- **Dynamic Island (expanded)** — Long-pressing shows a clean count badge ("4 — Remaining today") instead of a per-item list, avoiding the ~160pt height budget that caused clipped/garbled rendering in v0.6
+- **Lock Screen Live Activity** — Compact card showing up to 3 events with color dots and a "+N more events" overflow line; reduced fonts/spacing so the card never clips at the edges
+- **All events for the day** — The Live Activity now shows every entry occurring today (not just completable to-dos); completed items drop off automatically
+- **Stable row identities** — `LiveActivityItem` uses UUID instead of title, preventing ForEach collisions when two entries share a name
+
+### UX & form improvements
+
+- **Search & Filter bar** — "Search & Filter" header with magnifying glass icon, "Clear all" button, "Filter by category" label, broader placeholder ("Search titles, notes, places…"), and a bordered/padded card style
+- **Duration editor** — Hours/minutes steppers with quick-pick presets (5m–120m) replace the old single-stepper + text field
+- **Category sections** — Game and Entertainment pickers are in their own sections (no more "Category Details" header)
+- **Location flow** — "Add Location" opens the Place Search sheet immediately; each location row has a "Change Place" and "Remove" button; "Pinned" renamed to "On map" with a map-pin icon
+- **Add-action buttons** — "Add Expense Line", "Add Person Who Owes You", "Add Notification Rule", "Add Progress Tracking", and "Add Location" now use a consistent bold+icon style (`addActionButton`)
+- **Progress label** — Placeholder changed to "Counting by (e.g. episode, chapter, page)" with an explanatory footer
+- **Recurrence header** — Entertainment entries now show "Repeat Schedule" (not "Personal Habit (Display Only)") with a clarifying footer
+
+### Notification & detail enhancements
+
+- **Richer notification rule display** — Entry detail and form both show `triggerSummary`, `detailLines` (timing behavior, recurrence, completion needs), and `renderedMessage`
+- **Notification button contrast** — "Create Notification Rule" uses `.bordered` instead of `.borderedProminent`
+- **Recurrence summaries** — `RecurrenceRule.summaryDescription` provides human-readable schedules ("Weekly · Mon, Wed · 10 occurrences")
+
+### Haptic feedback
+
+- Selection haptics on progress steppers and recurrence day-picker
+- Light haptics on Cancel, Edit, Done buttons
+- Medium haptic on the "+" (Add Entry) button
+- Success haptic on Save
+
+### Theming & consistency
+
+- **Unified accent tint** — `LifeOSTheme.accent` applied app-wide via `.tint()` on the root `ContentView`, entry sheets, detail views, settings, and notification forms
+- **Accessibility** — Calendar navigation buttons and filter button now carry accessibility labels
+
+### Settings
+
+- **Default Scope picker removed** — Settings no longer has a "Default Scope" option for Live Activities (always Day)
+- **Updated footer** — Dynamic Island section footer reflects the day-only design
+
+---
+
+## What's in v0.6
 
 Everything from v0.5, plus calendar and notification UX polish:
 
@@ -90,7 +136,6 @@ Everything from v0.5, plus calendar and notification UX polish:
 - **JSON backup & restore** — Settings → Backup & Restore; Replace All or Merge by entry ID  
 - **Notification budget** — Scheduled / Remaining / Firing Today against the iOS 64 pending cap  
 - **Expense settlement share** — Share or copy plain-text hangout breakdowns  
-- **Live Activity (Dynamic Island)** — Optional remaining-count pulse with Day–Year scope switching  
 - **Default calendar view** — Day by default; Settings → Calendar for Day / Week / Month / Year  
 - **App icons** — Default / Geometric / Minimal with light and dark appearances  
 - **Calendar** — Day, Week, Month, Year with category-aware styling  
@@ -123,7 +168,7 @@ Or in Xcode: **⌘U**.
 
 Unit coverage includes recurrence, entry capabilities (incl. expense split), notification budget helpers, recap export formatting, backup encode/decode + replace/merge, and expense settlement text. UI tests include a notification-banner icon smoke check (`LifeOSUITests`).
 
-Live Activity UI, Dynamic Island scope switching, calendar swipe actions, and year heat maps should be verified manually on a simulator or device.
+Live Activity UI, Dynamic Island expanded count, calendar swipe actions, and year heat maps should be verified manually on a simulator or device.
 
 ---
 
@@ -132,12 +177,12 @@ Live Activity UI, Dynamic Island scope switching, calendar swipe actions, and ye
 ```
 LifeOS/
 ├── App/                 App entry, SwiftData container
-├── LiveActivity/        Shared ActivityKit models, manager, LiveActivityIntent
+├── LiveActivity/        Shared ActivityKit models, manager
 ├── LiveActivityWidget/  Dynamic Island / Lock Screen Live Activity UI (extension)
 ├── Models/              Entry, locations, expenses, recurrence, notifications, progress
 ├── Services/            Engine, planner, exporter, backup, expense share, templates, migrations
 ├── Views/               Calendar (incl. grid/swipe helpers), entries, notifications, settings, export / backup
-├── Utilities/           Theme, filters, date helpers
+├── Utilities/           Theme, filters, date helpers, haptics
 └── Resources/           Assets (App Icons + AccentColor)
 LifeOSTests/             Unit tests
 LifeOSUITests/           UI tests
@@ -146,7 +191,7 @@ project.yml              XcodeGen definition
 
 ---
 
-## Design notes (v0.6)
+## Design notes (v0.7)
 
 - Dark theme only in-app; neutral cool-gray accents  
 - App icons support system light/dark Home Screen appearances  
@@ -155,10 +200,12 @@ project.yml              XcodeGen definition
 - Year activity heat is count-only (contribution-style), not category-colored  
 - Calendar row swipes mirror Notifications hub motion (`List` swipeActions)  
 - Live Activities are time-limited by iOS; reopening/foregrounding LifeOS re-syncs the snapshot  
-- Dynamic Island interactivity is limited to App Intents (scope switching); deep lists still live in the app  
+- Dynamic Island expanded view shows only a count (no per-item list) to stay within the ~160pt system height budget  
+- Lock Screen Live Activity shows up to 3 event rows with an overflow indicator  
 - Entertainment logging is manual and notification-free by design  
 - Game event data is manual (no unofficial account scrapers)  
 - Expense tracking is hangout-scoped (no dedicated Expenses tab); share text has no currency symbol yet  
+- Haptic feedback uses `UIFeedbackGenerator` and `.sensoryFeedback` for tactile responses on key interactions  
 
 ---
 

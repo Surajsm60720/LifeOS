@@ -17,187 +17,149 @@ struct LifeOSLiveActivityWidget: Widget {
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    ExpandedCountBadge(count: context.state.remainingCount)
+                    Label("LifeOS", systemImage: "checklist")
+                        .font(.system(.caption, design: .rounded, weight: .semibold))
+                        .foregroundStyle(.white)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    Text(context.state.scope.title)
-                        .font(.system(.caption2, design: .rounded, weight: .semibold))
+                    Text("Today")
+                        .font(.system(.caption, design: .rounded, weight: .semibold))
                         .foregroundStyle(.secondary)
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    ExpandedBody(state: context.state)
+                    ExpandedSummary(count: context.state.itemCount)
                 }
             } compactLeading: {
-                Text("\(context.state.remainingCount)")
-                    .font(.system(.caption, design: .rounded, weight: .bold))
+                HStack(spacing: 3) {
+                    Image(systemName: "checklist")
+                        .font(.system(size: 11, weight: .semibold))
+                    Text("\(context.state.itemCount)")
+                        .font(.system(.caption, design: .rounded, weight: .bold))
+                        .monospacedDigit()
+                }
+                .foregroundStyle(.white)
             } compactTrailing: {
-                Text(context.state.scope.title)
+                Text("Today")
                     .font(.system(.caption2, design: .rounded, weight: .semibold))
                     .foregroundStyle(.secondary)
             } minimal: {
-                Text("\(context.state.remainingCount)")
+                Text("\(context.state.itemCount)")
                     .font(.system(.caption2, design: .rounded, weight: .bold))
+                    .monospacedDigit()
+                    .foregroundStyle(.white)
             }
+            .keylineTint(LifeOSTheme.accent)
         }
     }
 }
 
 // MARK: - Shared pieces
 
-private struct ExpandedCountBadge: View {
+/// The Dynamic Island's expanded (long-press) presentation has a hard, system-imposed
+/// height budget (~160pt total, including the top leading/trailing row) that Apple does
+/// not expose an API to override. A per-item list there is exactly what caused the
+/// clipped/garbled rendering originally reported, since the row count needed to show a
+/// whole day never reliably fits that budget. So the Dynamic Island shows a single,
+/// large, single-line count instead — nothing that can wrap, clip, or crowd the margins.
+///
+/// The Lock Screen / Always-On presentation has much more vertical room, so it keeps a
+/// short, real list: up to `lockScreenMaxRows` items, then a single "+N more" line.
+private enum LiveActivityLayout {
+    static let lockScreenMaxRows = 3
+}
+
+private struct ExpandedSummary: View {
     let count: Int
 
     var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "checklist")
-                .font(.system(size: 12, weight: .semibold))
-            Text("\(count)")
-                .font(.system(.title3, design: .rounded, weight: .bold))
-                .monospacedDigit()
-        }
-        .foregroundStyle(.primary)
-    }
-}
+        HStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(LifeOSTheme.accent.opacity(0.18))
 
-private struct ExpandedBody: View {
-    let state: LifeOSLiveActivityAttributes.ContentState
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            ScopePicker(active: state.scope)
-
-            if state.items.isEmpty {
-                Text(emptyLine)
-                    .font(.system(.caption, design: .rounded))
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, 4)
-            } else {
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        ForEach(state.items.prefix(8)) { item in
-                            LiveActivityRow(item: item)
-                        }
-
-                        if overflowCount > 0 {
-                            Text(moreLine)
-                                .font(.system(.caption2, design: .rounded, weight: .medium))
-                                .foregroundStyle(.secondary)
-                                .padding(.top, 2)
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .frame(maxHeight: 120)
+                Text("\(count)")
+                    .font(.system(.title2, design: .rounded, weight: .bold))
+                    .monospacedDigit()
+                    .foregroundStyle(.white)
             }
+            .frame(width: 48, height: 48)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(count == 0 ? "You're all caught up" : "Remaining today")
+                    .font(.system(.headline, design: .rounded, weight: .semibold))
+                    .foregroundStyle(.white)
+
+                Text(summaryLine)
+                    .font(.system(.caption, design: .rounded, weight: .medium))
+                    .foregroundStyle(.secondary)
+            }
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+
+            Spacer(minLength: 0)
         }
-        .padding(.top, 2)
+        .frame(maxWidth: .infinity)
+        .padding(.top, 4)
+        .padding(.bottom, 2)
     }
 
-    private var overflowCount: Int {
-        max(0, state.remainingCount - state.items.count)
-    }
-
-    private var emptyLine: String {
-        "Nothing open for this \(state.scope.title.lowercased())."
-    }
-
-    private var moreLine: String {
-        let noun = state.scope.title.lowercased()
-        if overflowCount == 1 {
-            return "...1 more for this \(noun) — open LifeOS"
-        }
-        return "...\(overflowCount) more for this \(noun) — open LifeOS"
+    private var summaryLine: String {
+        guard count > 0 else { return "No unfinished events" }
+        return count == 1 ? "1 event left" : "\(count) events left"
     }
 }
 
 private struct LockScreenContent: View {
     let state: LifeOSLiveActivityAttributes.ContentState
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(alignment: .firstTextBaseline) {
-                Text("\(state.remainingCount) open")
-                    .font(.system(.headline, design: .rounded, weight: .bold))
-                Spacer(minLength: 8)
-                Text(state.scope.title)
-                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
-                    .foregroundStyle(.secondary)
-            }
-
-            ScopePicker(active: state.scope)
-
-            if state.items.isEmpty {
-                Text("Nothing open for this \(state.scope.title.lowercased()).")
-                    .font(.system(.subheadline, design: .rounded))
-                    .foregroundStyle(.secondary)
-            } else {
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        ForEach(state.items.prefix(8)) { item in
-                            LiveActivityRow(item: item)
-                        }
-
-                        if overflowCount > 0 {
-                            Text(moreLine)
-                                .font(.system(.caption, design: .rounded, weight: .medium))
-                                .foregroundStyle(.secondary)
-                                .padding(.top, 2)
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .frame(maxHeight: 180)
-            }
-        }
-        .padding(14)
-        .activityBackgroundTint(Color.black.opacity(0.85))
+    private var visibleItems: [LiveActivityItem] {
+        Array(state.items.prefix(LiveActivityLayout.lockScreenMaxRows))
     }
 
     private var overflowCount: Int {
-        max(0, state.remainingCount - state.items.count)
+        max(0, state.itemCount - visibleItems.count)
     }
-
-    private var moreLine: String {
-        let noun = state.scope.title.lowercased()
-        if overflowCount == 1 {
-            return "...1 more for this \(noun) — open LifeOS"
-        }
-        return "...\(overflowCount) more for this \(noun) — open LifeOS"
-    }
-}
-
-private struct ScopePicker: View {
-    let active: LiveActivityScope
 
     var body: some View {
-        HStack(spacing: 4) {
-            ForEach(LiveActivityScope.allCases) { scope in
-                ScopeButton(scope: scope, active: active)
+        VStack(alignment: .leading, spacing: 7) {
+            HStack(spacing: 6) {
+                Image(systemName: "checklist")
+                    .font(.system(size: 13, weight: .semibold))
+
+                Text("Today")
+                    .font(.system(.subheadline, design: .rounded, weight: .semibold))
+
+                Spacer(minLength: 8)
+
+                Text(state.itemCount == 1 ? "1 event" : "\(state.itemCount) events")
+                    .font(.system(.caption, design: .rounded, weight: .semibold))
+                    .foregroundStyle(.secondary)
+            }
+            .foregroundStyle(.white)
+
+            if visibleItems.isEmpty {
+                Text("Nothing left for today")
+                    .font(.system(.footnote, design: .rounded, weight: .medium))
+                    .foregroundStyle(.secondary)
+            } else {
+                VStack(alignment: .leading, spacing: 5) {
+                    ForEach(visibleItems) { item in
+                        LiveActivityRow(item: item)
+                    }
+                }
+
+                if overflowCount > 0 {
+                    Text(overflowCount == 1 ? "+1 more event" : "+\(overflowCount) more events")
+                        .font(.system(.caption2, design: .rounded, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
             }
         }
-    }
-}
-
-private struct ScopeButton: View {
-    let scope: LiveActivityScope
-    let active: LiveActivityScope
-
-    private var isActive: Bool { scope == active }
-
-    var body: some View {
-        Button(intent: SetLiveActivityScopeIntent(scope: scope)) {
-            Text(scope.title)
-                .font(.system(.caption2, design: .rounded, weight: .semibold))
-                .foregroundStyle(isActive ? Color.black : Color.primary.opacity(0.85))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 6)
-                .background(
-                    RoundedRectangle(cornerRadius: 8, style: .continuous)
-                        .fill(isActive ? Color.white : Color.white.opacity(0.12))
-                )
-        }
-        .buttonStyle(.plain)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
+        .activityBackgroundTint(Color.black.opacity(0.85))
+        .activitySystemActionForegroundColor(.white)
     }
 }
 
@@ -211,8 +173,10 @@ private struct LiveActivityRow: View {
                 .frame(width: 7, height: 7)
 
             Text(item.title)
-                .font(.system(.caption, design: .rounded, weight: .medium))
+                .font(.system(.footnote, design: .rounded, weight: .medium))
+                .foregroundStyle(.white)
                 .lineLimit(1)
+                .truncationMode(.tail)
 
             Spacer(minLength: 0)
         }

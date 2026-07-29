@@ -11,6 +11,7 @@ struct PlaceSearchSheet: View {
     @State private var results: [MKMapItem] = []
     @State private var isSearching = false
     @State private var errorMessage: String?
+    @FocusState private var isSearchFocused: Bool
 
     var body: some View {
         NavigationStack {
@@ -19,6 +20,7 @@ struct PlaceSearchSheet: View {
                     TextField("Search places", text: $query)
                         .textInputAutocapitalization(.words)
                         .submitLabel(.search)
+                        .focused($isSearchFocused)
                         .onSubmit { search() }
                 }
 
@@ -72,6 +74,9 @@ struct PlaceSearchSheet: View {
                     Button("Search") { search() }
                         .disabled(query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
+            }
+            .onAppear {
+                isSearchFocused = true
             }
         }
     }
