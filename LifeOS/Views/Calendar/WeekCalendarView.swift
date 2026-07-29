@@ -38,6 +38,14 @@ struct WeekCalendarView<Leading: View>: View {
         return result
     }
 
+    /// Expand the whole week once and bucket by day, the way Month and Year already
+    /// do. Expanding per day re-scanned the entire entry list seven times per render.
+    private var occurrencesByDay: [Date: [CalendarEntryOccurrence]] {
+        CalendarGridSupport.groupByDay(
+            entryStore.occurrences(for: entries, in: weekInterval)
+        )
+    }
+
     var body: some View {
         List {
             Section {
@@ -47,8 +55,9 @@ struct WeekCalendarView<Leading: View>: View {
                     .listRowSeparator(.hidden)
             }
 
+            let grouped = occurrencesByDay
             ForEach(days, id: \.self) { day in
-                daySection(day)
+                daySection(day, occurrences: grouped[DateFormatting.startOfDay(day)] ?? [])
             }
 
             Section {
@@ -96,11 +105,7 @@ struct WeekCalendarView<Leading: View>: View {
     }
 
     @ViewBuilder
-    private func daySection(_ day: Date) -> some View {
-        let dayOccurrences = entryStore.occurrences(
-            for: entries,
-            in: DateInterval(start: DateFormatting.startOfDay(day), duration: 86_400)
-        )
+    private func daySection(_ day: Date, occurrences dayOccurrences: [CalendarEntryOccurrence]) -> some View {
         let isToday = Calendar.current.isDateInToday(day)
 
         Section {

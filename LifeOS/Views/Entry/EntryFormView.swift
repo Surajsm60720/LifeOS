@@ -159,7 +159,24 @@ struct EntryFormView: View {
                 applyCategoryDefaults(newCategory)
             }
 
-            DatePicker("Start", selection: $entry.startDate)
+            Toggle("All Day", isOn: Binding(
+                get: { entry.isAllDay },
+                set: { enabled in
+                    entry.isAllDay = enabled
+                    if enabled {
+                        entry.startDate = Calendar.current.startOfDay(for: entry.startDate)
+                    }
+                }
+            ))
+
+            if entry.isAllDay {
+                DatePicker("Date", selection: $entry.startDate, displayedComponents: .date)
+                    .onChange(of: entry.startDate) { _, newValue in
+                        entry.startDate = Calendar.current.startOfDay(for: newValue)
+                    }
+            } else {
+                DatePicker("Start", selection: $entry.startDate)
+            }
 
             Toggle("Has Duration", isOn: Binding(
                 get: { entry.duration != nil },
@@ -812,6 +829,8 @@ struct EntryFormView: View {
         if let progress = entry.progress {
             progress.entry = entry
         }
+
+        entry.normalizeStartDateIfAllDay()
 
         try? modelContext.save()
         entryStore.save(entry: entry, modelContext: modelContext, allEntries: allEntries)

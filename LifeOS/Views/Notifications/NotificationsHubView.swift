@@ -3,8 +3,10 @@ import SwiftData
 import UIKit
 
 struct NotificationsHubView: View {
+    /// Supplied by `ContentView` so all tabs share a single `@Query`.
+    let entries: [Entry]
+
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Entry.startDate) private var entries: [Entry]
 
     @State private var showingCreateSheet = false
     @State private var editingRule: NotificationRule?

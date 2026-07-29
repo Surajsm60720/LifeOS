@@ -86,8 +86,10 @@ struct EntryRowView: View {
                 parts.append("\(progress.currentUnit) \(progress.unitLabel)")
             }
         }
-        let time = DateFormatter.localizedString(from: occurrence.occurrenceDate, dateStyle: .none, timeStyle: .short)
-        parts.append(time)
+        if !occurrence.entry.isAllDay {
+            let time = DateFormatter.localizedString(from: occurrence.occurrenceDate, dateStyle: .none, timeStyle: .short)
+            parts.append(time)
+        }
         return parts.joined(separator: " · ")
     }
 }

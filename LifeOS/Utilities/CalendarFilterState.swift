@@ -9,6 +9,17 @@ final class CalendarFilterState: ObservableObject {
     @Published var gameFilter: GameSubCategory? = nil
     @Published var entertainmentFilter: EntertainmentSubCategory? = nil
 
+    /// Compact value identifying the current filter set, so views can cache derived
+    /// results and invalidate them with a single `onChange`.
+    var signature: String {
+        [
+            searchText,
+            categoryFilter?.rawValue ?? "",
+            gameFilter?.rawValue ?? "",
+            entertainmentFilter?.rawValue ?? ""
+        ].joined(separator: "\u{1F}")
+    }
+
     var isActive: Bool {
         !searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             || categoryFilter != nil

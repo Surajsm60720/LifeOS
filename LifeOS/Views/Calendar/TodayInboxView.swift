@@ -10,9 +10,13 @@ struct TodayInboxView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var upcomingReminders: [String] = []
 
-    private var todayOpen: [CalendarEntryOccurrence] {
+    /// Cached rather than computed, because `body` reads it three times (summary,
+    /// list, and overflow count) and each read re-expanded the whole library.
+    @State private var todayOpen: [CalendarEntryOccurrence] = []
+
+    private func recomputeTodayOpen() {
         let interval = DateInterval(start: DateFormatting.startOfDay(.now), duration: 86_400)
-        return entryStore.occurrences(for: entries, in: interval)
+        todayOpen = entryStore.occurrences(for: entries, in: interval)
             .filter { $0.entry.isCompletable && !$0.entry.isCompleted(on: $0.occurrenceDate) }
     }
 
@@ -100,6 +104,9 @@ struct TodayInboxView: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(LifeOSTheme.stroke, lineWidth: 1)
         )
+        .onAppear { recomputeTodayOpen() }
+        .onChange(of: entries) { _, _ in recomputeTodayOpen() }
+        .onChange(of: entryStore.dataVersion) { _, _ in recomputeTodayOpen() }
         .task {
             upcomingReminders = await NotificationPlanner.shared.pendingManagedSummaries()
         }

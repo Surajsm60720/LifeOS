@@ -210,7 +210,7 @@ actor NotificationPlanner {
         lastRefreshAt = now
 
         let calendar = Calendar.current
-        let desired = buildDesiredRequests(snapshot: snapshot, now: now, calendar: calendar)
+        let desired = buildDesiredCandidates(snapshot: snapshot, now: now, calendar: calendar)
         let desiredIDs = Set(desired.map(\.identifier))
 
         let pending = await center.pendingNotificationRequests()
@@ -243,10 +243,11 @@ actor NotificationPlanner {
             .filter { !existingIDs.contains($0.identifier) }
             .filter { !protectedIDs.contains($0.identifier) }
 
-        let sortedAdd = toAdd.sorted { (nextFireDate(for: $0) ?? .distantFuture) < (nextFireDate(for: $1) ?? .distantFuture) }
+        let sortedAdd = toAdd.sorted { $0.fireDate < $1.fireDate }
         let remainingSlots = max(0, maxPending - existingIDs.count)
 
-        for request in sortedAdd.prefix(remainingSlots) {
+        for candidate in sortedAdd.prefix(remainingSlots) {
+            guard let request = makeRequest(from: candidate, now: now, calendar: calendar) else { continue }
             try? await center.add(request)
         }
     }
@@ -278,7 +279,7 @@ actor NotificationPlanner {
         lastRefreshAt = now
 
         let calendar = Calendar.current
-        let desired = buildDesiredRequests(snapshot: snapshot, now: now, calendar: calendar)
+        let desired = buildDesiredCandidates(snapshot: snapshot, now: now, calendar: calendar)
         let desiredIDs = Set(desired.map(\.identifier))
 
         let pending = await center.pendingNotificationRequests()
@@ -305,76 +306,102 @@ actor NotificationPlanner {
         let toAdd = desired.filter { !existingIDs.contains($0.identifier) && !protectedIDs.contains($0.identifier) }
 
         // Prefer soonest fires when capping at 64.
-        let sortedAdd = toAdd.sorted { (nextFireDate(for: $0) ?? .distantFuture) < (nextFireDate(for: $1) ?? .distantFuture) }
+        let sortedAdd = toAdd.sorted { $0.fireDate < $1.fireDate }
         let remainingSlots = max(0, maxPending - (existingIDs.subtracting(Set(obsolete)).count))
 
-        for request in sortedAdd.prefix(remainingSlots) {
+        for candidate in sortedAdd.prefix(remainingSlots) {
+            guard let request = makeRequest(from: candidate, now: now, calendar: calendar) else { continue }
             try? await center.add(request)
         }
     }
 
-    private func buildDesiredRequests(
+    /// A notification we *may* schedule. Deliberately cheap to create: only an
+    /// identifier and the strings needed later. The system caps us at 64 pending
+    /// requests, so building `UNMutableNotificationContent` and a trigger for every
+    /// candidate — thousands of them at scale — was work thrown away immediately.
+    private struct Candidate {
+        let identifier: String
+        let fireDate: Date
+        let entryTitle: String
+        let categoryName: String
+        let messageTemplate: String
+    }
+
+    private func buildDesiredCandidates(
         snapshot: ScheduleSnapshot,
         now: Date,
         calendar: Calendar
-    ) -> [UNNotificationRequest] {
+    ) -> [Candidate] {
         let todayStart = calendar.startOfDay(for: now)
         let todayEnd = DateFormatting.endOfDay(now, calendar: calendar)
         let weekEnd = calendar.date(byAdding: .day, value: 7, to: todayStart) ?? todayEnd
         let range = todayStart...weekEnd
 
-        var requests: [UNNotificationRequest] = []
+        var candidates: [Candidate] = []
 
         for item in snapshot.items where item.supportsNotifications {
             let activeRules = item.rules.filter(\.isActive)
             guard !activeRules.isEmpty else { continue }
 
             let occurrences = occurrenceDates(for: item, in: range, calendar: calendar)
+            guard !occurrences.isEmpty else { continue }
 
             for rule in activeRules {
-                switch rule.triggerKind {
-                case .ifNotCompletedBy:
-                    guard item.isCompletable else { continue }
-                    for occurrence in occurrences {
-                        if isCompleted(item: item, occurrence: occurrence, calendar: calendar) { continue }
-                        let fire = fireDate(for: rule, occurrence: occurrence, calendar: calendar)
-                        guard fire > now else { continue }
-                        if let request = makeRequest(
-                            entryID: item.entryID,
-                            title: item.entryTitle,
-                            categoryName: item.categoryName,
-                            rule: rule,
-                            fireDate: fire,
-                            occurrence: occurrence,
-                            now: now,
-                            calendar: calendar
-                        ) {
-                            requests.append(request)
-                        }
-                    }
+                // Only `ifNotCompletedBy` cares about completion state.
+                let skipCompleted = rule.triggerKind == .ifNotCompletedBy
+                if skipCompleted && !item.isCompletable { continue }
 
-                case .fixedTime, .relativeToStart:
-                    for occurrence in occurrences {
-                        let fire = fireDate(for: rule, occurrence: occurrence, calendar: calendar)
-                        guard fire > now else { continue }
-                        if let request = makeRequest(
-                            entryID: item.entryID,
-                            title: item.entryTitle,
-                            categoryName: item.categoryName,
-                            rule: rule,
-                            fireDate: fire,
-                            occurrence: occurrence,
-                            now: now,
-                            calendar: calendar
-                        ) {
-                            requests.append(request)
-                        }
+                for occurrence in occurrences {
+                    if skipCompleted, isCompleted(item: item, occurrence: occurrence, calendar: calendar) {
+                        continue
                     }
+                    let fire = fireDate(for: rule, occurrence: occurrence, calendar: calendar)
+                    guard fire > now else { continue }
+
+                    candidates.append(
+                        Candidate(
+                            identifier: identifierPrefix
+                                + item.entryID.uuidString
+                                + "-"
+                                + dayKey(for: occurrence, calendar: calendar)
+                                + "-"
+                                + rule.ruleID.uuidString,
+                            fireDate: fire,
+                            entryTitle: item.entryTitle,
+                            categoryName: item.categoryName,
+                            messageTemplate: rule.messageTemplate
+                        )
+                    )
                 }
             }
         }
 
-        return requests
+        return candidates
+    }
+
+    private func makeRequest(from candidate: Candidate, now: Date, calendar: Calendar) -> UNNotificationRequest? {
+        let interval = candidate.fireDate.timeIntervalSince(now)
+        guard interval > 0 else { return nil }
+
+        let trigger: UNNotificationTrigger
+        if interval <= 12 * 60 * 60 {
+            trigger = UNTimeIntervalNotificationTrigger(timeInterval: max(1, ceil(interval)), repeats: false)
+        } else {
+            let components = calendar.dateComponents(
+                [.year, .month, .day, .hour, .minute, .second],
+                from: candidate.fireDate
+            )
+            trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)
+        }
+
+        let content = UNMutableNotificationContent()
+        content.title = "LifeOS"
+        content.body = candidate.messageTemplate
+            .replacingOccurrences(of: "{title}", with: candidate.entryTitle)
+            .replacingOccurrences(of: "{category}", with: candidate.categoryName)
+        content.sound = .default
+
+        return UNNotificationRequest(identifier: candidate.identifier, content: content, trigger: trigger)
     }
 
     private func occurrenceDates(
@@ -481,12 +508,15 @@ actor NotificationPlanner {
         return nil
     }
 
+    /// Builds the `yyyyMMdd` key from raw date components. `dayKey` runs once per
+    /// (occurrence x rule) on every notification refresh, and allocating a
+    /// `DateFormatter` per call there was a measurable cost for no benefit — the
+    /// format is fixed and locale-independent.
     private func dayKey(for date: Date, calendar: Calendar) -> String {
-        let day = calendar.startOfDay(for: date)
-        let formatter = DateFormatter()
-        formatter.calendar = calendar
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyyMMdd"
-        return formatter.string(from: day)
+        let parts = calendar.dateComponents([.year, .month, .day], from: date)
+        let year = parts.year ?? 0
+        let month = parts.month ?? 0
+        let day = parts.day ?? 0
+        return String(format: "%04d%02d%02d", year, month, day)
     }
 }

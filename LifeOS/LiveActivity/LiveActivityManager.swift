@@ -5,7 +5,7 @@ import SwiftUI
 
 @MainActor
 final class LiveActivityManager {
-    static let enabledStorageKey = "liveActivityEnabled"
+    nonisolated static let enabledStorageKey = "liveActivityEnabled"
 
     /// Live Activities render as fixed, non-scrolling snapshots, so the content payload
     /// only ever needs enough rows to cover the largest surface (Lock Screen).

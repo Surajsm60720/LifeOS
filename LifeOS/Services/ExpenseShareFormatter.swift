@@ -47,7 +47,11 @@ enum ExpenseShareFormatter {
         return blocks.joined(separator: "\n\n")
     }
 
-    private static func formatAmount(_ value: Decimal) -> String {
+    static func displayAmount(_ value: Decimal) -> String {
         NSDecimalNumber(decimal: value).stringValue
+    }
+
+    private static func formatAmount(_ value: Decimal) -> String {
+        displayAmount(value)
     }
 }

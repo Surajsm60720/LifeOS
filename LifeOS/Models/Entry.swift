@@ -9,6 +9,9 @@ final class Entry {
     var categoryRaw: String
     var subCategory: String?
     var startDate: Date
+    /// When true, the entry is tied to a calendar day without a specific clock time
+    /// (e.g. daily leave). `startDate` is stored at the start of that day.
+    var isAllDay: Bool = false
     var duration: TimeInterval?
     /// Legacy single-location string; migrated into `locations` then cleared.
     var location: String?
@@ -38,6 +41,7 @@ final class Entry {
         category: EntryCategory,
         subCategory: String? = nil,
         startDate: Date = .now,
+        isAllDay: Bool = false,
         duration: TimeInterval? = nil,
         location: String? = nil,
         notes: String? = nil,
@@ -53,6 +57,7 @@ final class Entry {
         self.categoryRaw = category.rawValue
         self.subCategory = subCategory
         self.startDate = startDate
+        self.isAllDay = isAllDay
         self.duration = duration
         self.location = location
         self.notes = notes
@@ -263,6 +268,12 @@ final class Entry {
         return completions.contains { completion in
             calendar.isDate(completion.occurrenceStart, inSameDayAs: normalized)
         }
+    }
+
+    /// Keeps `startDate` at midnight when the entry has no specific start time.
+    func normalizeStartDateIfAllDay(calendar: Calendar = .current) {
+        guard isAllDay else { return }
+        startDate = calendar.startOfDay(for: startDate)
     }
 
     func completion(for occurrenceDate: Date, calendar: Calendar = .current) -> EntryCompletion? {

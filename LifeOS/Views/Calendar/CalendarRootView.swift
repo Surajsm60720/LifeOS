@@ -17,7 +17,10 @@ enum CalendarViewMode: String, CaseIterable, Identifiable {
 }
 
 struct CalendarRootView: View {
-    @Query(sort: \Entry.startDate) private var entries: [Entry]
+    /// Supplied by `ContentView` rather than queried again here. `TabView` keeps every
+    /// tab root alive, so a private `@Query` per tab meant one mutation triggered
+    /// several independent full-table fetches.
+    let entries: [Entry]
     @ObservedObject var entryStore: EntryStore
     @StateObject private var filters = CalendarFilterState()
 
@@ -27,6 +30,7 @@ struct CalendarRootView: View {
     @State private var selectedOccurrence: CalendarEntryOccurrence?
     @State private var showFilters = false
     @State private var didApplyStoredDefault = false
+    @State private var subtitleCount = 0
 
     private var filteredEntries: [Entry] {
         filters.filter(entries)
@@ -80,12 +84,18 @@ struct CalendarRootView: View {
         }
         .onAppear {
             applyStoredDefaultIfNeeded()
+            recomputeSubtitleCount()
         }
         .onChange(of: defaultModeRaw) { _, newValue in
             if let preferred = CalendarViewMode(rawValue: newValue), preferred != mode {
                 mode = preferred
             }
         }
+        .onChange(of: mode) { _, _ in recomputeSubtitleCount() }
+        .onChange(of: anchorDate) { _, _ in recomputeSubtitleCount() }
+        .onChange(of: entries) { _, _ in recomputeSubtitleCount() }
+        .onChange(of: entryStore.dataVersion) { _, _ in recomputeSubtitleCount() }
+        .onChange(of: filters.signature) { _, _ in recomputeSubtitleCount() }
     }
 
     @ViewBuilder
@@ -200,22 +210,28 @@ struct CalendarRootView: View {
         let suffix = filters.isActive ? " · filtered" : ""
         switch mode {
         case .day:
-            let interval = DateInterval(start: DateFormatting.startOfDay(anchorDate), duration: 86_400)
-            let count = entryStore.occurrences(for: filteredEntries, in: interval).count
-            return (count == 0 ? "Clear day" : "\(count) on the books") + suffix
+            return (subtitleCount == 0 ? "Clear day" : "\(subtitleCount) on the books") + suffix
         case .week:
-            let count = entryStore.occurrences(for: filteredEntries, in: DateFormatting.weekInterval(containing: anchorDate)).count
-            return "\(count) across the week" + suffix
+            return "\(subtitleCount) across the week" + suffix
         case .month:
-            let count = entryStore.occurrences(for: filteredEntries, in: DateFormatting.monthInterval(containing: anchorDate)).count
-            return "\(count) this month" + suffix
+            return "\(subtitleCount) this month" + suffix
         case .year:
-            let count = entryStore.occurrences(
-                for: filteredEntries,
-                in: DateFormatting.yearInterval(containing: anchorDate)
-            ).count
-            return "\(count) across the year" + suffix
+            return "\(subtitleCount) across the year" + suffix
         }
+    }
+
+    /// Recomputed only when the inputs change. Reading this from `body` as a computed
+    /// property meant a full expansion of the library on every render, on top of the
+    /// identical one the visible mode view was already doing.
+    private func recomputeSubtitleCount() {
+        let interval: DateInterval
+        switch mode {
+        case .day: interval = DateInterval(start: DateFormatting.startOfDay(anchorDate), duration: 86_400)
+        case .week: interval = DateFormatting.weekInterval(containing: anchorDate)
+        case .month: interval = DateFormatting.monthInterval(containing: anchorDate)
+        case .year: interval = DateFormatting.yearInterval(containing: anchorDate)
+        }
+        subtitleCount = entryStore.occurrenceCount(for: filteredEntries, in: interval)
     }
 
     private func chromeButton(

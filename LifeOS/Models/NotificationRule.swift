@@ -77,8 +77,9 @@ final class NotificationRule {
 
         let startFormatter = DateFormatter()
         startFormatter.dateStyle = .medium
-        startFormatter.timeStyle = .short
-        lines.append("Entry start: \(startFormatter.string(from: entry.startDate))")
+        startFormatter.timeStyle = entry.isAllDay ? .none : .short
+        let startLabel = entry.isAllDay ? "Entry date" : "Entry start"
+        lines.append("\(startLabel): \(startFormatter.string(from: entry.startDate))")
 
         return lines
     }

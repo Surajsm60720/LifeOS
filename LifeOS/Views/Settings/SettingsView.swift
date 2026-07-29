@@ -38,8 +38,11 @@ private enum AppIconChoice: String, CaseIterable, Identifiable {
 }
 
 struct SettingsView: View {
+    /// Supplied by `ContentView` so all tabs share a single `@Query`.
+    let entries: [Entry]
+    var appLock: AppLockManager
+
     @Environment(\.modelContext) private var modelContext
-    @Query(sort: \Entry.startDate) private var entries: [Entry]
 
     @AppStorage(CalendarViewMode.defaultStorageKey) private var defaultModeRaw: String = CalendarViewMode.day.rawValue
     @AppStorage(LiveActivityManager.enabledStorageKey) private var liveActivityEnabled: Bool = false
@@ -48,6 +51,7 @@ struct SettingsView: View {
     @State private var showingTemplates = false
     @State private var showingLibrary = false
     @State private var confirmClearAll = false
+    @State private var todayCompletableCount = 0
     @StateObject private var entryStore = EntryStore()
 
     @State private var selectedIconChoice: AppIconChoice = .primary
@@ -55,6 +59,16 @@ struct SettingsView: View {
 
     private var supportsAlternateIcons: Bool {
         UIApplication.shared.supportsAlternateIcons
+    }
+
+    /// Reads straight from `AppLockManager` so there is no mirrored state to fall out
+    /// of sync. Writes route through `setEnabled`, which authenticates in both
+    /// directions; if the user cancels, the toggle simply springs back.
+    private var appLockBinding: Binding<Bool> {
+        Binding(
+            get: { appLock.isEnabled },
+            set: { appLock.setEnabled($0) { _ in } }
+        )
     }
 
     private var defaultModeBinding: Binding<CalendarViewMode> {
@@ -66,6 +80,31 @@ struct SettingsView: View {
 
     var body: some View {
         List {
+            if LifeOSSharedStore.isUsingRecoveryStore {
+                Section {
+                    Label("Database could not be opened", systemImage: "exclamationmark.triangle.fill")
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(.orange)
+
+                    if let reason = LifeOSSharedStore.storeFailureReason {
+                        Text(reason)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Button {
+                        showingBackup = true
+                    } label: {
+                        Label("Restore From Backup", systemImage: "externaldrive")
+                            .font(.body.weight(.semibold))
+                    }
+                } header: {
+                    Text("Recovery Mode")
+                } footer: {
+                    Text("LifeOS is running on a temporary in-memory database, so changes will not be saved. Restore a backup to recover your data.")
+                }
+            }
+
             Section {
                 Picker("App Icon", selection: $selectedIconChoice) {
                     ForEach(AppIconChoice.allCases) { choice in
@@ -97,6 +136,17 @@ struct SettingsView: View {
                 Text("Dynamic Island")
             } footer: {
                 Text("When enabled, LifeOS shows today's remaining to-dos directly on the Dynamic Island and Lock Screen (system limits how long it stays visible).")
+            }
+
+            Section {
+                Toggle("\(appLock.biometryName) Unlock", isOn: appLockBinding)
+                    .disabled(!appLock.canAuthenticate)
+            } header: {
+                Text("Security")
+            } footer: {
+                Text(appLock.canAuthenticate
+                     ? "When enabled, LifeOS asks for \(appLock.biometryName) (or your device passcode) each time you open it. Turning this off also requires authentication."
+                     : "Set a device passcode in iOS Settings to use App Lock.")
             }
 
             Section {
@@ -149,7 +199,7 @@ struct SettingsView: View {
 
             Section("About") {
                 LabeledContent("App", value: "LifeOS")
-                LabeledContent("Version", value: "0.7")
+                LabeledContent("Version", value: appVersion)
             }
         }
         .navigationTitle("Settings")
@@ -184,7 +234,15 @@ struct SettingsView: View {
         } message: {
             Text("All \(entries.count) entries will be removed. You can add your own data afterward.")
         }
+        .onChange(of: entries) { _, _ in
+            recomputeTodayCompletableCount()
+        }
+        .onChange(of: entryStore.dataVersion) { _, _ in
+            recomputeTodayCompletableCount()
+        }
         .onAppear {
+            recomputeTodayCompletableCount()
+
             guard !didLoadCurrentIcon else { return }
             selectedIconChoice = AppIconChoice.from(alternateIconName: UIApplication.shared.alternateIconName)
             didLoadCurrentIcon = true
@@ -199,7 +257,7 @@ struct SettingsView: View {
                     print("Alternate icon change failed: \(error)")
                     return
                 }
-                Task {
+                Task { @MainActor in
                     // Drop already-delivered banners that may still show the previous glyph
                     // (iOS 18.1+ often caches notification icons separately from Home Screen).
                     await NotificationPlanner.clearDeliveredNotifications()
@@ -212,10 +270,16 @@ struct SettingsView: View {
         }
     }
 
-    private var todayCompletableCount: Int {
-        let store = EntryStore()
+    /// Recomputed on data change rather than on every render, and reusing the
+    /// existing store. As a computed property this re-expanded the whole library
+    /// each time SwiftUI evaluated `body`.
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+    }
+
+    private func recomputeTodayCompletableCount() {
         let interval = DateInterval(start: DateFormatting.startOfDay(.now), duration: 86_400)
-        return store.occurrences(for: entries, in: interval)
+        todayCompletableCount = entryStore.occurrences(for: entries, in: interval)
             .filter { $0.entry.isCompletable && !$0.entry.isCompleted(on: $0.occurrenceDate) }
             .count
     }

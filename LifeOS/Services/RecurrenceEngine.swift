@@ -1,14 +1,22 @@
 import Foundation
 
 struct CalendarEntryOccurrence: Identifiable {
-    let id: String
+    /// A composite key instead of an interpolated string. Expanding a year of
+    /// recurring entries can create six figures of these, and `uuidString` plus
+    /// string interpolation per occurrence was pure allocation overhead.
+    struct ID: Hashable {
+        let entryID: UUID
+        let occurrenceDate: Date
+    }
+
+    let id: ID
     let entry: Entry
     let occurrenceDate: Date
 
     init(entry: Entry, occurrenceDate: Date) {
         self.entry = entry
         self.occurrenceDate = occurrenceDate
-        self.id = "\(entry.id.uuidString)-\(occurrenceDate.timeIntervalSince1970)"
+        self.id = ID(entryID: entry.id, occurrenceDate: occurrenceDate)
     }
 }
 
@@ -159,24 +167,76 @@ struct RecurrenceEngine {
 
     func normalizeOccurrenceStart(_ date: Date, for entry: Entry, calendar: Calendar = .current) -> Date {
         if entry.recurrence == nil {
+            if entry.isAllDay {
+                return calendar.startOfDay(for: entry.startDate)
+            }
             return entry.startDate
         }
+        if entry.isAllDay {
+            return calendar.startOfDay(for: date)
+        }
+        // A recurring occurrence always lands on the anchor's wall-clock time, so the
+        // normalized value is just that time on `date`'s day. Running a full expansion
+        // here was needless work on a path that `isCompleted` hits per visible row.
         let dayStart = calendar.startOfDay(for: date)
-        let dayEnd = DateFormatting.endOfDay(date, calendar: calendar)
-        let matches = occurrences(for: entry, in: dayStart...dayEnd, calendar: calendar)
-        return matches.first ?? combineTime(from: entry.startDate, day: dayStart, calendar: calendar)
+        return combineTime(from: entry.startDate, day: dayStart, calendar: calendar)
     }
+
+    /// Ceiling on occurrences returned from a single expansion. A year view over a
+    /// large library of daily-recurring entries can otherwise materialize hundreds of
+    /// thousands of objects; no UI can present that, so we stop early instead.
+    static let maxExpandedOccurrences = 20_000
 
     func expandEntries(_ entries: [Entry], in interval: DateInterval, calendar: Calendar = .current) -> [CalendarEntryOccurrence] {
         // DateInterval.end is exclusive; convert carefully for ClosedRange expansion.
         let endInclusive = interval.end.addingTimeInterval(-0.001)
         let range = interval.start...max(interval.start, endInclusive)
-        return entries.flatMap { entry -> [CalendarEntryOccurrence] in
-            occurrences(for: entry, in: range, calendar: calendar).map {
-                CalendarEntryOccurrence(entry: entry, occurrenceDate: $0)
+
+        var results: [CalendarEntryOccurrence] = []
+        for entry in entries {
+            // Cheap O(1) rejection before touching any Calendar math.
+            guard overlapsRange(entry, range: range) else { continue }
+
+            for date in occurrences(for: entry, in: range, calendar: calendar) {
+                results.append(CalendarEntryOccurrence(entry: entry, occurrenceDate: date))
+                if results.count >= Self.maxExpandedOccurrences { break }
             }
+            if results.count >= Self.maxExpandedOccurrences { break }
         }
-        .sorted { $0.occurrenceDate < $1.occurrenceDate }
+
+        results.sort { $0.occurrenceDate < $1.occurrenceDate }
+        if results.count > Self.maxExpandedOccurrences {
+            results = Array(results.prefix(Self.maxExpandedOccurrences))
+        }
+        return results
+    }
+
+    /// Counts occurrences without building `CalendarEntryOccurrence` objects or
+    /// sorting, for callers that only display a total.
+    func countOccurrences(_ entries: [Entry], in interval: DateInterval, calendar: Calendar = .current) -> Int {
+        let endInclusive = interval.end.addingTimeInterval(-0.001)
+        let range = interval.start...max(interval.start, endInclusive)
+
+        var total = 0
+        for entry in entries {
+            guard overlapsRange(entry, range: range) else { continue }
+            total += occurrences(for: entry, in: range, calendar: calendar).count
+            if total >= Self.maxExpandedOccurrences { break }
+        }
+        return min(total, Self.maxExpandedOccurrences)
+    }
+
+    /// Rejects entries that provably cannot produce an occurrence in `range`,
+    /// using only date comparisons.
+    private func overlapsRange(_ entry: Entry, range: ClosedRange<Date>) -> Bool {
+        guard let rule = entry.recurrence else {
+            return range.contains(entry.startDate)
+        }
+        // Series hasn't begun by the end of the window.
+        if entry.startDate > range.upperBound { return false }
+        // Series already finished before the window opens.
+        if let end = rule.endDate, end < range.lowerBound { return false }
+        return true
     }
 
     private func shouldInclude(_ occurrence: Date, endDate: Date?, range: ClosedRange<Date>) -> Bool {

@@ -128,10 +128,19 @@ enum CalendarGridSupport {
         return colors
     }
 
-    static func monthTitle(_ date: Date, calendar: Calendar = .current) -> String {
+    /// Cached because the Year view calls `monthTitle` 12 times per render and
+    /// `DateFormatter` construction dominates the cost of the call otherwise.
+    private static let monthTitleFormatter: DateFormatter = {
         let formatter = DateFormatter()
-        formatter.calendar = calendar
         formatter.setLocalizedDateFormatFromTemplate("MMM")
+        return formatter
+    }()
+
+    static func monthTitle(_ date: Date, calendar: Calendar = .current) -> String {
+        let formatter = monthTitleFormatter
+        if formatter.calendar != calendar {
+            formatter.calendar = calendar
+        }
         return formatter.string(from: date)
     }
 

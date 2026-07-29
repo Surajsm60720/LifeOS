@@ -5,6 +5,11 @@ enum BackupService {
     static let formatIdentifier = "lifeos.backup"
     static let currentVersion = 1
 
+    /// Oldest document version this build can still read. Every version from here
+    /// through `currentVersion` must remain decodable, so bumping `currentVersion`
+    /// never strands backups a user already made.
+    static let minimumSupportedVersion = 1
+
     enum BackupError: LocalizedError {
         case invalidFormat
         case unsupportedVersion(Int)
@@ -16,6 +21,9 @@ enum BackupService {
             case .invalidFormat:
                 return "This file is not a LifeOS backup."
             case .unsupportedVersion(let version):
+                if version > BackupService.currentVersion {
+                    return "This backup (version \(version)) was made by a newer version of LifeOS. Update the app to restore it."
+                }
                 return "Unsupported backup version \(version)."
             case .decodeFailed(let detail):
                 return "Could not read backup: \(detail)"
@@ -45,6 +53,8 @@ enum BackupService {
         var categoryRaw: String
         var subCategory: String?
         var startDate: Date
+        /// Omitted in v1 backups; treated as `false` when missing.
+        var isAllDay: Bool?
         var duration: TimeInterval?
         var location: String?
         var notes: String?
@@ -171,7 +181,9 @@ enum BackupService {
         guard document.format == formatIdentifier else {
             throw BackupError.invalidFormat
         }
-        guard document.version == currentVersion else {
+        // Older files stay readable; only files from a *newer* build we can't
+        // understand are rejected.
+        guard document.version >= minimumSupportedVersion, document.version <= currentVersion else {
             throw BackupError.unsupportedVersion(document.version)
         }
         return document
@@ -214,7 +226,7 @@ enum BackupService {
     @MainActor
     static func merge(document: Document, modelContext: ModelContext) throws -> ImportSummary {
         let existing = (try? modelContext.fetch(FetchDescriptor<Entry>())) ?? []
-        var byID = Dictionary(uniqueKeysWithValues: existing.map { ($0.id, $0) })
+        var byID = Dictionary(existing.map { ($0.id, $0) }, uniquingKeysWith: { _, latest in latest })
         var inserted = 0
         var updated = 0
 
@@ -268,9 +280,13 @@ enum BackupService {
         mergeRulesAndCompletions: Bool
     ) {
         entry.title = dto.title
-        entry.categoryRaw = dto.categoryRaw
+        // Coerce here too, matching `makeEntry`. Writing the raw string unchecked would
+        // let an unrecognized value from a newer/corrupted backup persist on the model.
+        entry.categoryRaw = (EntryCategory(rawValue: dto.categoryRaw) ?? .irl).rawValue
         entry.subCategory = dto.subCategory
         entry.startDate = dto.startDate
+        entry.isAllDay = dto.isAllDay ?? false
+        entry.normalizeStartDateIfAllDay()
         entry.duration = dto.duration
         entry.location = dto.location
         entry.notes = dto.notes
@@ -380,10 +396,16 @@ enum BackupService {
     }
 
     private static func mergeNotificationRules(_ dtos: [NotificationRuleDTO], on entry: Entry, modelContext: ModelContext) {
-        var byID = Dictionary(uniqueKeysWithValues: entry.notificationRules.map { ($0.ruleID, $0) })
+        // `ruleID` is not DB-enforced unique, so a hand-edited or corrupted backup can
+        // contain duplicates. `uniquingKeysWith` keeps the last one instead of trapping,
+        // which `Dictionary(uniqueKeysWithValues:)` would do.
+        var byID = Dictionary(
+            entry.notificationRules.map { ($0.ruleID, $0) },
+            uniquingKeysWith: { _, latest in latest }
+        )
         for dto in dtos {
             if let existing = byID[dto.ruleID] {
-                existing.triggerKindRaw = dto.triggerKindRaw
+                existing.triggerKindRaw = (NotificationTriggerKind(rawValue: dto.triggerKindRaw) ?? .ifNotCompletedBy).rawValue
                 existing.triggerDate = dto.triggerDate
                 existing.triggerInterval = dto.triggerInterval
                 existing.messageTemplate = dto.messageTemplate
@@ -446,6 +468,7 @@ private extension BackupService.EntryDTO {
             categoryRaw: entry.categoryRaw,
             subCategory: entry.subCategory,
             startDate: entry.startDate,
+            isAllDay: entry.isAllDay,
             duration: entry.duration,
             location: entry.location,
             notes: entry.notes,

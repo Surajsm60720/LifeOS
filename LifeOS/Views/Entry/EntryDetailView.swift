@@ -53,6 +53,14 @@ struct EntryDetailView: View {
 
                 Section("When") {
                     LabeledContent("Date", value: DateFormatting.recapLine.string(from: occurrenceDate))
+                    if entry.isAllDay {
+                        LabeledContent("Time", value: "All day")
+                    } else {
+                        LabeledContent(
+                            "Time",
+                            value: DateFormatter.localizedString(from: occurrenceDate, dateStyle: .none, timeStyle: .short)
+                        )
+                    }
                     if let duration = entry.duration {
                         LabeledContent("Duration", value: "\(Int(duration / 60)) minutes")
                     }
@@ -120,7 +128,8 @@ struct EntryDetailView: View {
                 if !entry.expenseBalances.isEmpty {
                     Section("Settlements") {
                         ForEach(entry.expenseBalances, id: \.persistentModelID) { balance in
-                            Text("\(balance.personName.isEmpty ? "Someone" : balance.personName) owes you \(balance.amount)")
+                            let person = balance.personName.isEmpty ? "Someone" : balance.personName
+                            Text("\(person) owes you \(ExpenseShareFormatter.displayAmount(balance.amount))")
                         }
                         LabeledContent("Owed to you", value: "\(entry.expenseOwedToYou)")
                             .fontWeight(.semibold)

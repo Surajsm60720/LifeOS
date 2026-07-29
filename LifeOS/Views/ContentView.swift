@@ -10,6 +10,7 @@ struct ContentView: View {
     @StateObject private var entryStore = EntryStore()
     @State private var showingCreateSheet = false
     @State private var selectedTab = 0
+    @State private var appLock = AppLockManager()
 
     /// Tracks the alternate-icon selection used when we last rescheduled notifications.
     @AppStorage("lastNotificationIconFingerprint") private var lastNotificationIconFingerprint: String = ""
@@ -17,7 +18,7 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
-                CalendarRootView(entryStore: entryStore)
+                CalendarRootView(entries: entries, entryStore: entryStore)
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             Button {
@@ -38,7 +39,7 @@ struct ContentView: View {
             .tag(0)
 
             NavigationStack {
-                NotificationsHubView()
+                NotificationsHubView(entries: entries)
                     .toolbarBackground(LifeOSTheme.canvas, for: .navigationBar)
                     .toolbarBackground(.visible, for: .navigationBar)
             }
@@ -48,7 +49,7 @@ struct ContentView: View {
             .tag(1)
 
             NavigationStack {
-                SettingsView()
+                SettingsView(entries: entries, appLock: appLock)
                     .toolbarBackground(LifeOSTheme.canvas, for: .navigationBar)
                     .toolbarBackground(.visible, for: .navigationBar)
             }
@@ -63,17 +64,44 @@ struct ContentView: View {
             EntryFormView(mode: .create(category: .irl))
                 .tint(LifeOSTheme.accent)
         }
+        // Presented as a full-screen cover rather than an in-tree overlay so it also
+        // covers any sheet (entry detail, backup, recap) that was open when we locked.
+        .fullScreenCover(isPresented: lockPresentation) {
+            AppLockScreen(appLock: appLock)
+        }
         .onChange(of: scenePhase) { _, newPhase in
-            if newPhase == .active {
+            switch newPhase {
+            case .active:
+                // Skip data work while locked so nothing reaches the Lock Screen or
+                // Dynamic Island before the owner authenticates.
+                guard !appLock.isLocked else { return }
                 refreshNotifications()
                 Task { await LiveActivityManager.syncActiveActivity(modelContext: modelContext) }
+            case .background:
+                // Only on `.background`. `.inactive` also fires for the Face ID sheet,
+                // Control Center, and the app switcher, which would re-lock mid-unlock.
+                appLock.lockIfEnabled()
+            default:
+                break
             }
+        }
+        .onChange(of: appLock.isLocked) { _, locked in
+            // Catch up on the work that was deferred while the lock screen was up.
+            guard !locked else { return }
+            refreshNotifications()
+            Task { await LiveActivityManager.syncActiveActivity(modelContext: modelContext) }
         }
         .task {
             LifeOSDataMigration.runLaunchMigrations(modelContext: modelContext, entryStore: entryStore)
+            guard !appLock.isLocked else { return }
             refreshNotifications()
             await LiveActivityManager.syncActiveActivity(modelContext: modelContext)
         }
+    }
+
+    /// Read-only binding: the cover is dismissed by successful authentication, never by a swipe.
+    private var lockPresentation: Binding<Bool> {
+        Binding(get: { appLock.isLocked }, set: { _ in })
     }
 
     private func refreshNotifications() {

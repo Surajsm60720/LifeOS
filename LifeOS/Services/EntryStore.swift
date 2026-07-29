@@ -6,8 +6,22 @@ import SwiftUI
 final class EntryStore: ObservableObject {
     private let engine = RecurrenceEngine.shared
 
+    /// Bumped on every mutation. Views that cache derived results (occurrence
+    /// expansions, counts) observe this to know when to recompute — comparing the
+    /// `[Entry]` array itself is not enough, since toggling a completion mutates a
+    /// relationship without changing array identity.
+    @Published private(set) var dataVersion = 0
+
+    private func markChanged() {
+        dataVersion &+= 1
+    }
+
     func occurrences(for entries: [Entry], in interval: DateInterval, calendar: Calendar = .current) -> [CalendarEntryOccurrence] {
         engine.expandEntries(entries, in: interval, calendar: calendar)
+    }
+
+    func occurrenceCount(for entries: [Entry], in interval: DateInterval, calendar: Calendar = .current) -> Int {
+        engine.countOccurrences(entries, in: interval, calendar: calendar)
     }
 
     func toggleCompletion(for entry: Entry, on date: Date, modelContext: ModelContext, calendar: Calendar = .current) {
@@ -20,6 +34,8 @@ final class EntryStore: ObservableObject {
             entry.completions.append(completion)
             modelContext.insert(completion)
         }
+
+        markChanged()
 
         let entryID = entry.id
         let completed = entry.isCompleted(on: date, calendar: calendar)
@@ -41,7 +57,7 @@ final class EntryStore: ObservableObject {
         Task { await NotificationPlanner.shared.cancelAll(entryID: entryID) }
         modelContext.delete(entry)
         try? modelContext.save()
-        objectWillChange.send()
+        markChanged()
     }
 
     func deleteAll(modelContext: ModelContext) {
@@ -52,7 +68,7 @@ final class EntryStore: ObservableObject {
             modelContext.delete(entry)
         }
         try? modelContext.save()
-        objectWillChange.send()
+        markChanged()
     }
 
     func save(entry: Entry, modelContext: ModelContext, allEntries: [Entry]) {
@@ -60,6 +76,7 @@ final class EntryStore: ObservableObject {
             modelContext.insert(entry)
         }
         let entries = allEntries.contains(where: { $0.id == entry.id }) ? allEntries : allEntries + [entry]
+        markChanged()
         Task {
             await NotificationPlanner.refreshPendingNotifications(entries: entries, force: true)
         }
@@ -75,7 +92,7 @@ final class EntryStore: ObservableObject {
             entry.progress?.currentUnit += 1
         }
         try? modelContext.save()
-        objectWillChange.send()
+        markChanged()
     }
 
     func duplicate(entry: Entry, modelContext: ModelContext) -> Entry {
@@ -84,6 +101,7 @@ final class EntryStore: ObservableObject {
             category: entry.category,
             subCategory: entry.subCategory,
             startDate: entry.startDate,
+            isAllDay: entry.isAllDay,
             duration: entry.duration,
             notes: entry.notes,
             isCompletable: entry.isCompletable,
