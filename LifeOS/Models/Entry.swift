@@ -188,6 +188,23 @@ final class Entry {
         category == .entertainment
     }
 
+    /// Long-running one-off window (banner, endgame, multi-week plan).
+    var isEventWindow: Bool {
+        guard recurrence == nil, let duration else { return false }
+        return duration >= EventWindowPolicy.minimumDuration
+    }
+
+    func endDate(calendar: Calendar = .current) -> Date? {
+        guard let duration else { return nil }
+        if isAllDay {
+            let startDay = calendar.startOfDay(for: startDate)
+            let dayCount = max(1, Int(duration / 86_400))
+            return calendar.date(byAdding: .day, value: dayCount - 1, to: startDay)
+                .map { DateFormatting.endOfDay($0, calendar: calendar) }
+        }
+        return startDate.addingTimeInterval(duration)
+    }
+
     func clearExpense(modelContext: ModelContext? = nil) {
         trackExpense = false
         expenseAmount = nil

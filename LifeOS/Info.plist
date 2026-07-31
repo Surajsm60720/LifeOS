@@ -15,11 +15,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>$(MARKETING_VERSION)</string>
+	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
-	<key>NSFaceIDUsageDescription</key>
-	<string>LifeOS uses Face ID to keep your data private when you enable App Lock.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>LifeOS can look up place names for IRL events. Your live location is not required for search.</string>
 	<key>NSSupportsLiveActivities</key>

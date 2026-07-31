@@ -245,10 +245,18 @@ struct EntryFormView: View {
     private var durationEditor: some View {
         Group {
             Stepper(
+                "Days: \(durationDays)",
+                value: Binding(
+                    get: { durationDays },
+                    set: { setDuration(days: $0, hours: durationHours, minutes: durationMinutes) }
+                ),
+                in: 0...365
+            )
+            Stepper(
                 "Hours: \(durationHours)",
                 value: Binding(
                     get: { durationHours },
-                    set: { setDuration(hours: $0, minutes: durationMinutes) }
+                    set: { setDuration(days: durationDays, hours: $0, minutes: durationMinutes) }
                 ),
                 in: 0...23
             )
@@ -256,28 +264,68 @@ struct EntryFormView: View {
                 "Minutes: \(durationMinutes)",
                 value: Binding(
                     get: { durationMinutes },
-                    set: { setDuration(hours: durationHours, minutes: $0) }
+                    set: { setDuration(days: durationDays, hours: durationHours, minutes: $0) }
                 ),
                 in: 0...59
             )
             LabeledContent("Total", value: durationSummary)
 
+            if entry.isAllDay, entry.duration != nil {
+                if let endDate = entry.endDate() {
+                    DatePicker(
+                        "Ends on",
+                        selection: Binding(
+                            get: { Calendar.current.startOfDay(for: endDate) },
+                            set: { setEndDate($0) }
+                        ),
+                        displayedComponents: .date
+                    )
+                }
+            }
+
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    ForEach([5, 15, 30, 45, 60, 90, 120], id: \.self) { minutes in
-                        Button("\(minutes)m") {
-                            entry.duration = TimeInterval(minutes * 60)
+                    ForEach(durationPresets, id: \.label) { preset in
+                        Button(preset.label) {
+                            entry.duration = preset.interval
                         }
                         .font(.caption.weight(.semibold))
                         .buttonStyle(.bordered)
                     }
                 }
             }
+
+            if entry.isEventWindow, let endDate = entry.endDate() {
+                Text("Appears in Ongoing Events · \(DateFormatting.formatDateRange(start: entry.startDate, end: endDate))")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 
+    private struct DurationPreset {
+        let label: String
+        let interval: TimeInterval
+    }
+
+    private var durationPresets: [DurationPreset] {
+        [
+            DurationPreset(label: "1h", interval: 3600),
+            DurationPreset(label: "2d", interval: 2 * 86_400),
+            DurationPreset(label: "7d", interval: 7 * 86_400),
+            DurationPreset(label: "14d", interval: 14 * 86_400),
+            DurationPreset(label: "21d", interval: 21 * 86_400),
+            DurationPreset(label: "30d", interval: 30 * 86_400),
+            DurationPreset(label: "42d", interval: 42 * 86_400),
+        ]
+    }
+
+    private var durationDays: Int {
+        Int((entry.duration ?? 0) / 86_400)
+    }
+
     private var durationHours: Int {
-        Int((entry.duration ?? 0) / 3600)
+        Int(((entry.duration ?? 0).truncatingRemainder(dividingBy: 86_400)) / 3600)
     }
 
     private var durationMinutes: Int {
@@ -285,22 +333,23 @@ struct EntryFormView: View {
     }
 
     private var durationSummary: String {
-        let total = Int((entry.duration ?? 0) / 60)
-        if durationHours == 0 {
-            return "\(total) min"
-        }
-        if durationMinutes == 0 {
-            return "\(durationHours) hr"
-        }
-        return "\(durationHours) hr \(durationMinutes) min"
+        DateFormatting.formatDuration(entry.duration ?? 0)
     }
 
-    private func setDuration(hours: Int, minutes: Int) {
-        var totalMinutes = max(0, hours) * 60 + max(0, minutes)
-        if totalMinutes == 0 {
-            totalMinutes = 1
-        }
-        entry.duration = TimeInterval(min(totalMinutes, 24 * 60) * 60)
+    private func setDuration(days: Int, hours: Int, minutes: Int) {
+        let totalSeconds = TimeInterval(days * 86_400 + hours * 3600 + minutes * 60)
+        entry.duration = min(
+            max(60, totalSeconds),
+            EventWindowPolicy.maximumDuration
+        )
+    }
+
+    private func setEndDate(_ endDay: Date) {
+        let calendar = Calendar.current
+        let startDay = calendar.startOfDay(for: entry.startDate)
+        let end = calendar.startOfDay(for: endDay)
+        let dayCount = max(1, (calendar.dateComponents([.day], from: startDay, to: end).day ?? 0) + 1)
+        entry.duration = TimeInterval(dayCount * 86_400)
     }
 
     private var locationSection: some View {

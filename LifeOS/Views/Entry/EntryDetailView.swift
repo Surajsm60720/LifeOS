@@ -62,7 +62,14 @@ struct EntryDetailView: View {
                         )
                     }
                     if let duration = entry.duration {
-                        LabeledContent("Duration", value: "\(Int(duration / 60)) minutes")
+                        LabeledContent("Duration", value: DateFormatting.formatDuration(duration))
+                        if entry.isEventWindow, let endDate = entry.endDate() {
+                            LabeledContent("Ends", value: DateFormatting.recapLine.string(from: endDate))
+                            LabeledContent("Range", value: DateFormatting.formatDateRange(
+                                start: entry.startDate,
+                                end: endDate
+                            ))
+                        }
                     }
                 }
 

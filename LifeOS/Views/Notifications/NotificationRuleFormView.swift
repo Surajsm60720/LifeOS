@@ -20,6 +20,7 @@ struct NotificationRuleFormView: View {
     @State private var triggerKind: NotificationTriggerKind = .ifNotCompletedBy
     @State private var triggerDate: Date = Calendar.current.date(bySettingHour: 21, minute: 0, second: 0, of: .now) ?? .now
     @State private var triggerOffsetMinutes: Int = 0
+    @State private var triggerOffsetDays: Int = 0
     @State private var messageTemplate: String = "Still open: {title}"
     @State private var isActive: Bool = true
 
@@ -42,7 +43,14 @@ struct NotificationRuleFormView: View {
     }
 
     private var canSave: Bool {
-        selectedEntry != nil && !messageTemplate.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        guard selectedEntry != nil,
+              !messageTemplate.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return false
+        }
+        if triggerKind == .relativeToEnd {
+            return selectedEntry?.isEventWindow == true
+        }
+        return true
     }
 
     var body: some View {
@@ -99,6 +107,16 @@ struct NotificationRuleFormView: View {
                             DatePicker("Time", selection: $triggerDate, displayedComponents: [.hourAndMinute])
                         case .relativeToStart:
                             Stepper(offsetLabel, value: $triggerOffsetMinutes, in: -24 * 60...24 * 60, step: 5)
+                        case .fixedDateTime:
+                            DatePicker("Date & Time", selection: $triggerDate)
+                        case .relativeToEnd:
+                            Stepper(endOffsetLabel, value: $triggerOffsetDays, in: -30...0)
+                            DatePicker("Time", selection: $triggerDate, displayedComponents: [.hourAndMinute])
+                            if selectedEntry?.isEventWindow != true {
+                                Text("The linked entry needs a duration over 24 hours.")
+                                    .font(.caption)
+                                    .foregroundStyle(.orange)
+                            }
                         }
                     } header: {
                         Text("When")
@@ -168,10 +186,22 @@ struct NotificationRuleFormView: View {
         return "Offset: \(-triggerOffsetMinutes) min before start"
     }
 
+    private var endOffsetLabel: String {
+        if triggerOffsetDays == 0 { return "Offset: on last day" }
+        if triggerOffsetDays == -1 { return "Offset: 1 day before end" }
+        return "Offset: \(-triggerOffsetDays) days before end"
+    }
+
     private var footerText: String {
         var parts = ["Inactive rules stay saved but will not schedule local notifications."]
         if triggerKind == .ifNotCompletedBy {
             parts.append("“If Not Completed By” only fires when the linked entry has completion tracking enabled.")
+        }
+        if triggerKind == .fixedDateTime {
+            parts.append("Fires once on the chosen date — ideal for a specific deadline.")
+        }
+        if triggerKind == .relativeToEnd {
+            parts.append("Uses the entry’s end date from its duration. Great for banner or endgame windows.")
         }
         return parts.joined(separator: " ")
     }
@@ -206,6 +236,9 @@ struct NotificationRuleFormView: View {
                 ?? Calendar.current.date(bySettingHour: 21, minute: 0, second: 0, of: .now)
                 ?? .now
             triggerOffsetMinutes = Int((rule.triggerInterval ?? 0) / 60)
+            if rule.triggerKind == .relativeToEnd {
+                triggerOffsetDays = Int((rule.triggerInterval ?? 0) / 86_400)
+            }
             messageTemplate = rule.messageTemplate
             isActive = rule.isActive
         }
@@ -219,6 +252,9 @@ struct NotificationRuleFormView: View {
         }
         if let minutes = preset.triggerOffsetMinutes {
             triggerOffsetMinutes = minutes
+        }
+        if let days = preset.triggerOffsetDays {
+            triggerOffsetDays = days
         }
         isActive = true
     }
@@ -255,6 +291,12 @@ struct NotificationRuleFormView: View {
         case .relativeToStart:
             rule.triggerInterval = TimeInterval(triggerOffsetMinutes * 60)
             rule.triggerDate = nil
+        case .fixedDateTime:
+            rule.triggerDate = triggerDate
+            rule.triggerInterval = nil
+        case .relativeToEnd:
+            rule.triggerDate = triggerDate
+            rule.triggerInterval = TimeInterval(triggerOffsetDays * 86_400)
         }
 
         if entry.modelContext != nil {

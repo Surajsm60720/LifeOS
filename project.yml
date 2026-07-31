@@ -85,6 +85,7 @@ targets:
           - "**/NotificationPreset.swift"
       - path: LifeOS/Services
         excludes:
+          - "**/BackupService.swift"
           - "**/EntryTemplates.swift"
           - "**/EntryStore.swift"
           - "**/NotificationPlanner.swift"

@@ -54,4 +54,27 @@ enum DateFormatting {
     static func yearInterval(containing date: Date, calendar: Calendar = .current) -> DateInterval {
         calendar.dateInterval(of: .year, for: date) ?? DateInterval(start: date, duration: 31_536_000)
     }
+
+    static func formatDuration(_ interval: TimeInterval) -> String {
+        let totalMinutes = max(1, Int(interval / 60))
+        let days = totalMinutes / (24 * 60)
+        let hours = (totalMinutes % (24 * 60)) / 60
+        let minutes = totalMinutes % 60
+
+        var parts: [String] = []
+        if days > 0 { parts.append(days == 1 ? "1 day" : "\(days) days") }
+        if hours > 0 { parts.append(hours == 1 ? "1 hr" : "\(hours) hr") }
+        if minutes > 0, days == 0 { parts.append(minutes == 1 ? "1 min" : "\(minutes) min") }
+        if parts.isEmpty { return "1 min" }
+        return parts.joined(separator: " ")
+    }
+
+    static func formatDateRange(start: Date, end: Date, calendar: Calendar = .current) -> String {
+        let startDay = calendar.startOfDay(for: start)
+        let endDay = calendar.startOfDay(for: end)
+        if calendar.isDate(startDay, inSameDayAs: endDay) {
+            return recapLine.string(from: startDay)
+        }
+        return "\(recapLine.string(from: startDay)) – \(recapLine.string(from: endDay))"
+    }
 }

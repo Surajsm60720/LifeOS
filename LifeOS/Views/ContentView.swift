@@ -18,7 +18,11 @@ struct ContentView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             NavigationStack {
-                CalendarRootView(entries: entries, entryStore: entryStore)
+                CalendarRootView(
+                    entries: entries,
+                    entryStore: entryStore,
+                    onOpenOngoing: { selectedTab = 1 }
+                )
                     .toolbar {
                         ToolbarItem(placement: .topBarTrailing) {
                             Button {
@@ -39,6 +43,27 @@ struct ContentView: View {
             .tag(0)
 
             NavigationStack {
+                OngoingEventsView(entries: entries, entryStore: entryStore)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button {
+                                Haptics.medium()
+                                showingCreateSheet = true
+                            } label: {
+                                Image(systemName: "plus")
+                            }
+                            .accessibilityLabel("Add Entry")
+                        }
+                    }
+                    .toolbarBackground(LifeOSTheme.canvas, for: .navigationBar)
+                    .toolbarBackground(.visible, for: .navigationBar)
+            }
+            .tabItem {
+                Label("Ongoing", systemImage: "hourglass")
+            }
+            .tag(1)
+
+            NavigationStack {
                 NotificationsHubView(entries: entries)
                     .toolbarBackground(LifeOSTheme.canvas, for: .navigationBar)
                     .toolbarBackground(.visible, for: .navigationBar)
@@ -46,7 +71,7 @@ struct ContentView: View {
             .tabItem {
                 Label("Notifications", systemImage: "bell")
             }
-            .tag(1)
+            .tag(2)
 
             NavigationStack {
                 SettingsView(entries: entries, appLock: appLock)
@@ -56,7 +81,7 @@ struct ContentView: View {
             .tabItem {
                 Label("Settings", systemImage: "gearshape")
             }
-            .tag(2)
+            .tag(3)
         }
         .tint(LifeOSTheme.accent)
         .preferredColorScheme(.dark)

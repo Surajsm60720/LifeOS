@@ -54,6 +54,22 @@ final class NotificationRule {
             }
             let sign = minutes > 0 ? "+" : ""
             return "\(triggerKind.displayName) · \(sign)\(minutes) min"
+        case .fixedDateTime:
+            let date = triggerDate ?? .now
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            formatter.timeStyle = .short
+            return "\(triggerKind.displayName) · \(formatter.string(from: date))"
+        case .relativeToEnd:
+            let days = Int((triggerInterval ?? 0) / 86_400)
+            let time = triggerDate ?? calendar.date(bySettingHour: 21, minute: 0, second: 0, of: .now) ?? .now
+            let formatter = DateFormatter()
+            formatter.timeStyle = .short
+            if days == 0 {
+                return "\(triggerKind.displayName) · last day at \(formatter.string(from: time))"
+            }
+            let label = days == -1 ? "1 day before end" : "\(-days) days before end"
+            return "\(triggerKind.displayName) · \(label) at \(formatter.string(from: time))"
         }
     }
 
@@ -73,6 +89,14 @@ final class NotificationRule {
             lines.append("Repeats: \(recurrence.summaryDescription)")
         } else {
             lines.append("One-time entry (no repeat schedule)")
+        }
+
+        if triggerKind == .relativeToEnd {
+            lines.append(
+                entry.isEventWindow
+                    ? "Uses the entry end date from its duration"
+                    : "Needs a duration over 24 hours on the entry"
+            )
         }
 
         let startFormatter = DateFormatter()

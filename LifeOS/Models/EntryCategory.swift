@@ -61,6 +61,7 @@ enum GameEventType: String, Codable, CaseIterable, Identifiable {
     case bannerWindow
     case battlePass
     case endgameContent
+    case inGameEvents
     case irlTieIn
 
     var id: String { rawValue }
@@ -82,6 +83,7 @@ enum GameEventType: String, Codable, CaseIterable, Identifiable {
         case .bannerWindow: "Banner Window"
         case .battlePass: "Battle Pass"
         case .endgameContent: "Endgame Content"
+        case .inGameEvents: "In-Game Events"
         case .irlTieIn: "IRL Tie-In"
         }
     }
@@ -151,6 +153,8 @@ enum NotificationTriggerKind: String, Codable, CaseIterable, Identifiable, Senda
     case fixedTime
     case relativeToStart
     case ifNotCompletedBy
+    case fixedDateTime
+    case relativeToEnd
 
     var id: String { rawValue }
 
@@ -159,6 +163,8 @@ enum NotificationTriggerKind: String, Codable, CaseIterable, Identifiable, Senda
         case .fixedTime: "Fixed Time"
         case .relativeToStart: "Relative to Start"
         case .ifNotCompletedBy: "If Not Completed By"
+        case .fixedDateTime: "Specific Date & Time"
+        case .relativeToEnd: "Relative to End"
         }
     }
 
@@ -170,6 +176,19 @@ enum NotificationTriggerKind: String, Codable, CaseIterable, Identifiable, Senda
             "Fires a number of minutes before or after the entry start time."
         case .ifNotCompletedBy:
             "Fires at the chosen time only if that day's occurrence is still incomplete."
+        case .fixedDateTime:
+            "Fires once on the exact date and time you choose."
+        case .relativeToEnd:
+            "Fires relative to when the event ends. Requires a duration over 24 hours."
+        }
+    }
+
+    var isOccurrenceBased: Bool {
+        switch self {
+        case .fixedTime, .relativeToStart, .ifNotCompletedBy:
+            return true
+        case .fixedDateTime, .relativeToEnd:
+            return false
         }
     }
 }

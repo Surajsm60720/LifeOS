@@ -35,6 +35,8 @@ actor NotificationPlanner {
             let isCompletable: Bool
             let supportsNotifications: Bool
             let startDate: Date
+            let isAllDay: Bool
+            let duration: TimeInterval?
             let recurrence: RecurrenceSnapshot?
             let completedOccurrenceStarts: [Date]
             let rules: [RuleSnapshot]
@@ -72,6 +74,8 @@ actor NotificationPlanner {
                     isCompletable: entry.isCompletable,
                     supportsNotifications: entry.supportsNotifications,
                     startDate: entry.startDate,
+                    isAllDay: entry.isAllDay,
+                    duration: entry.duration,
                     recurrence: entry.recurrence.map {
                         ScheduleSnapshot.RecurrenceSnapshot(
                             frequency: $0.frequency,
@@ -343,36 +347,57 @@ actor NotificationPlanner {
             let activeRules = item.rules.filter(\.isActive)
             guard !activeRules.isEmpty else { continue }
 
-            let occurrences = occurrenceDates(for: item, in: range, calendar: calendar)
-            guard !occurrences.isEmpty else { continue }
+            let occurrenceRules = activeRules.filter(\.triggerKind.isOccurrenceBased)
+            let absoluteRules = activeRules.filter { !$0.triggerKind.isOccurrenceBased }
 
-            for rule in activeRules {
-                // Only `ifNotCompletedBy` cares about completion state.
-                let skipCompleted = rule.triggerKind == .ifNotCompletedBy
-                if skipCompleted && !item.isCompletable { continue }
+            if !occurrenceRules.isEmpty {
+                let occurrences = occurrenceDates(for: item, in: range, calendar: calendar)
+                for rule in occurrenceRules {
+                    let skipCompleted = rule.triggerKind == .ifNotCompletedBy
+                    if skipCompleted && !item.isCompletable { continue }
 
-                for occurrence in occurrences {
-                    if skipCompleted, isCompleted(item: item, occurrence: occurrence, calendar: calendar) {
-                        continue
-                    }
-                    let fire = fireDate(for: rule, occurrence: occurrence, calendar: calendar)
-                    guard fire > now else { continue }
+                    for occurrence in occurrences {
+                        if skipCompleted, isCompleted(item: item, occurrence: occurrence, calendar: calendar) {
+                            continue
+                        }
+                        let fire = fireDate(for: rule, item: item, occurrence: occurrence, calendar: calendar)
+                        guard fire > now else { continue }
 
-                    candidates.append(
-                        Candidate(
-                            identifier: identifierPrefix
-                                + item.entryID.uuidString
-                                + "-"
-                                + dayKey(for: occurrence, calendar: calendar)
-                                + "-"
-                                + rule.ruleID.uuidString,
-                            fireDate: fire,
-                            entryTitle: item.entryTitle,
-                            categoryName: item.categoryName,
-                            messageTemplate: rule.messageTemplate
+                        candidates.append(
+                            Candidate(
+                                identifier: identifierPrefix
+                                    + item.entryID.uuidString
+                                    + "-"
+                                    + dayKey(for: occurrence, calendar: calendar)
+                                    + "-"
+                                    + rule.ruleID.uuidString,
+                                fireDate: fire,
+                                entryTitle: item.entryTitle,
+                                categoryName: item.categoryName,
+                                messageTemplate: rule.messageTemplate
+                            )
                         )
-                    )
+                    }
                 }
+            }
+
+            for rule in absoluteRules {
+                if rule.triggerKind == .relativeToEnd, item.duration == nil { continue }
+                let fire = fireDate(for: rule, item: item, occurrence: item.startDate, calendar: calendar)
+                guard fire > now else { continue }
+
+                candidates.append(
+                    Candidate(
+                        identifier: identifierPrefix
+                            + item.entryID.uuidString
+                            + "-absolute-"
+                            + rule.ruleID.uuidString,
+                        fireDate: fire,
+                        entryTitle: item.entryTitle,
+                        categoryName: item.categoryName,
+                        messageTemplate: rule.messageTemplate
+                    )
+                )
             }
         }
 
@@ -432,6 +457,7 @@ actor NotificationPlanner {
 
     private func fireDate(
         for rule: ScheduleSnapshot.RuleSnapshot,
+        item: ScheduleSnapshot.Item,
         occurrence: Date,
         calendar: Calendar
     ) -> Date {
@@ -454,7 +480,40 @@ actor NotificationPlanner {
             ) ?? occurrence
         case .relativeToStart:
             return occurrence.addingTimeInterval(rule.triggerInterval ?? 0)
+        case .fixedDateTime:
+            return rule.triggerDate ?? occurrence
+        case .relativeToEnd:
+            guard let endDate = endDate(for: item, calendar: calendar) else { return occurrence }
+            let offsetDay = calendar.date(
+                byAdding: .day,
+                value: Int((rule.triggerInterval ?? 0) / 86_400),
+                to: calendar.startOfDay(for: endDate)
+            ) ?? endDate
+            if let triggerDate = rule.triggerDate {
+                let time = calendar.dateComponents([.hour, .minute], from: triggerDate)
+                return calendar.date(
+                    bySettingHour: time.hour ?? 21,
+                    minute: time.minute ?? 0,
+                    second: 0,
+                    of: offsetDay
+                ) ?? offsetDay
+            }
+            return offsetDay
         }
+    }
+
+    private func endDate(
+        for item: ScheduleSnapshot.Item,
+        calendar: Calendar
+    ) -> Date? {
+        guard let duration = item.duration else { return nil }
+        if item.isAllDay {
+            let startDay = calendar.startOfDay(for: item.startDate)
+            let dayCount = max(1, Int(duration / 86_400))
+            return calendar.date(byAdding: .day, value: dayCount - 1, to: startDay)
+                .map { DateFormatting.endOfDay($0, calendar: calendar) }
+        }
+        return item.startDate.addingTimeInterval(duration)
     }
 
     private func makeRequest(

@@ -95,6 +95,9 @@ struct EntryTemplateDefinition: Identifiable, Hashable {
                 entry.eventType = .weeklies
             case "banner":
                 entry.eventType = .bannerWindow
+                entry.duration = 42 * 86_400
+                entry.isAllDay = true
+                entry.startDate = Calendar.current.startOfDay(for: startDate)
             default:
                 break
             }

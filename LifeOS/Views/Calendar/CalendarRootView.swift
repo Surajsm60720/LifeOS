@@ -22,6 +22,7 @@ struct CalendarRootView: View {
     /// several independent full-table fetches.
     let entries: [Entry]
     @ObservedObject var entryStore: EntryStore
+    var onOpenOngoing: () -> Void = {}
     @StateObject private var filters = CalendarFilterState()
 
     @AppStorage(CalendarViewMode.defaultStorageKey) private var defaultModeRaw: String = CalendarViewMode.day.rawValue
@@ -112,6 +113,8 @@ struct CalendarRootView: View {
                     }
                 }
             )
+
+            OngoingEventsTeaserView(entries: filteredEntries, onOpenOngoing: onOpenOngoing)
 
             if showFilters {
                 CalendarFilterBar(filters: filters)
