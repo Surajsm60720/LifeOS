@@ -364,17 +364,20 @@ struct EntryFormView: View {
                             get: { place.name },
                             set: { place.name = $0 }
                         ))
+                        if place.hasCoordinates, let latitude = place.latitude, let longitude = place.longitude {
+                            LocationMapPreview(
+                                name: place.name,
+                                latitude: latitude,
+                                longitude: longitude,
+                                height: 120
+                            )
+                            .accessibilityLabel("Location pinned on the map")
+                        }
                         HStack {
                             Button("Change Place") {
                                 locationSearchIndex = index
                             }
                             Spacer()
-                            if place.hasCoordinates {
-                                Label("On map", systemImage: "mappin.circle.fill")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .accessibilityLabel("Location pinned on the map")
-                            }
                             Button("Remove", role: .destructive) {
                                 removeLocation(at: index)
                             }
@@ -395,7 +398,7 @@ struct EntryFormView: View {
         } header: {
             Text("Locations")
         } footer: {
-            Text("Multi-stop hangouts can list several places in order. Add Location opens Find Place right away. “On map” means that place has GPS coordinates from Find Place.")
+            Text("Multi-stop hangouts can list several places in order. Add Location opens a map where you can search, tap a pin, or use your current location.")
         }
     }
 

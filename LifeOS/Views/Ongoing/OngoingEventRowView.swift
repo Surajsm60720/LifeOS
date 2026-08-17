@@ -68,10 +68,16 @@ struct OngoingEventRowView: View {
         if let eventType = window.entry.eventType {
             parts.append(eventType.displayName)
         }
+        if let periodCaption = window.periodCaption {
+            parts.append(periodCaption)
+        }
         return parts.joined(separator: " · ")
     }
 
     private var statusBadge: String {
+        if window.isPeriodComplete {
+            return "Done"
+        }
         switch window.status {
         case .active:
             if window.daysRemaining == 0 { return "Last day" }
@@ -87,6 +93,9 @@ struct OngoingEventRowView: View {
     }
 
     private var badgeColor: Color {
+        if window.isPeriodComplete {
+            return Color.green.opacity(0.85)
+        }
         switch window.status {
         case .active:
             return window.daysRemaining <= 3 ? Color.orange.opacity(0.9) : LifeOSTheme.accent

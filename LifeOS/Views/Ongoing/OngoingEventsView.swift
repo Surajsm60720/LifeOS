@@ -84,7 +84,7 @@ struct OngoingEventsView: View {
             parts.append("\(grouped.upcomingCount) starting soon")
         }
         if parts.isEmpty {
-            return filters.isActive ? "No windows match filters" : "Events longer than a day appear here"
+            return filters.isActive ? "No windows match filters" : "Multi-day windows and this week's or month's cadence appear here"
         }
         if filters.isActive { parts.append("filtered") }
         return parts.joined(separator: " · ")
@@ -152,7 +152,7 @@ struct OngoingEventsView: View {
             Text("No ongoing events")
                 .font(.system(.headline, design: .rounded))
                 .foregroundStyle(.white)
-            Text("Create an entry with a duration over 24 hours. It will show its full date range here while the calendar keeps only the start date.")
+            Text("Create a multi-day entry, or a weekly/monthly repeating one. This week's and this month's cadence show here so you can see whether the current run is done.")
                 .font(.system(.subheadline, design: .rounded))
                 .foregroundStyle(LifeOSTheme.softText)
         }
@@ -173,7 +173,7 @@ struct OngoingEventsView: View {
     private func open(_ window: EventWindow) {
         selectedOccurrence = CalendarEntryOccurrence(
             entry: window.entry,
-            occurrenceDate: window.entry.startDate
+            occurrenceDate: window.occurrenceDate
         )
     }
 }

@@ -32,8 +32,8 @@ targets:
         ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: YES
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         SWIFT_EMIT_LOC_STRINGS: YES
-        CURRENT_PROJECT_VERSION: 1
-        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: 2
+        MARKETING_VERSION: "1.0.2"
         DEVELOPMENT_TEAM: ""
         CODE_SIGN_STYLE: Automatic
         ENABLE_PREVIEWS: YES
@@ -42,7 +42,7 @@ targets:
       properties:
         UIApplicationSupportsIndirectInputEvents: true
         NSSupportsLiveActivities: true
-        NSLocationWhenInUseUsageDescription: LifeOS can look up place names for IRL events. Your live location is not required for search.
+        NSLocationWhenInUseUsageDescription: LifeOS can use your location to drop a pin for IRL events when you choose a place on the map. Search and tap-to-pin still work without sharing your live location.
     dependencies:
       - target: LifeOSLiveActivityWidget
   LifeOSTests:
@@ -98,8 +98,8 @@ targets:
         TARGETED_DEVICE_FAMILY: "1,2"
         GENERATE_INFOPLIST_FILE: NO
         SWIFT_EMIT_LOC_STRINGS: YES
-        CURRENT_PROJECT_VERSION: 1
-        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: 2
+        MARKETING_VERSION: "1.0.2"
         CODE_SIGN_STYLE: Automatic
     info:
       path: LifeOS/LiveActivityWidget/Info.plist

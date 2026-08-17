@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -94,6 +94,7 @@
 		D65C6735B3676CD30D0A42CB /* NotificationRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD11AB3DAD814570410AB48D /* NotificationRule.swift */; };
 		DC5F8B62A13C676C3F00017F /* OngoingEventRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB2D83A3269E0D617FF87933 /* OngoingEventRowView.swift */; };
 		DCBA4449F26562E0D2B72A42 /* Entry.swift in Sources */ = {isa = PBXBuildFile; fileRef = A270817C108490A6FFB5D04A /* Entry.swift */; };
+		E136B361A65C070EF2F7D46B /* LocationMapPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = C81FFD3B95213C220F97E2FD /* LocationMapPreview.swift */; };
 		E3F0082B1792EAD90F270845 /* EventWindowPolicyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D27192A47CF407A16CBF1F9 /* EventWindowPolicyTests.swift */; };
 		E55E853D78110C75393F30E8 /* NotificationRuleFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CF326F1D71A8DB9F35265A /* NotificationRuleFormView.swift */; };
 		EBC9861EF558A24D86DBB706 /* DateFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71A82A890B38CAEC50446231 /* DateFormatting.swift */; };
@@ -206,6 +207,7 @@
 		B97297AD78FF5ADABAE2C37D /* EntryDeleteModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryDeleteModifier.swift; sourceTree = "<group>"; };
 		C11A96F8DDBD0A30705FF2B4 /* TodayInboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayInboxView.swift; sourceTree = "<group>"; };
 		C460C4A8C45B9037D4936DB5 /* PlaceSearchSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceSearchSheet.swift; sourceTree = "<group>"; };
+		C81FFD3B95213C220F97E2FD /* LocationMapPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationMapPreview.swift; sourceTree = "<group>"; };
 		C8D26AD0186BE55701186C79 /* NotificationRuleEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationRuleEditor.swift; sourceTree = "<group>"; };
 		CB2D83A3269E0D617FF87933 /* OngoingEventRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OngoingEventRowView.swift; sourceTree = "<group>"; };
 		D17940F7D9B9485F0F20B6DF /* CategoryColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryColors.swift; sourceTree = "<group>"; };
@@ -444,6 +446,7 @@
 			children = (
 				55D0D1C2BC50D670C5226278 /* EntryDetailView.swift */,
 				112E55BA567B0F9AF4F84870 /* EntryFormView.swift */,
+				C81FFD3B95213C220F97E2FD /* LocationMapPreview.swift */,
 				C460C4A8C45B9037D4936DB5 /* PlaceSearchSheet.swift */,
 				148659ED96FA271DF673B091 /* RecurrenceEditorView.swift */,
 			);
@@ -547,7 +550,6 @@
 				};
 			};
 			buildConfigurationList = 24DF66001BD257C948B118A1 /* Build configuration list for PBXProject "LifeOS" */;
-			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -556,13 +558,15 @@
 			);
 			mainGroup = E3E864CA5403ADA09E1B3C4A;
 			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 6BBD885734BE07D038423D8A /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				AD5DB9344CDCD6867ABB9D4E /* LifeOS */,
-				9CF116BE7ED9BD6E1B799277 /* LifeOSLiveActivityWidget */,
 				B6DC0030DCD7D810745068F6 /* LifeOSTests */,
 				F416C705B05A08F9488EEA6E /* LifeOSUITests */,
+				9CF116BE7ED9BD6E1B799277 /* LifeOSLiveActivityWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -674,6 +678,7 @@
 				45B7B3777830B128283F400F /* LiveActivityManager.swift in Sources */,
 				B2BDDEE2ECBB5A7CC4D32D7E /* LiveActivityModels.swift in Sources */,
 				9C4F9719FB552C7B276A2AB5 /* LocationEntry.swift in Sources */,
+				E136B361A65C070EF2F7D46B /* LocationMapPreview.swift in Sources */,
 				5F65E79A8BBF60EA768BF2F9 /* MonthCalendarView.swift in Sources */,
 				0D5A4B098FE6D1E29886B603 /* NotificationPlanner.swift in Sources */,
 				1161FEA66E88F1D1158037B8 /* NotificationPreset.swift in Sources */,
@@ -727,7 +732,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = DFNJK22KYY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -741,7 +746,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -753,7 +758,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = DFNJK22KYY;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = LifeOS/LiveActivityWidget/Info.plist;
@@ -762,7 +767,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos.liveactivity;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -808,7 +813,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = DFNJK22KYY;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = LifeOS/LiveActivityWidget/Info.plist;
@@ -817,7 +822,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos.liveactivity;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -971,7 +976,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = DFNJK22KYY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -985,7 +990,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.surajmenon.lifeos;
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;

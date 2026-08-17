@@ -76,12 +76,15 @@ struct EntryDetailView: View {
                 if entry.supportsLocation, !entry.locations.isEmpty {
                     Section("Locations") {
                         ForEach(entry.locations, id: \.persistentModelID) { place in
-                            VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: 8) {
                                 Text(place.name)
-                                if place.hasCoordinates {
-                                    Text("\(place.latitude ?? 0), \(place.longitude ?? 0)")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                if place.hasCoordinates, let latitude = place.latitude, let longitude = place.longitude {
+                                    LocationMapPreview(
+                                        name: place.name,
+                                        latitude: latitude,
+                                        longitude: longitude,
+                                        height: 160
+                                    )
                                 }
                             }
                         }

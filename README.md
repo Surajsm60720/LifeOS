@@ -1,47 +1,46 @@
 # LifeOS
 
-**Version 1.0.1** · Released July 31, 2026  
-*(App bundle `MARKETING_VERSION` remains **1.0** until the next Xcode release bump.)*
+**Version 1.0.2** · Released August 17, 2026
 
 A personal, calendar-centric iOS app for tracking day-to-day life, game events, and entertainment progress — locally, without accounts or third-party sync.
 
-LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and reading/watching logs into one entry model with recurrence, completion tracking, customizable local notifications, hangout expense ledgers, multi-stop locations, Markdown recap export, full-app JSON backup/restore, optional Face ID app lock, a Dynamic Island Live Activity for today's events at a glance, and an **Ongoing Events** tab for multi-day windows.
+LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and reading/watching logs into one entry model with recurrence, completion tracking, customizable local notifications, hangout expense ledgers, multi-stop locations with a map picker, Markdown recap export, full-app JSON backup/restore, optional Face ID app lock, a Dynamic Island Live Activity for today's events at a glance, and an **Ongoing Events** tab for multi-day windows and the current weekly or monthly cycle (this occurrence through the next).
 
-> **v1.0.1** adds long-running event tracking and richer notification scheduling on top of the v1.0 local-first foundation. CloudKit sync, home-screen widgets, and charts remain intentionally out of scope.
+> **v1.0.2** adds a map-first place picker with live MapKit previews, and puts the current weekly/monthly cycle into Ongoing Events (for example 16 Aug → 16 Sep, not 1–31 Aug). CloudKit sync, home-screen widgets, and charts remain intentionally out of scope.
 
 ---
 
 ## Status
 
-| Area | v1.0 | v1.0.1 |
-|---|---|---|
-| Unified entry model (IRL / Games / Entertainment) | Included | — |
-| All-day entries (date-only, no start time) | Included | — |
-| Day / Week / Month / Year calendar | Included | — |
-| Month heat grid + Year mini-month contribution maps | Included | — |
-| Swipe complete / delete on Day, Week, Month rows | Included | — |
-| Configurable default calendar view (Day default) | Included | — |
-| Alternate app icons (Default / Geometric / Minimal) + light/dark appearances | Included | — |
-| Live Activity / Dynamic Island (day-only, count + event list) | Included | — |
-| Recurrence + occurrence-level completion | Included | — |
-| Local notification rules + presets (64-cap aware) | Included | Enhanced |
-| Notification budget (scheduled / remaining / firing today) | Included | — |
-| Safe notification rule create (Save-only; draft-entry aware) | Included | — |
-| Today inbox, search / filters, templates | Included | — |
-| IRL multi-location + MapKit place search | Included | — |
-| Hangout expense ledger (lines, totals, who owes you) | Included | — |
-| Expense settlement share & clipboard copy | Included | — |
-| Game event types (GI / HSR / WuWa) + Other session logs | Included | + In-Game Events |
-| Entertainment progress + session targets | Included | — |
-| Markdown recap export with stats | Included | — |
-| JSON backup & restore (Replace or Merge) | Included | — |
-| App Lock (Face ID / Touch ID / device passcode) | Included | — |
-| Corrupted-store recovery mode + restore banner | Included | — |
-| Haptic feedback across the app | Included | — |
-| **Ongoing Events tab** (multi-day windows, start → end) | — | Included |
-| **Extended entry duration** (days / weeks / months; end-date picker) | — | Included |
-| **Date-based notifications** (specific date & time; relative to end) | — | Included |
-| Calendar teaser → Ongoing tab | — | Included |
+| Area | v1.0 | v1.0.1 | v1.0.2 |
+|---|---|---|---|
+| Unified entry model (IRL / Games / Entertainment) | Included | — | — |
+| All-day entries (date-only, no start time) | Included | — | — |
+| Day / Week / Month / Year calendar | Included | — | — |
+| Month heat grid + Year mini-month contribution maps | Included | — | — |
+| Swipe complete / delete on Day, Week, Month rows | Included | — | — |
+| Configurable default calendar view (Day default) | Included | — | — |
+| Alternate app icons (Default / Geometric / Minimal) + light/dark appearances | Included | — | — |
+| Live Activity / Dynamic Island (day-only, count + event list) | Included | — | — |
+| Recurrence + occurrence-level completion | Included | — | — |
+| Local notification rules + presets (64-cap aware) | Included | Enhanced | — |
+| Notification budget (scheduled / remaining / firing today) | Included | — | — |
+| Safe notification rule create (Save-only; draft-entry aware) | Included | — | — |
+| Today inbox, search / filters, templates | Included | — | — |
+| IRL multi-location + MapKit place search | Included | — | Map picker + live preview |
+| Hangout expense ledger (lines, totals, who owes you) | Included | — | — |
+| Expense settlement share & clipboard copy | Included | — | — |
+| Game event types (GI / HSR / WuWa) + Other session logs | Included | + In-Game Events | — |
+| Entertainment progress + session targets | Included | — | — |
+| Markdown recap export with stats | Included | — | — |
+| JSON backup & restore (Replace or Merge) | Included | — | — |
+| App Lock (Face ID / Touch ID / device passcode) | Included | — | — |
+| Corrupted-store recovery mode + restore banner | Included | — | — |
+| Haptic feedback across the app | Included | — | — |
+| **Ongoing Events tab** (multi-day windows, start → end) | — | Included | + occurrence-cycle cadence |
+| **Extended entry duration** (days / weeks / months; end-date picker) | — | Included | — |
+| **Date-based notifications** (specific date & time; relative to end) | — | Included | — |
+| Calendar teaser → Ongoing tab | — | Included | — |
 
 ---
 
@@ -62,7 +61,7 @@ LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and re
 | Persistence | SwiftData |
 | Notifications | UserNotifications |
 | Live Activities | ActivityKit · WidgetKit extension |
-| Places | MapKit (`MKLocalSearch`) |
+| Places | MapKit (search + map picker) |
 | Recurrence | Custom `Calendar` / `DateComponents` engine |
 | Project generation | XcodeGen |
 
@@ -82,6 +81,30 @@ open LifeOS.xcodeproj
 4. Run (**⌘R**).
 
 Allow notification permission when prompted if you plan to use reminders.
+
+---
+
+## What's new in v1.0.2
+
+### Map-first location picker
+
+- **Add Location** opens a map where you can search with suggestions, tap to drop a pin, or use your current location
+- Reverse-geocoding fills the place name after a pin drop; you can still type a name with no pin
+- Entry form and detail show a live MapKit thumbnail when a place has coordinates (nothing extra is stored — name + lat/long only)
+
+### Current-period cadence in Ongoing Events
+
+- Weekly recurrence appears in **Active Now** from this occurrence through the next (e.g. Wed → next Wed)
+- Monthly / every-N-months uses the same cycle (e.g. 16 Aug → 16 Sep) — never a separate upcoming next month
+- Dailies stay out of Ongoing so the tab does not flood
+- Completable current-period items stay in Active Now with a **Done** badge after every occurrence in the period is marked complete
+- One-off windows (duration ≥ 24h, no recurrence) are unchanged, including Starting Soon and Recently Ended
+
+### Notes
+
+- `isEventWindow` is still one-off-only, so relative-to-end notifications do not attach to weeklies/monthlies
+- Marketing version is **1.0.2** (`CURRENT_PROJECT_VERSION` 2)
+- Unit tests: 75, including current-period Ongoing coverage
 
 ---
 
@@ -181,7 +204,7 @@ xcodebuild test \
 
 Or in Xcode: **⌘U**.
 
-Unit coverage includes recurrence, entry capabilities (incl. expense split), notification budget helpers, event window policy, recap export formatting, backup encode/decode + replace/merge, expense settlement text, scale/integrity harness, and audit regression tests. UI tests include a notification-banner icon smoke check (`LifeOSUITests`).
+Unit coverage includes recurrence, entry capabilities (incl. expense split), notification budget helpers, event window policy (including occurrence-cycle cadence), recap export formatting, backup encode/decode + replace/merge, expense settlement text, scale/integrity harness, and audit regression tests. UI tests include a notification-banner icon smoke check (`LifeOSUITests`).
 
 Live Activity UI, Dynamic Island expanded count, calendar swipe actions, App Lock, and year heat maps should be verified manually on a simulator or device.
 
@@ -206,10 +229,12 @@ project.yml              XcodeGen definition
 
 ---
 
-## Design notes (v1.0.1)
+## Design notes (v1.0.2)
 
-- **Ongoing Events** lists one-off windows (duration ≥ 24h, no recurrence); calendar grid keeps start-day-only markers to avoid month clutter  
-- **Recurring** game cadence (dailies, weeklies, abyss resets) stays in Calendar / Today — not duplicated in Ongoing  
+- **Ongoing Events** lists one-off windows (duration ≥ 24h, no recurrence) plus the current weekly/monthly **cycle** (this occurrence through the next)  
+- **Dailies** stay in Calendar / Today — not duplicated in Ongoing  
+- Cadence items never appear in Starting Soon or Recently Ended  
+- Place picker is map-first; location rows use a live MapKit preview, not a stored screenshot  
 - Dark theme only in-app; neutral cool-gray accents  
 - App icons support system light/dark Home Screen appearances  
 - Local-only data — no backend, no account login  

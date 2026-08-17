@@ -19,7 +19,7 @@
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>LifeOS can look up place names for IRL events. Your live location is not required for search.</string>
+	<string>LifeOS can use your location to drop a pin for IRL events when you choose a place on the map. Search and tap-to-pin still work without sharing your live location.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
