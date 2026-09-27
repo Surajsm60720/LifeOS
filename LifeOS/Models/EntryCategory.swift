@@ -43,6 +43,15 @@ enum GameSubCategory: String, Codable, CaseIterable, Identifiable {
     var supportsSessionLog: Bool {
         self == .other
     }
+
+    var supportsPityCounters: Bool {
+        self != .other
+    }
+
+    /// The three gacha titles that get seeded pity banners.
+    static var gachaGames: [GameSubCategory] {
+        [.genshinImpact, .honkaiStarRail, .wutheringWaves]
+    }
 }
 
 enum GameEventType: String, Codable, CaseIterable, Identifiable {

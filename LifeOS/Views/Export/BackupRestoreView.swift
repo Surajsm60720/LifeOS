@@ -34,7 +34,7 @@ struct BackupRestoreView: View {
                         Label("Import Backup", systemImage: "square.and.arrow.down")
                     }
                 } footer: {
-                    Text("Backup is a JSON snapshot of every entry, expense, location, recurrence, notification rule, progress, and completion. Use it to recover after a wipe or reinstall. Markdown recaps stay separate for LLM summaries.")
+                    Text("Backup is a JSON snapshot of every entry, expense, location, recurrence, notification rule, progress, completion, and pity counter. Use it to recover after a wipe or reinstall. Markdown recaps stay separate for LLM summaries.")
                 }
 
                 if let pendingDocument {
@@ -121,7 +121,8 @@ struct BackupRestoreView: View {
 
     private func exportBackup() {
         do {
-            let url = try BackupService.writeTemporaryFile(entries: entries)
+            let trackers = (try? modelContext.fetch(FetchDescriptor<PityTracker>())) ?? []
+            let url = try BackupService.writeTemporaryFile(entries: entries, pityTrackers: trackers)
             exportURL = url
             showingShareSheet = true
             errorMessage = nil

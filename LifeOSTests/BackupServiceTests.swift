@@ -150,6 +150,58 @@ final class BackupServiceTests: XCTestCase {
         XCTAssertTrue(all.contains { $0.title == "Brand New" })
     }
 
+    func testPityTrackerRoundTrip() throws {
+        let tracker = PityTracker(
+            game: .wutheringWaves,
+            name: "Featured Weapon",
+            presetKey: "wuwa.weapon",
+            sortOrder: 1,
+            hardPity: 80,
+            softPity: 65,
+            guaranteeKind: .alwaysGuaranteed,
+            currentPity: 41,
+            lifetimePulls: 120,
+            isGuaranteed: false
+        )
+        context.insert(tracker)
+        try context.save()
+
+        let data = try BackupService.exportData(entries: [], pityTrackers: [tracker])
+        let document = try BackupService.decode(data)
+        let dto = try XCTUnwrap(document.pityTrackers?.first)
+        XCTAssertEqual(dto.id, tracker.id)
+        XCTAssertEqual(dto.currentPity, 41)
+        XCTAssertEqual(dto.guaranteeKindRaw, PityGuaranteeKind.alwaysGuaranteed.rawValue)
+        XCTAssertEqual(dto.presetKey, "wuwa.weapon")
+    }
+
+    func testOldBackupWithoutPityTrackersStillDecodes() throws {
+        let json = Data(#"{"format":"lifeos.backup","version":1,"exportedAt":"2026-07-28T00:00:00Z","preferences":{},"entries":[]}"#.utf8)
+        let document = try BackupService.decode(json)
+        XCTAssertNil(document.pityTrackers)
+    }
+
+    func testReplaceFromOldBackupReseedsPresets() throws {
+        let leftover = PityTracker(
+            game: .genshinImpact,
+            name: "Leftover",
+            hardPity: 90,
+            guaranteeKind: .fiftyFifty,
+            currentPity: 12
+        )
+        context.insert(leftover)
+        try context.save()
+
+        let json = Data(#"{"format":"lifeos.backup","version":1,"exportedAt":"2026-07-28T00:00:00Z","preferences":{},"entries":[]}"#.utf8)
+        let document = try BackupService.decode(json)
+        _ = try BackupService.replace(document: document, modelContext: context, entryStore: EntryStore())
+
+        let remaining = try context.fetch(FetchDescriptor<PityTracker>())
+        XCTAssertEqual(remaining.count, PityCatalog.presets.count)
+        XCTAssertTrue(remaining.contains { $0.presetKey == "gi.character" })
+        XCTAssertFalse(remaining.contains { $0.name == "Leftover" })
+    }
+
     func testDecodeRejectsWrongFormat() {
         let json = Data(#"{"format":"other","version":1,"exportedAt":"2026-07-28T00:00:00Z","preferences":{},"entries":[]}"#.utf8)
         XCTAssertThrowsError(try BackupService.decode(json)) { error in

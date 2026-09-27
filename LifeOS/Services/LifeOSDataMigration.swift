@@ -12,6 +12,7 @@ enum LifeOSDataMigration {
         wipeSampleDataIfNeeded(modelContext: modelContext, entryStore: entryStore)
         migrateLegacyLocationsIfNeeded(modelContext: modelContext)
         migrateLegacyExpenseIfNeeded(modelContext: modelContext)
+        PityCatalog.seedIfEmpty(modelContext: modelContext)
     }
 
     @MainActor

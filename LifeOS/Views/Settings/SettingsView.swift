@@ -50,6 +50,7 @@ struct SettingsView: View {
     @State private var showingBackup = false
     @State private var showingTemplates = false
     @State private var showingLibrary = false
+    @State private var showingPityCounters = false
     @State private var confirmClearAll = false
     @State private var todayCompletableCount = 0
     @StateObject private var entryStore = EntryStore()
@@ -151,6 +152,18 @@ struct SettingsView: View {
 
             Section {
                 Button {
+                    showingPityCounters = true
+                } label: {
+                    Label("Pity Counters", systemImage: "sparkles")
+                }
+            } header: {
+                Text("Games")
+            } footer: {
+                Text("Track pulls, 50/50, and hard pity for Genshin, Star Rail, and Wuthering Waves. Open this during a pull session.")
+            }
+
+            Section {
+                Button {
                     showingExport = true
                 } label: {
                     Label("Generate Recap", systemImage: "square.and.arrow.up")
@@ -194,7 +207,7 @@ struct SettingsView: View {
             } header: {
                 Text("Danger Zone")
             } footer: {
-                Text("Permanently removes every entry, completion, and notification rule on this device. This cannot be undone.")
+                    Text("Permanently removes every entry, completion, notification rule, and pity counter on this device. This cannot be undone.")
             }
 
             Section("About") {
@@ -219,6 +232,9 @@ struct SettingsView: View {
         .sheet(isPresented: $showingLibrary) {
             EntryLibraryView()
         }
+        .sheet(isPresented: $showingPityCounters) {
+            PityCountersView()
+        }
         .confirmationDialog(
             "Delete all LifeOS data?",
             isPresented: $confirmClearAll,
@@ -226,13 +242,14 @@ struct SettingsView: View {
         ) {
             Button("Delete Everything", role: .destructive) {
                 entryStore.deleteAll(modelContext: modelContext)
+                PityCatalog.seedIfEmpty(modelContext: modelContext)
                 Task {
                     await NotificationPlanner.refreshPendingNotifications(entries: [], force: true)
                 }
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("All \(entries.count) entries will be removed. You can add your own data afterward.")
+            Text("All \(entries.count) entries and every pity counter will be removed. Official banners are re-seeded empty afterward.")
         }
         .onChange(of: entries) { _, _ in
             recomputeTodayCompletableCount()

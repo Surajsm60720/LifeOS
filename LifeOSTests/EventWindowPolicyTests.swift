@@ -243,6 +243,49 @@ final class EventWindowPolicyTests: XCTestCase {
         XCTAssertTrue(grouped.active.first?.isPeriodComplete ?? false)
     }
 
+    func testCompletableDurationWindowIsPeriodCompleteWhenStartDone() {
+        let entry = Entry(
+            title: "Banner",
+            category: .game,
+            subCategory: GameSubCategory.genshinImpact.rawValue,
+            startDate: date(2026, 7, 1),
+            isAllDay: true,
+            duration: 14 * 86_400,
+            isCompletable: true
+        )
+        entry.completions = [EntryCompletion(occurrenceStart: date(2026, 7, 1))]
+
+        let grouped = EventWindowEngine.groupedWindows(
+            from: [entry],
+            now: date(2026, 7, 8),
+            calendar: calendar
+        )
+
+        XCTAssertEqual(grouped.active.count, 1)
+        XCTAssertTrue(grouped.active.first?.isPeriodComplete ?? false)
+    }
+
+    func testCompletableDurationWindowIsNotDoneWithoutCompletion() {
+        let entry = Entry(
+            title: "Banner",
+            category: .game,
+            subCategory: GameSubCategory.genshinImpact.rawValue,
+            startDate: date(2026, 7, 1),
+            isAllDay: true,
+            duration: 14 * 86_400,
+            isCompletable: true
+        )
+
+        let grouped = EventWindowEngine.groupedWindows(
+            from: [entry],
+            now: date(2026, 7, 8),
+            calendar: calendar
+        )
+
+        XCTAssertEqual(grouped.active.count, 1)
+        XCTAssertFalse(grouped.active.first?.isPeriodComplete ?? true)
+    }
+
     func testGroupedWindowsActiveAndUpcoming() {
         let active = Entry(
             title: "Active Banner",

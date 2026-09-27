@@ -8,13 +8,13 @@ struct EntryDetailView: View {
 
     let entry: Entry
     let occurrenceDate: Date
+    @ObservedObject var entryStore: EntryStore
 
     @State private var showingEditSheet = false
     @State private var showDeleteConfirm = false
     @State private var showingExpenseShare = false
     @State private var expenseShareText = ""
     @State private var copyConfirmation: String?
-    @StateObject private var entryStore = EntryStore()
 
     private var isCompleted: Bool {
         entry.isCompleted(on: occurrenceDate)

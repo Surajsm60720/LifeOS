@@ -11,6 +11,7 @@ enum LifeOSSharedStore {
         NotificationRule.self,
         EntryProgress.self,
         EntryCompletion.self,
+        PityTracker.self,
     ])
 
     @MainActor

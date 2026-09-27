@@ -57,7 +57,7 @@ struct DayCalendarView<Leading: View>: View {
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
         .sheet(item: $selectedOccurrence) { occurrence in
-            EntryDetailView(entry: occurrence.entry, occurrenceDate: occurrence.occurrenceDate)
+            EntryDetailView(entry: occurrence.entry, occurrenceDate: occurrence.occurrenceDate, entryStore: entryStore)
         }
         .confirmationDialog(
             pendingDelete.map { "Delete “\($0.entry.title)”?" } ?? "Delete entry?",

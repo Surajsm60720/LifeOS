@@ -45,6 +45,31 @@ enum BackupService {
         var exportedAt: Date
         var preferences: PreferencesDTO
         var entries: [EntryDTO]
+        /// Omitted in pre-1.0.3 backups; treated as "leave / re-seed" on import.
+        var pityTrackers: [PityTrackerDTO]?
+    }
+
+    struct PityTrackerDTO: Codable, Equatable, Sendable {
+        var id: UUID
+        var gameRaw: String
+        var name: String
+        var presetKey: String?
+        var sortOrder: Int
+        var hardPity: Int
+        var softPity: Int?
+        var guaranteeKindRaw: String
+        var fatePointCap: Int
+        var currentPity: Int
+        var lifetimePulls: Int
+        var isGuaranteed: Bool
+        var fatePoints: Int
+        var guaranteeLabel: String?
+        var lastDropName: String?
+        var lastDropPity: Int?
+        var lastDropAt: Date?
+        var lastDropWasFeatured: Bool?
+        var createdAt: Date
+        var updatedAt: Date
     }
 
     struct EntryDTO: Codable, Equatable, Sendable {
@@ -131,13 +156,19 @@ enum BackupService {
 
     // MARK: - Export / decode
 
-    static func makeDocument(entries: [Entry], preferences: PreferencesDTO = currentPreferences(), exportedAt: Date = .now) -> Document {
+    static func makeDocument(
+        entries: [Entry],
+        pityTrackers: [PityTracker] = [],
+        preferences: PreferencesDTO = currentPreferences(),
+        exportedAt: Date = .now
+    ) -> Document {
         Document(
             format: formatIdentifier,
             version: currentVersion,
             exportedAt: exportedAt,
             preferences: preferences,
-            entries: entries.map(EntryDTO.init(entry:))
+            entries: entries.map(EntryDTO.init(entry:)),
+            pityTrackers: pityTrackers.map(PityTrackerDTO.init(tracker:))
         )
     }
 
@@ -152,12 +183,21 @@ enum BackupService {
         }
     }
 
-    static func exportData(entries: [Entry], preferences: PreferencesDTO = currentPreferences()) throws -> Data {
-        try encode(makeDocument(entries: entries, preferences: preferences))
+    static func exportData(
+        entries: [Entry],
+        pityTrackers: [PityTracker] = [],
+        preferences: PreferencesDTO = currentPreferences()
+    ) throws -> Data {
+        try encode(makeDocument(entries: entries, pityTrackers: pityTrackers, preferences: preferences))
     }
 
-    static func writeTemporaryFile(entries: [Entry], preferences: PreferencesDTO = currentPreferences(), now: Date = .now) throws -> URL {
-        let data = try exportData(entries: entries, preferences: preferences)
+    static func writeTemporaryFile(
+        entries: [Entry],
+        pityTrackers: [PityTracker] = [],
+        preferences: PreferencesDTO = currentPreferences(),
+        now: Date = .now
+    ) throws -> URL {
+        let data = try exportData(entries: entries, pityTrackers: pityTrackers, preferences: preferences)
         let formatter = DateFormatter()
         formatter.calendar = Calendar(identifier: .gregorian)
         formatter.locale = Locale(identifier: "en_US_POSIX")
@@ -218,6 +258,7 @@ enum BackupService {
             let entry = makeEntry(from: dto, modelContext: modelContext)
             modelContext.insert(entry)
         }
+        replacePityTrackers(document.pityTrackers, modelContext: modelContext)
         try modelContext.save()
         applyPreferences(document.preferences)
         return ImportSummary(inserted: document.entries.count, updated: 0)
@@ -241,6 +282,8 @@ enum BackupService {
                 inserted += 1
             }
         }
+
+        mergePityTrackers(document.pityTrackers, modelContext: modelContext)
 
         try modelContext.save()
         applyPreferences(document.preferences)
@@ -454,6 +497,82 @@ enum BackupService {
         }
     }
 
+    @MainActor
+    private static func replacePityTrackers(_ dtos: [PityTrackerDTO]?, modelContext: ModelContext) {
+        // `deleteAll` already removed existing rows.
+        if let dtos {
+            for dto in dtos {
+                modelContext.insert(makeTracker(from: dto))
+            }
+        } else {
+            PityCatalog.seedIfEmpty(modelContext: modelContext)
+        }
+    }
+
+    @MainActor
+    private static func mergePityTrackers(_ dtos: [PityTrackerDTO]?, modelContext: ModelContext) {
+        guard let dtos else { return }
+        let existing = (try? modelContext.fetch(FetchDescriptor<PityTracker>())) ?? []
+        var byID = Dictionary(existing.map { ($0.id, $0) }, uniquingKeysWith: { _, latest in latest })
+        for dto in dtos {
+            if let tracker = byID[dto.id] {
+                apply(dto, to: tracker)
+            } else {
+                let tracker = makeTracker(from: dto)
+                modelContext.insert(tracker)
+                byID[tracker.id] = tracker
+            }
+        }
+    }
+
+    private static func makeTracker(from dto: PityTrackerDTO) -> PityTracker {
+        let tracker = PityTracker(
+            id: dto.id,
+            game: GameSubCategory(rawValue: dto.gameRaw) ?? .genshinImpact,
+            name: dto.name,
+            presetKey: dto.presetKey,
+            sortOrder: dto.sortOrder,
+            hardPity: dto.hardPity,
+            softPity: dto.softPity,
+            guaranteeKind: PityGuaranteeKind(rawValue: dto.guaranteeKindRaw) ?? .none,
+            fatePointCap: dto.fatePointCap,
+            currentPity: dto.currentPity,
+            lifetimePulls: dto.lifetimePulls,
+            isGuaranteed: dto.isGuaranteed,
+            fatePoints: dto.fatePoints,
+            guaranteeLabel: dto.guaranteeLabel,
+            lastDropName: dto.lastDropName,
+            lastDropPity: dto.lastDropPity,
+            lastDropAt: dto.lastDropAt,
+            lastDropWasFeatured: dto.lastDropWasFeatured,
+            createdAt: dto.createdAt,
+            updatedAt: dto.updatedAt
+        )
+        return tracker
+    }
+
+    private static func apply(_ dto: PityTrackerDTO, to tracker: PityTracker) {
+        tracker.gameRaw = (GameSubCategory(rawValue: dto.gameRaw) ?? .genshinImpact).rawValue
+        tracker.name = dto.name
+        tracker.presetKey = dto.presetKey
+        tracker.sortOrder = dto.sortOrder
+        tracker.hardPity = dto.hardPity
+        tracker.softPity = dto.softPity
+        tracker.guaranteeKindRaw = (PityGuaranteeKind(rawValue: dto.guaranteeKindRaw) ?? .none).rawValue
+        tracker.fatePointCap = dto.fatePointCap
+        tracker.currentPity = dto.currentPity
+        tracker.lifetimePulls = dto.lifetimePulls
+        tracker.isGuaranteed = dto.isGuaranteed
+        tracker.fatePoints = dto.fatePoints
+        tracker.guaranteeLabel = dto.guaranteeLabel
+        tracker.lastDropName = dto.lastDropName
+        tracker.lastDropPity = dto.lastDropPity
+        tracker.lastDropAt = dto.lastDropAt
+        tracker.lastDropWasFeatured = dto.lastDropWasFeatured
+        tracker.createdAt = dto.createdAt
+        tracker.updatedAt = dto.updatedAt
+    }
+
     private static func decimal(from string: String?) -> Decimal? {
         guard let string, !string.isEmpty else { return nil }
         return Decimal(string: string)
@@ -525,6 +644,33 @@ private extension BackupService.EntryDTO {
             completions: entry.completions.map {
                 BackupService.CompletionDTO(occurrenceStart: $0.occurrenceStart, completedAt: $0.completedAt)
             }
+        )
+    }
+}
+
+private extension BackupService.PityTrackerDTO {
+    init(tracker: PityTracker) {
+        self.init(
+            id: tracker.id,
+            gameRaw: tracker.gameRaw,
+            name: tracker.name,
+            presetKey: tracker.presetKey,
+            sortOrder: tracker.sortOrder,
+            hardPity: tracker.hardPity,
+            softPity: tracker.softPity,
+            guaranteeKindRaw: tracker.guaranteeKindRaw,
+            fatePointCap: tracker.fatePointCap,
+            currentPity: tracker.currentPity,
+            lifetimePulls: tracker.lifetimePulls,
+            isGuaranteed: tracker.isGuaranteed,
+            fatePoints: tracker.fatePoints,
+            guaranteeLabel: tracker.guaranteeLabel,
+            lastDropName: tracker.lastDropName,
+            lastDropPity: tracker.lastDropPity,
+            lastDropAt: tracker.lastDropAt,
+            lastDropWasFeatured: tracker.lastDropWasFeatured,
+            createdAt: tracker.createdAt,
+            updatedAt: tracker.updatedAt
         )
     }
 }

@@ -127,7 +127,7 @@ enum EventWindowEngine {
             progress: metrics.progress,
             kind: .durationWindow,
             occurrenceDate: entry.startDate,
-            isPeriodComplete: false,
+            isPeriodComplete: entry.isCompletable && entry.isCompleted(on: entry.startDate, calendar: calendar),
             periodCaption: nil
         )
     }

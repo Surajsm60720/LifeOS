@@ -81,7 +81,7 @@ struct CalendarRootView: View {
         }
         .background(LifeOSTheme.canvas.ignoresSafeArea())
         .sheet(item: $selectedOccurrence) { occurrence in
-            EntryDetailView(entry: occurrence.entry, occurrenceDate: occurrence.occurrenceDate)
+            EntryDetailView(entry: occurrence.entry, occurrenceDate: occurrence.occurrenceDate, entryStore: entryStore)
         }
         .onAppear {
             applyStoredDefaultIfNeeded()

@@ -61,7 +61,7 @@ struct EntryLibraryView: View {
                 }
             }
             .sheet(item: $selected) { entry in
-                EntryDetailView(entry: entry, occurrenceDate: entry.startDate)
+                EntryDetailView(entry: entry, occurrenceDate: entry.startDate, entryStore: entryStore)
             }
         }
     }

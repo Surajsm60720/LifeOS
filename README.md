@@ -1,46 +1,47 @@
 # LifeOS
 
-**Version 1.0.2** · Released August 17, 2026
+**Version 1.0.3** · Released September 25, 2026
 
 A personal, calendar-centric iOS app for tracking day-to-day life, game events, and entertainment progress — locally, without accounts or third-party sync.
 
 LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and reading/watching logs into one entry model with recurrence, completion tracking, customizable local notifications, hangout expense ledgers, multi-stop locations with a map picker, Markdown recap export, full-app JSON backup/restore, optional Face ID app lock, a Dynamic Island Live Activity for today's events at a glance, and an **Ongoing Events** tab for multi-day windows and the current weekly or monthly cycle (this occurrence through the next).
 
-> **v1.0.2** adds a map-first place picker with live MapKit previews, and puts the current weekly/monthly cycle into Ongoing Events (for example 16 Aug → 16 Sep, not 1–31 Aug). CloudKit sync, home-screen widgets, and charts remain intentionally out of scope.
+> **v1.0.3** adds Settings → Pity Counters for Genshin, Star Rail, and Wuthering Waves: live +1 / +10 tracking, 50/50 vs guaranteed, and a visual ramp as you climb toward hard pity. CloudKit sync, home-screen widgets, and charts remain intentionally out of scope.
 
 ---
 
 ## Status
 
-| Area | v1.0 | v1.0.1 | v1.0.2 |
-|---|---|---|---|
-| Unified entry model (IRL / Games / Entertainment) | Included | — | — |
-| All-day entries (date-only, no start time) | Included | — | — |
-| Day / Week / Month / Year calendar | Included | — | — |
-| Month heat grid + Year mini-month contribution maps | Included | — | — |
-| Swipe complete / delete on Day, Week, Month rows | Included | — | — |
-| Configurable default calendar view (Day default) | Included | — | — |
-| Alternate app icons (Default / Geometric / Minimal) + light/dark appearances | Included | — | — |
-| Live Activity / Dynamic Island (day-only, count + event list) | Included | — | — |
-| Recurrence + occurrence-level completion | Included | — | — |
-| Local notification rules + presets (64-cap aware) | Included | Enhanced | — |
-| Notification budget (scheduled / remaining / firing today) | Included | — | — |
-| Safe notification rule create (Save-only; draft-entry aware) | Included | — | — |
-| Today inbox, search / filters, templates | Included | — | — |
-| IRL multi-location + MapKit place search | Included | — | Map picker + live preview |
-| Hangout expense ledger (lines, totals, who owes you) | Included | — | — |
-| Expense settlement share & clipboard copy | Included | — | — |
-| Game event types (GI / HSR / WuWa) + Other session logs | Included | + In-Game Events | — |
-| Entertainment progress + session targets | Included | — | — |
-| Markdown recap export with stats | Included | — | — |
-| JSON backup & restore (Replace or Merge) | Included | — | — |
-| App Lock (Face ID / Touch ID / device passcode) | Included | — | — |
-| Corrupted-store recovery mode + restore banner | Included | — | — |
-| Haptic feedback across the app | Included | — | — |
-| **Ongoing Events tab** (multi-day windows, start → end) | — | Included | + occurrence-cycle cadence |
-| **Extended entry duration** (days / weeks / months; end-date picker) | — | Included | — |
-| **Date-based notifications** (specific date & time; relative to end) | — | Included | — |
-| Calendar teaser → Ongoing tab | — | Included | — |
+| Area | v1.0 | v1.0.1 | v1.0.2 | v1.0.3 |
+|---|---|---|---|---|
+| Unified entry model (IRL / Games / Entertainment) | Included | — | — | — |
+| All-day entries (date-only, no start time) | Included | — | — | — |
+| Day / Week / Month / Year calendar | Included | — | — | — |
+| Month heat grid + Year mini-month contribution maps | Included | — | — | — |
+| Swipe complete / delete on Day, Week, Month rows | Included | — | — | — |
+| Configurable default calendar view (Day default) | Included | — | — | — |
+| Alternate app icons (Default / Geometric / Minimal) + light/dark appearances | Included | — | — | — |
+| Live Activity / Dynamic Island (day-only, count + event list) | Included | — | — | — |
+| Recurrence + occurrence-level completion | Included | — | — | — |
+| Local notification rules + presets (64-cap aware) | Included | Enhanced | — | — |
+| Notification budget (scheduled / remaining / firing today) | Included | — | — | — |
+| Safe notification rule create (Save-only; draft-entry aware) | Included | — | — | — |
+| Today inbox, search / filters, templates | Included | — | — | — |
+| IRL multi-location + MapKit place search | Included | — | Map picker + live preview | — |
+| Hangout expense ledger (lines, totals, who owes you) | Included | — | — | — |
+| Expense settlement share & clipboard copy | Included | — | — | — |
+| Game event types (GI / HSR / WuWa) + Other session logs | Included | + In-Game Events | — | — |
+| Entertainment progress + session targets | Included | — | — | — |
+| Markdown recap export with stats | Included | — | — | — |
+| JSON backup & restore (Replace or Merge) | Included | — | — | — |
+| App Lock (Face ID / Touch ID / device passcode) | Included | — | — | — |
+| Corrupted-store recovery mode + restore banner | Included | — | — | — |
+| Haptic feedback across the app | Included | — | — | — |
+| **Ongoing Events tab** (multi-day windows, start → end) | — | Included | + occurrence-cycle cadence | — |
+| **Extended entry duration** (days / weeks / months; end-date picker) | — | Included | — | — |
+| **Date-based notifications** (specific date & time; relative to end) | — | Included | — | — |
+| Calendar teaser → Ongoing tab | — | Included | — | — |
+| **Pity counters** (GI / HSR / WuWa banners, +1/+10, 50/50) | — | — | — | Included |
 
 ---
 
@@ -81,6 +82,27 @@ open LifeOS.xcodeproj
 4. Run (**⌘R**).
 
 Allow notification permission when prompted if you plan to use reminders.
+
+---
+
+## What's new in v1.0.3
+
+### Pity counters
+
+- **Settings → Games → Pity Counters** — one sheet with all three gacha titles and their banner types
+- Seeded banners: Genshin character / weapon / standard; Star Rail character / light cone / standard; WuWa resonator / featured weapon / standard convenes
+- **+1 / +10 / −1 / −10** for a live pull session, plus **Got 5★** (asks Featured vs Lost 50/50 when it matters; guaranteed and always-guaranteed banners just reset)
+- Long-press a card to move it up or down within that game
+- After Got 5★ you can optionally name who you got — only the last 5★ is kept per banner
+- Cards heat up through approaching → soft pity → hard pity → over pity
+- Add your own banner type (new selectors / anniversary banners) without a catalog change
+- Counters are their own SwiftData store — pity is not tied to calendar Banner Window entries, so it survives a patch rotation
+- Included in JSON backup / restore and wiped with Delete All Data (official banners re-seed empty)
+
+### Notes
+
+- Marketing version is **1.0.3** (`CURRENT_PROJECT_VERSION` 3)
+- Chronicled Wish and WuWa standard character convene are not seeded; add them from the sheet if you need them
 
 ---
 
@@ -204,7 +226,7 @@ xcodebuild test \
 
 Or in Xcode: **⌘U**.
 
-Unit coverage includes recurrence, entry capabilities (incl. expense split), notification budget helpers, event window policy (including occurrence-cycle cadence), recap export formatting, backup encode/decode + replace/merge, expense settlement text, scale/integrity harness, and audit regression tests. UI tests include a notification-banner icon smoke check (`LifeOSUITests`).
+Unit coverage includes recurrence, entry capabilities (incl. expense split), notification budget helpers, event window policy (including occurrence-cycle cadence), recap export formatting, backup encode/decode + replace/merge, expense settlement text, scale/integrity harness, audit regression tests, and pity-counter rules. UI tests include a notification-banner icon smoke check (`LifeOSUITests`).
 
 Live Activity UI, Dynamic Island expanded count, calendar swipe actions, App Lock, and year heat maps should be verified manually on a simulator or device.
 
@@ -229,8 +251,10 @@ project.yml              XcodeGen definition
 
 ---
 
-## Design notes (v1.0.2)
+## Design notes (v1.0.3)
 
+- **Pity counters** live under Settings, not a fifth tab; they are banner-type rows (not calendar Banner Window entries) so pity survives a patch rotation
+- Cards heat from the game accent into orange/red as you enter approaching, soft pity, hard pity, and over pity
 - **Ongoing Events** lists one-off windows (duration ≥ 24h, no recurrence) plus the current weekly/monthly **cycle** (this occurrence through the next)  
 - **Dailies** stay in Calendar / Today — not duplicated in Ongoing  
 - Cadence items never appear in Starting Soon or Recently Ended  

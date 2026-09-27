@@ -30,6 +30,7 @@ enum PreviewData {
             NotificationRule.self,
             EntryProgress.self,
             EntryCompletion.self,
+            PityTracker.self,
         ])
         let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try! ModelContainer(for: schema, configurations: [configuration])
@@ -58,5 +59,7 @@ enum PreviewData {
         anime.progress = EntryProgress(currentUnit: 3, totalUnits: 12, unitLabel: "episode")
         anime.progress?.entry = anime
         context.insert(anime)
+
+        PityCatalog.seedIfEmpty(modelContext: context)
     }
 }

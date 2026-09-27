@@ -67,6 +67,10 @@ final class EntryStore: ObservableObject {
             Task { await NotificationPlanner.shared.cancelAll(entryID: entryID) }
             modelContext.delete(entry)
         }
+        let trackers = (try? modelContext.fetch(FetchDescriptor<PityTracker>())) ?? []
+        for tracker in trackers {
+            modelContext.delete(tracker)
+        }
         try? modelContext.save()
         markChanged()
     }

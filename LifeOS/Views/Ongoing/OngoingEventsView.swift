@@ -41,7 +41,7 @@ struct OngoingEventsView: View {
         .onChange(of: entryStore.dataVersion) { _, _ in recompute() }
         .onChange(of: filters.signature) { _, _ in recompute() }
         .sheet(item: $selectedOccurrence) { occurrence in
-            EntryDetailView(entry: occurrence.entry, occurrenceDate: occurrence.occurrenceDate)
+            EntryDetailView(entry: occurrence.entry, occurrenceDate: occurrence.occurrenceDate, entryStore: entryStore)
         }
     }
 
