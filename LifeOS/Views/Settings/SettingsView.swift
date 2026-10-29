@@ -45,8 +45,12 @@ struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
 
     @AppStorage(CalendarViewMode.defaultStorageKey) private var defaultModeRaw: String = CalendarViewMode.day.rawValue
-    @AppStorage(LiveActivityManager.enabledStorageKey) private var liveActivityEnabled: Bool = false
+    @AppStorage(AutomaticBackup.enabledKey) private var autoBackupEnabled: Bool = false
+    @AppStorage(AutomaticBackup.weekdayKey) private var autoBackupWeekday: Int = AutomaticBackup.defaultWeekday
+    @AppStorage(AutomaticBackup.monthlyEnabledKey) private var autoBackupMonthly: Bool = false
+    @AppStorage(AutomaticBackup.yearlyEnabledKey) private var autoBackupYearly: Bool = false
     @State private var showingExport = false
+    @State private var showingAutoBackup = false
     @State private var showingBackup = false
     @State private var showingTemplates = false
     @State private var showingLibrary = false
@@ -132,14 +136,6 @@ struct SettingsView: View {
             }
 
             Section {
-                Toggle("Live Activity (Dynamic Island)", isOn: $liveActivityEnabled)
-            } header: {
-                Text("Dynamic Island")
-            } footer: {
-                Text("When enabled, LifeOS shows today's remaining to-dos directly on the Dynamic Island and Lock Screen (system limits how long it stays visible).")
-            }
-
-            Section {
                 Toggle("\(appLock.biometryName) Unlock", isOn: appLockBinding)
                     .disabled(!appLock.canAuthenticate)
             } header: {
@@ -176,6 +172,18 @@ struct SettingsView: View {
                 }
 
                 Button {
+                    showingAutoBackup = true
+                } label: {
+                    HStack {
+                        Label("Automatic Backup", systemImage: "clock.arrow.circlepath")
+                        Spacer(minLength: 8)
+                        Text(autoBackupSummary)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                Button {
                     showingTemplates = true
                 } label: {
                     Label("Entry Templates", systemImage: "doc.on.doc")
@@ -189,7 +197,7 @@ struct SettingsView: View {
             } header: {
                 Text("Data")
             } footer: {
-                Text("Recap builds Markdown for LLM summaries. Backup exports JSON you can restore after a wipe or reinstall (Replace or Merge). Templates create starter entries.")
+                Text("Recap builds Markdown for LLM summaries. Backup exports JSON you can restore after a wipe or reinstall (Replace or Merge). Automatic Backup writes weekly restore points plus monthly/yearly archive JSON to a folder outside the app.")
             }
 
             Section("Library") {
@@ -225,6 +233,9 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showingBackup) {
             BackupRestoreView(entries: entries)
+        }
+        .sheet(isPresented: $showingAutoBackup) {
+            AutomaticBackupSettingsView()
         }
         .sheet(isPresented: $showingTemplates) {
             EntryTemplatesView()
@@ -263,8 +274,6 @@ struct SettingsView: View {
             guard !didLoadCurrentIcon else { return }
             selectedIconChoice = AppIconChoice.from(alternateIconName: UIApplication.shared.alternateIconName)
             didLoadCurrentIcon = true
-
-            Task { await LiveActivityManager.syncActiveActivity(modelContext: modelContext) }
         }
         .onChange(of: selectedIconChoice) { _, newValue in
             guard didLoadCurrentIcon, supportsAlternateIcons else { return }
@@ -282,9 +291,6 @@ struct SettingsView: View {
                 }
             }
         }
-        .onChange(of: liveActivityEnabled) { _, _ in
-            Task { await LiveActivityManager.syncActiveActivity(modelContext: modelContext) }
-        }
     }
 
     /// Recomputed on data change rather than on every render, and reusing the
@@ -292,6 +298,17 @@ struct SettingsView: View {
     /// each time SwiftUI evaluated `body`.
     private var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+    }
+
+    private var autoBackupSummary: String {
+        guard autoBackupEnabled || autoBackupMonthly || autoBackupYearly else { return "Off" }
+        guard BackupDestination.isConfigured else { return "Choose folder" }
+
+        var parts: [String] = []
+        if autoBackupEnabled { parts.append("Weekly") }
+        if autoBackupMonthly { parts.append("Monthly") }
+        if autoBackupYearly { parts.append("Yearly") }
+        return parts.joined(separator: " · ")
     }
 
     private func recomputeTodayCompletableCount() {

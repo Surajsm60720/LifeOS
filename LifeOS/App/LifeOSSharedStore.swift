@@ -17,8 +17,8 @@ enum LifeOSSharedStore {
     @MainActor
     private static var _container: ModelContainer?
 
-    /// One shared container for the app + Live Activity intents.
-    /// Creating a second container on the same store was breaking scope updates.
+    /// One shared container for the whole app. Creating a second container on the
+    /// same store broke relationship updates, so every caller goes through here.
     @MainActor
     static var container: ModelContainer {
         if let _container {

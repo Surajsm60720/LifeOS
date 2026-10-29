@@ -103,8 +103,7 @@ struct PityCountersView: View {
                     onEdit: { editingTracker = tracker },
                     onDelete: { delete(tracker) },
                     onMoveUp: { move(tracker, in: ordered, by: -1) },
-                    onMoveDown: { move(tracker, in: ordered, by: 1) },
-                    onRecordDrop: { recordDrop(on: tracker, name: $0, pity: $1, featured: $2) }
+                    onMoveDown: { move(tracker, in: ordered, by: 1) }
                 )
             }
         }
@@ -137,16 +136,6 @@ struct PityCountersView: View {
         ordered[target].sortOrder = currentOrder
         tracker.updatedAt = .now
         ordered[target].updatedAt = .now
-        try? modelContext.save()
-    }
-
-    private func recordDrop(on tracker: PityTracker, name: String?, pity: Int, featured: Bool) {
-        let trimmed = name?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        tracker.lastDropName = trimmed.isEmpty ? nil : trimmed
-        tracker.lastDropPity = pity
-        tracker.lastDropAt = .now
-        tracker.lastDropWasFeatured = featured
-        tracker.updatedAt = .now
         try? modelContext.save()
     }
 }

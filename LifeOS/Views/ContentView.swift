@@ -97,14 +97,16 @@ struct ContentView: View {
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
             case .active:
-                // Skip data work while locked so nothing reaches the Lock Screen or
-                // Dynamic Island before the owner authenticates.
+                // Backups ignore the app lock: they write a file, nothing reaches the UI.
+                scheduleBackups()
+                // Skip data work while locked so nothing reaches the Lock Screen before
+                // the owner authenticates.
                 guard !appLock.isLocked else { return }
                 refreshNotifications()
-                Task { await LiveActivityManager.syncActiveActivity(modelContext: modelContext) }
             case .background:
                 // Only on `.background`. `.inactive` also fires for the Face ID sheet,
                 // Control Center, and the app switcher, which would re-lock mid-unlock.
+                scheduleBackups()
                 appLock.lockIfEnabled()
             default:
                 break
@@ -114,14 +116,19 @@ struct ContentView: View {
             // Catch up on the work that was deferred while the lock screen was up.
             guard !locked else { return }
             refreshNotifications()
-            Task { await LiveActivityManager.syncActiveActivity(modelContext: modelContext) }
         }
         .task {
             LifeOSDataMigration.runLaunchMigrations(modelContext: modelContext, entryStore: entryStore)
+            scheduleBackups()
             guard !appLock.isLocked else { return }
             refreshNotifications()
-            await LiveActivityManager.syncActiveActivity(modelContext: modelContext)
         }
+    }
+
+    /// Weekly + archive slot check, plus the next background wake-up request.
+    private func scheduleBackups() {
+        AutomaticBackup.runAllIfDue(modelContext: modelContext)
+        AutoBackupScheduler.scheduleNext()
     }
 
     /// Read-only binding: the cover is dismissed by successful authentication, never by a swipe.

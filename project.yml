@@ -18,7 +18,6 @@ targets:
       - path: LifeOS
         excludes:
           - "**/.DS_Store"
-          - "**/LiveActivityWidget/**"
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.surajmenon.lifeos
@@ -32,8 +31,8 @@ targets:
         ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: YES
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         SWIFT_EMIT_LOC_STRINGS: YES
-        CURRENT_PROJECT_VERSION: 3
-        MARKETING_VERSION: "1.0.3"
+        CURRENT_PROJECT_VERSION: 4
+        MARKETING_VERSION: "1.0.4"
         DEVELOPMENT_TEAM: ""
         CODE_SIGN_STYLE: Automatic
         ENABLE_PREVIEWS: YES
@@ -41,10 +40,12 @@ targets:
       path: LifeOS/Info.plist
       properties:
         UIApplicationSupportsIndirectInputEvents: true
-        NSSupportsLiveActivities: true
+        BGTaskSchedulerPermittedIdentifiers:
+          - com.surajmenon.lifeos.autobackup
+        UIBackgroundModes:
+          - fetch
         NSLocationWhenInUseUsageDescription: LifeOS can use your location to drop a pin for IRL events when you choose a place on the map. Search and tap-to-pin still work without sharing your live location.
-    dependencies:
-      - target: LifeOSLiveActivityWidget
+        NSFaceIDUsageDescription: LifeOS uses Face ID to unlock the app, so your entries stay private without typing your passcode every time.
   LifeOSTests:
     type: bundle.unit-test
     platform: iOS
@@ -70,45 +71,6 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.surajmenon.lifeos.uitests
         GENERATE_INFOPLIST_FILE: YES
         TEST_TARGET_NAME: LifeOS
-  LifeOSLiveActivityWidget:
-    type: app-extension
-    platform: iOS
-    sources:
-      - path: LifeOS/LiveActivity
-      - path: LifeOS/LiveActivityWidget
-      - path: LifeOS/Models
-      - path: LifeOS/Utilities
-        excludes:
-          - "**/CalendarFilterState.swift"
-          - "**/EntryDeleteModifier.swift"
-          - "**/GameIdentity.swift"
-          - "**/NotificationPreset.swift"
-          - "**/PityVisuals.swift"
-      - path: LifeOS/Services
-        excludes:
-          - "**/BackupService.swift"
-          - "**/EntryTemplates.swift"
-          - "**/EntryStore.swift"
-          - "**/NotificationPlanner.swift"
-          - "**/LifeOSDataMigration.swift"
-          - "**/RecapExporter.swift"
-          - "**/LifeOSNotificationDelegate.swift"
-          - "**/PityCatalog.swift"
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.surajmenon.lifeos.liveactivity
-        TARGETED_DEVICE_FAMILY: "1,2"
-        GENERATE_INFOPLIST_FILE: NO
-        SWIFT_EMIT_LOC_STRINGS: YES
-        CURRENT_PROJECT_VERSION: 3
-        MARKETING_VERSION: "1.0.3"
-        CODE_SIGN_STYLE: Automatic
-    info:
-      path: LifeOS/LiveActivityWidget/Info.plist
-      properties:
-        CFBundleDisplayName: LifeOS Live Activity
-        NSExtension:
-          NSExtensionPointIdentifier: com.apple.widgetkit-extension
 schemes:
   LifeOS:
     build:

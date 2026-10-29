@@ -10,10 +10,6 @@ struct PitySnapshot: Equatable, Sendable {
     var guaranteeKind: PityGuaranteeKind
     var fatePointCap: Int
     var guaranteeLabel: String? = nil
-    var lastDropName: String? = nil
-    var lastDropPity: Int? = nil
-    var lastDropAt: Date? = nil
-    var lastDropWasFeatured: Bool? = nil
 }
 
 enum PityFiveStarOutcome: String, Sendable {

@@ -2,6 +2,40 @@ import Foundation
 import LocalAuthentication
 import SwiftUI
 
+/// Face ID / Touch ID / Optic ID naming and iconography.
+///
+/// `LAContext.biometryType` is only populated *after* a policy check. A bare
+/// `LAContext()` reports `.none`, so the UI used to announce a Face ID iPhone as
+/// "Passcode" and draw a shield. Every read here performs the silent
+/// (non-prompting) capability check first.
+enum Biometry {
+    static var type: LABiometryType {
+        let context = LAContext()
+        _ = context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
+        return context.biometryType
+    }
+
+    static var name: String {
+        switch type {
+        case .faceID: return "Face ID"
+        case .touchID: return "Touch ID"
+        case .opticID: return "Optic ID"
+        case .none: return "Passcode"
+        @unknown default: return "Biometrics"
+        }
+    }
+
+    static var systemImage: String {
+        switch type {
+        case .faceID: return "faceid"
+        case .touchID: return "touchid"
+        case .opticID: return "opticid"
+        case .none: return "lock.shield"
+        @unknown default: return "lock.shield"
+        }
+    }
+}
+
 enum AppLockMode: String {
     case off
     case biometric
@@ -9,14 +43,7 @@ enum AppLockMode: String {
     var systemImage: String {
         switch self {
         case .off: return "lock.open"
-        case .biometric:
-            switch LAContext().biometryType {
-            case .faceID: return "faceid"
-            case .touchID: return "touchid"
-            case .opticID: return "opticid"
-            case .none: return "lock.shield"
-            @unknown default: return "lock.shield"
-            }
+        case .biometric: return Biometry.systemImage
         }
     }
 }
@@ -46,15 +73,7 @@ final class AppLockManager {
 
     var isEnabled: Bool { mode != .off }
 
-    var biometryName: String {
-        switch LAContext().biometryType {
-        case .faceID: return "Face ID"
-        case .touchID: return "Touch ID"
-        case .opticID: return "Optic ID"
-        case .none: return "Passcode"
-        @unknown default: return "Biometrics"
-        }
-    }
+    var biometryName: String { Biometry.name }
 
     /// Whether the device can authenticate at all (biometrics or passcode).
     var canAuthenticate: Bool {
@@ -117,9 +136,27 @@ final class AppLockManager {
             do {
                 let success = try await context.evaluatePolicy(Self.policy, localizedReason: reason)
                 completion(success, success ? nil : "Authentication failed.")
-            } catch let policyError {
-                completion(false, policyError.localizedDescription)
+            } catch {
+                completion(false, Self.message(for: error))
             }
+        }
+    }
+
+    /// `LAError`'s own description ("Biometry is not available.") leaves the user
+    /// with nowhere to go, so name the actual setting that fixes each case.
+    private static func message(for error: Error) -> String {
+        guard let laError = error as? LAError else { return error.localizedDescription }
+        switch laError.code {
+        case .biometryNotAvailable:
+            return "Face ID can't be used by LifeOS. Allow it in Settings → Face ID & Passcode → Other Apps, or keep using your passcode."
+        case .biometryNotEnrolled:
+            return "Face ID isn't set up on this iPhone. Add it in Settings → Face ID & Passcode, or keep using your passcode."
+        case .biometryLockout:
+            return "Face ID is locked after too many attempts. Unlock your iPhone with its passcode, then try again."
+        case .userCancel, .appCancel, .systemCancel:
+            return "Authentication cancelled."
+        default:
+            return laError.localizedDescription
         }
     }
 }

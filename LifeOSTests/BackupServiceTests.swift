@@ -31,6 +31,8 @@ final class BackupServiceTests: XCTestCase {
 
         let data = try BackupService.exportData(entries: [entry], preferences: .init(
             calendarDefaultMode: "week",
+            // The Live Activity was removed in 1.0.4 but these optional fields stay in
+            // the DTO so backups written by 1.0.3 and earlier still decode.
             liveActivityEnabled: true,
             liveActivityDefaultScope: "day"
         ))

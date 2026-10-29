@@ -12,17 +12,21 @@ struct PityTrackerCard: View {
     var onDelete: () -> Void
     var onMoveUp: () -> Void
     var onMoveDown: () -> Void
-    var onRecordDrop: (String?, Int, Bool) -> Void
 
     @State private var showingOutcome = false
-    @State private var showingNamePrompt = false
-    @State private var dropName = ""
-    @State private var pendingDropPity = 0
-    @State private var pendingDropFeatured = true
 
     private var state: PitySnapshot { tracker.snapshot }
     private var proximity: PityProximity { PityRules.proximity(for: state) }
     private var heat: Color { PityVisuals.heatColor(proximity: proximity, game: tracker.game) }
+
+    /// A freshly seeded preset has `updatedAt == createdAt`; calling that "Updated today"
+    /// would suggest a pull session that never happened.
+    private var lastUpdatedText: String {
+        guard tracker.updatedAt.timeIntervalSince(tracker.createdAt) > 1 else {
+            return "Not updated yet"
+        }
+        return DateFormatting.lastUpdatedLine(for: tracker.updatedAt)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -70,19 +74,6 @@ struct PityTrackerCard: View {
         } message: {
             Text(outcomeMessage)
         }
-        .alert("Who did you get?", isPresented: $showingNamePrompt) {
-            TextField("Character or weapon", text: $dropName)
-            Button("Save") {
-                onRecordDrop(dropName, pendingDropPity, pendingDropFeatured)
-                dropName = ""
-            }
-            Button("Skip", role: .cancel) {
-                onRecordDrop(nil, pendingDropPity, pendingDropFeatured)
-                dropName = ""
-            }
-        } message: {
-            Text("Optional. Stored as the last 5★ on this banner only — not a full pull history.")
-        }
     }
 
     private var header: some View {
@@ -97,11 +88,9 @@ struct PityTrackerCard: View {
                     .font(.system(.body, design: .rounded, weight: .semibold))
                     .foregroundStyle(.white)
 
-                if let caption = tracker.lastDropCaption {
-                    Text(caption)
-                        .font(.system(.caption, design: .rounded))
-                        .foregroundStyle(LifeOSTheme.softText)
-                }
+                Text(lastUpdatedText)
+                    .font(.system(.caption, design: .rounded))
+                    .foregroundStyle(LifeOSTheme.softText)
             }
 
             Spacer(minLength: 8)
@@ -257,12 +246,8 @@ struct PityTrackerCard: View {
     }
 
     private func applyFiveStar(_ outcome: PityFiveStarOutcome) {
-        pendingDropPity = tracker.currentPity
-        pendingDropFeatured = outcome == .featured || !PityRules.needsOutcomePrompt(for: state)
         Haptics.success()
         onApply(PityRules.applyFiveStar(state, outcome: outcome))
-        dropName = ""
-        showingNamePrompt = true
     }
 
     private func chip(_ title: String, fill: Color) -> some View {

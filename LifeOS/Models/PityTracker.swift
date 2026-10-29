@@ -63,10 +63,6 @@ final class PityTracker {
     var isGuaranteed: Bool
     var fatePoints: Int
     var guaranteeLabel: String? = nil
-    var lastDropName: String? = nil
-    var lastDropPity: Int? = nil
-    var lastDropAt: Date? = nil
-    var lastDropWasFeatured: Bool? = nil
     var createdAt: Date
     var updatedAt: Date
 
@@ -82,15 +78,6 @@ final class PityTracker {
 
     var isPreset: Bool { presetKey != nil }
 
-    var lastDropCaption: String? {
-        guard let pity = lastDropPity else { return nil }
-        let name = lastDropName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        if name.isEmpty {
-            return "Last 5★ at \(pity)"
-        }
-        return "Last: \(name) · \(pity)"
-    }
-
     var snapshot: PitySnapshot {
         PitySnapshot(
             currentPity: currentPity,
@@ -101,11 +88,7 @@ final class PityTracker {
             softPity: softPity,
             guaranteeKind: guaranteeKind,
             fatePointCap: fatePointCap,
-            guaranteeLabel: guaranteeLabel,
-            lastDropName: lastDropName,
-            lastDropPity: lastDropPity,
-            lastDropAt: lastDropAt,
-            lastDropWasFeatured: lastDropWasFeatured
+            guaranteeLabel: guaranteeLabel
         )
     }
 
@@ -124,10 +107,6 @@ final class PityTracker {
         isGuaranteed: Bool = false,
         fatePoints: Int = 0,
         guaranteeLabel: String? = nil,
-        lastDropName: String? = nil,
-        lastDropPity: Int? = nil,
-        lastDropAt: Date? = nil,
-        lastDropWasFeatured: Bool? = nil,
         createdAt: Date = .now,
         updatedAt: Date = .now
     ) {
@@ -145,10 +124,6 @@ final class PityTracker {
         self.isGuaranteed = isGuaranteed
         self.fatePoints = fatePoints
         self.guaranteeLabel = guaranteeLabel
-        self.lastDropName = lastDropName
-        self.lastDropPity = lastDropPity
-        self.lastDropAt = lastDropAt
-        self.lastDropWasFeatured = lastDropWasFeatured
         self.createdAt = createdAt
         self.updatedAt = updatedAt
     }
@@ -163,10 +138,6 @@ final class PityTracker {
         guaranteeKind = snapshot.guaranteeKind
         fatePointCap = snapshot.fatePointCap
         guaranteeLabel = snapshot.guaranteeLabel
-        lastDropName = snapshot.lastDropName
-        lastDropPity = snapshot.lastDropPity
-        lastDropAt = snapshot.lastDropAt
-        lastDropWasFeatured = snapshot.lastDropWasFeatured
         updatedAt = .now
     }
 }

@@ -5,6 +5,8 @@ import UserNotifications
 @main
 struct LifeOSApp: App {
     init() {
+        AutomaticBackup.registerDefaults()
+        AutoBackupScheduler.register()
         UNUserNotificationCenter.current().delegate = LifeOSNotificationDelegate.shared
     }
 

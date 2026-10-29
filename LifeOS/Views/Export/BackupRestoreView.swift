@@ -192,7 +192,6 @@ struct BackupRestoreView: View {
         let all = (try? modelContext.fetch(descriptor)) ?? []
         Task {
             await NotificationPlanner.refreshPendingNotifications(entries: all, force: true)
-            await LiveActivityManager.syncActiveActivity(modelContext: modelContext)
         }
     }
 }

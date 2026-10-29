@@ -5,6 +5,7 @@ enum LifeOSDataMigration {
     private static let sampleWipeKey = "lifeos.didWipeSampleData.v1"
     private static let locationMigrateKey = "lifeos.didMigrateLegacyLocation.v1"
     private static let expenseMigrateKey = "lifeos.didMigrateLegacyExpense.v1"
+    private static let liveActivityCleanupKey = "lifeos.didRemoveLiveActivity.v1"
 
     /// Runs one-time store migrations at app launch. Call from a thin view/app hook.
     @MainActor
@@ -12,7 +13,18 @@ enum LifeOSDataMigration {
         wipeSampleDataIfNeeded(modelContext: modelContext, entryStore: entryStore)
         migrateLegacyLocationsIfNeeded(modelContext: modelContext)
         migrateLegacyExpenseIfNeeded(modelContext: modelContext)
+        removeLiveActivityPreferenceIfNeeded()
         PityCatalog.seedIfEmpty(modelContext: modelContext)
+    }
+
+    /// 1.0.4 dropped the Live Activity. Any pending ActivityKit activity from a 1.0.3
+    /// build is ended by the system when the widget extension disappears, so all that
+    /// is left to do is drop the dead preference key.
+    @MainActor
+    private static func removeLiveActivityPreferenceIfNeeded() {
+        guard !UserDefaults.standard.bool(forKey: liveActivityCleanupKey) else { return }
+        UserDefaults.standard.removeObject(forKey: "liveActivityEnabled")
+        UserDefaults.standard.set(true, forKey: liveActivityCleanupKey)
     }
 
     @MainActor

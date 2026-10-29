@@ -64,10 +64,6 @@ enum BackupService {
         var isGuaranteed: Bool
         var fatePoints: Int
         var guaranteeLabel: String?
-        var lastDropName: String?
-        var lastDropPity: Int?
-        var lastDropAt: Date?
-        var lastDropWasFeatured: Bool?
         var createdAt: Date
         var updatedAt: Date
     }
@@ -232,9 +228,9 @@ enum BackupService {
     static func currentPreferences() -> PreferencesDTO {
         PreferencesDTO(
             calendarDefaultMode: UserDefaults.standard.string(forKey: CalendarViewMode.defaultStorageKey),
-            liveActivityEnabled: UserDefaults.standard.object(forKey: LiveActivityManager.enabledStorageKey) as? Bool,
-            // Retained only so older backup files (format version 1) still decode cleanly;
-            // the Live Activity is Day-only now, so this preference is no longer read anywhere.
+            // Retained as optional fields only so older backup files (format version 1)
+            // still decode cleanly. The Live Activity feature was removed in 1.0.4.
+            liveActivityEnabled: nil,
             liveActivityDefaultScope: nil
         )
     }
@@ -243,10 +239,8 @@ enum BackupService {
         if let mode = preferences.calendarDefaultMode {
             UserDefaults.standard.set(mode, forKey: CalendarViewMode.defaultStorageKey)
         }
-        if let enabled = preferences.liveActivityEnabled {
-            UserDefaults.standard.set(enabled, forKey: LiveActivityManager.enabledStorageKey)
-        }
-        // preferences.liveActivityDefaultScope is intentionally ignored (see currentPreferences).
+        // liveActivityEnabled / liveActivityDefaultScope are intentionally ignored:
+        // the Live Activity was removed in 1.0.4 and the stored key is now dead.
     }
 
     // MARK: - Import
@@ -541,10 +535,6 @@ enum BackupService {
             isGuaranteed: dto.isGuaranteed,
             fatePoints: dto.fatePoints,
             guaranteeLabel: dto.guaranteeLabel,
-            lastDropName: dto.lastDropName,
-            lastDropPity: dto.lastDropPity,
-            lastDropAt: dto.lastDropAt,
-            lastDropWasFeatured: dto.lastDropWasFeatured,
             createdAt: dto.createdAt,
             updatedAt: dto.updatedAt
         )
@@ -565,10 +555,6 @@ enum BackupService {
         tracker.isGuaranteed = dto.isGuaranteed
         tracker.fatePoints = dto.fatePoints
         tracker.guaranteeLabel = dto.guaranteeLabel
-        tracker.lastDropName = dto.lastDropName
-        tracker.lastDropPity = dto.lastDropPity
-        tracker.lastDropAt = dto.lastDropAt
-        tracker.lastDropWasFeatured = dto.lastDropWasFeatured
         tracker.createdAt = dto.createdAt
         tracker.updatedAt = dto.updatedAt
     }
@@ -665,10 +651,6 @@ private extension BackupService.PityTrackerDTO {
             isGuaranteed: tracker.isGuaranteed,
             fatePoints: tracker.fatePoints,
             guaranteeLabel: tracker.guaranteeLabel,
-            lastDropName: tracker.lastDropName,
-            lastDropPity: tracker.lastDropPity,
-            lastDropAt: tracker.lastDropAt,
-            lastDropWasFeatured: tracker.lastDropWasFeatured,
             createdAt: tracker.createdAt,
             updatedAt: tracker.updatedAt
         )

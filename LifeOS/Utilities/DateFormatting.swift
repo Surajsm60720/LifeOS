@@ -32,8 +32,37 @@ enum DateFormatting {
         return formatter
     }()
 
-    static func startOfDay(_ date: Date, calendar: Calendar = .current) -> Date {
-        calendar.startOfDay(for: date)
+    static let timeOfDay: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        return formatter
+    }()
+
+    static let monthDay: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter
+    }()
+
+    /// Short "when did I last touch this" line. Relative to the current day where
+    /// possible so a glance tells you whether today's session was already logged.
+    static func lastUpdatedLine(for date: Date, now: Date = .now, calendar: Calendar = .current) -> String {
+        let updatedDay = calendar.startOfDay(for: date)
+        let today = calendar.startOfDay(for: now)
+        let time = timeOfDay.string(from: date)
+
+        if updatedDay == today {
+            return "Updated today, \(time)"
+        }
+        if let yesterday = calendar.date(byAdding: .day, value: -1, to: today), updatedDay == yesterday {
+            return "Updated yesterday, \(time)"
+        }
+        let sameYear = calendar.component(.year, from: updatedDay) == calendar.component(.year, from: today)
+        let day = sameYear ? monthDay.string(from: updatedDay) : recapLine.string(from: updatedDay)
+        return "Updated \(day), \(time)"
+    }
+
+    static func startOfDay(_ date: Date, calendar: Calendar = .current) -> Date {        calendar.startOfDay(for: date)
     }
 
     static func endOfDay(_ date: Date, calendar: Calendar = .current) -> Date {
