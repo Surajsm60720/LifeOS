@@ -28,6 +28,17 @@ final class Entry {
     var plannedActivity: String?
     var playedWithRaw: String = ""
 
+    /// Provenance for entries created by a game timeline import.
+    ///
+    /// `importKey` is stable across re-imports (game + patch + item id), so a
+    /// corrected JSON file updates the same row instead of adding a duplicate.
+    /// `importSource` groups a whole run ("Genshin Impact 6.1") so it can be
+    /// removed in one action. All three are optional, which keeps the SwiftData
+    /// migration lightweight and keeps older backups decodable.
+    var importKey: String?
+    var importSource: String?
+    var importedAt: Date?
+
     @Relationship(deleteRule: .cascade) var locations: [LocationEntry]
     @Relationship(deleteRule: .cascade) var expenseLines: [ExpenseLine]
     @Relationship(deleteRule: .cascade) var expenseBalances: [ExpenseBalance]

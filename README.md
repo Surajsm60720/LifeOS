@@ -1,50 +1,53 @@
 # LifeOS
 
-**Version 1.0.4** · Released October 29, 2026
+**Version 1.0.5** · Released October 29, 2026
 
 A personal, calendar-centric iOS app for tracking day-to-day life, game events, and entertainment progress — locally, without accounts or third-party sync.
 
-LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and reading/watching logs into one entry model with recurrence, completion tracking, customizable local notifications, hangout expense ledgers, multi-stop locations with a map picker, Markdown recap export, weekly automatic backups plus monthly/yearly archive exports to a folder outside the app, optional Face ID app lock, and an **Ongoing Events** tab for multi-day windows and the current weekly or monthly cycle (this occurrence through the next).
+LifeOS unifies IRL plans, gacha-game cadence (dailies, banners, patches), and reading/watching logs into one entry model with recurrence, completion tracking, customizable local notifications, hangout expense ledgers, multi-stop locations with a map picker, Markdown recap export, weekly automatic backups plus monthly/yearly archive exports to a folder outside the app, optional Face ID app lock, an **Ongoing Events** tab for multi-day windows and the current weekly or monthly cycle (this occurrence through the next), and **Game Timeline import** that fills a whole version's events, banners, and endgame windows from one LLM-built JSON file.
 
-> **v1.0.4** retires the Dynamic Island Live Activity, trims pity counters to just the number and the guarantee state, and adds **Automatic Backup** — weekly full-restore snapshots plus monthly and yearly archive exports, written to a folder you choose in Files so they survive the app being deleted. CloudKit sync, home-screen widgets, and charts remain intentionally out of scope.
+> **v1.0.5** adds **Game Timeline** — share a prompt with Claude, ChatGPT, or Gemini alongside the livestream timeline image, save its JSON reply, and import it in Settings. Events land in Ongoing with start/end dates and durations automatically; re-importing a corrected file updates its rows without touching your edits. Everything stays on-device: no AI APIs, no scraping.
 
 ---
 
 ## Status
 
-| Area | v1.0 | v1.0.1 | v1.0.2 | v1.0.3 | v1.0.4 |
-|---|---|---|---|---|---|
-| Unified entry model (IRL / Games / Entertainment) | Included | — | — | — | — |
-| All-day entries (date-only, no start time) | Included | — | — | — | — |
-| Day / Week / Month / Year calendar | Included | — | — | — | — |
-| Month heat grid + Year mini-month contribution maps | Included | — | — | — | — |
-| Swipe complete / delete on Day, Week, Month rows | Included | — | — | — | — |
-| Configurable default calendar view (Day default) | Included | — | — | — | — |
-| Alternate app icons (Default / Geometric / Minimal) + light/dark appearances | Included | — | — | — | — |
-| ~~Live Activity / Dynamic Island~~ (removed in v1.0.4) | Included | — | — | — | Removed |
-| Recurrence + occurrence-level completion | Included | — | — | — | — |
-| Local notification rules + presets (64-cap aware) | Included | Enhanced | — | — | — |
-| Notification budget (scheduled / remaining / firing today) | Included | — | — | — | — |
-| Safe notification rule create (Save-only; draft-entry aware) | Included | — | — | — | — |
-| Today inbox, search / filters, templates | Included | — | — | — | — |
-| IRL multi-location + MapKit place search | Included | — | Map picker + live preview | — | — |
-| Hangout expense ledger (lines, totals, who owes you) | Included | — | — | — | — |
-| Expense settlement share & clipboard copy | Included | — | — | — | — |
-| Game event types (GI / HSR / WuWa) + Other session logs | Included | + In-Game Events | — | — | — |
-| Entertainment progress + session targets | Included | — | — | — | — |
-| Markdown recap export with stats | Included | — | — | — | — |
-| JSON backup & restore (Replace or Merge) | Included | — | — | — | — |
-| App Lock (Face ID / Touch ID / device passcode) | Included | — | — | — | Face ID fixed |
-| Corrupted-store recovery mode + restore banner | Included | — | — | — | — |
-| Haptic feedback across the app | Included | — | — | — | — |
-| **Ongoing Events tab** (multi-day windows, start → end) | — | Included | + occurrence-cycle cadence | — | — |
-| **Extended entry duration** (days / weeks / months; end-date picker) | — | Included | — | — | — |
-| **Date-based notifications** (specific date & time; relative to end) | — | Included | — | — | — |
-| Calendar teaser → Ongoing tab | — | Included | — | — | — |
-| **Pity counters** (GI / HSR / WuWa banners, +1/+10, 50/50) | — | — | — | Included | — |
-| **Automatic weekly backup** to a user-chosen folder (outside the app) | — | — | — | — | Included |
-| **Monthly & yearly archive exports** (period JSON for LLM recaps) | — | — | — | — | Included |
-| **Manual "Back Up Now" snapshot** (own rotation, never evicts weeklies) | — | — | — | — | Included |
+| Area | v1.0 | v1.0.1 | v1.0.2 | v1.0.3 | v1.0.4 | v1.0.5 |
+|---|---|---|---|---|---|---|
+| Unified entry model (IRL / Games / Entertainment) | Included | — | — | — | — | — |
+| All-day entries (date-only, no start time) | Included | — | — | — | — | — |
+| Day / Week / Month / Year calendar | Included | — | — | — | — | — |
+| Month heat grid + Year mini-month contribution maps | Included | — | — | — | — | — |
+| Swipe complete / delete on Day, Week, Month rows | Included | — | — | — | — | — |
+| Configurable default calendar view (Day default) | Included | — | — | — | — | — |
+| Alternate app icons (Default / Geometric / Minimal) + light/dark appearances | Included | — | — | — | — | — |
+| ~~Live Activity / Dynamic Island~~ (removed in v1.0.4) | Included | — | — | — | Removed | — |
+| Recurrence + occurrence-level completion | Included | — | — | — | — | — |
+| Local notification rules + presets (64-cap aware) | Included | Enhanced | — | — | — | — |
+| Notification budget (scheduled / remaining / firing today) | Included | — | — | — | — | — |
+| Safe notification rule create (Save-only; draft-entry aware) | Included | — | — | — | — | — |
+| Today inbox, search / filters, templates | Included | — | — | — | — | — |
+| IRL multi-location + MapKit place search | Included | — | Map picker + live preview | — | — | — |
+| Hangout expense ledger (lines, totals, who owes you) | Included | — | — | — | — | — |
+| Expense settlement share & clipboard copy | Included | — | — | — | — | — |
+| Game event types (GI / HSR / WuWa) + Other session logs | Included | + In-Game Events | — | — | — | — |
+| Entertainment progress + session targets | Included | — | — | — | — | — |
+| Markdown recap export with stats | Included | — | — | — | — | — |
+| JSON backup & restore (Replace or Merge) | Included | — | — | — | — | — |
+| App Lock (Face ID / Touch ID / device passcode) | Included | — | — | — | Face ID fixed | — |
+| Corrupted-store recovery mode + restore banner | Included | — | — | — | — | — |
+| Haptic feedback across the app | Included | — | — | — | — | — |
+| **Ongoing Events tab** (multi-day windows, start → end) | — | Included | + occurrence-cycle cadence | — | — | — |
+| **Extended entry duration** (days / weeks / months; end-date picker) | — | Included | — | — | — | — |
+| **Date-based notifications** (specific date & time; relative to end) | — | Included | — | — | — | — |
+| Calendar teaser → Ongoing tab | — | Included | — | — | — | — |
+| **Pity counters** (GI / HSR / WuWa banners, +1/+10, 50/50) | — | — | — | Included | — | — |
+| **Automatic weekly backup** to a user-chosen folder (outside the app) | — | — | — | — | Included | — |
+| **Monthly & yearly archive exports** (period JSON for LLM recaps) | — | — | — | — | Included | — |
+| **Manual "Back Up Now" snapshot** (own rotation, never evicts weeklies) | — | — | — | — | Included | — |
+| **Game timeline import** (LLM-built JSON from a livestream image → entries) | — | — | — | — | — | Included |
+| **Re-import upsert + one-tap per-import removal** | — | — | — | — | — | Included |
+| **Per-game server presets & banner-switch hour** | — | — | — | — | — | Included |
 
 ---
 
@@ -86,6 +89,91 @@ open LifeOS.xcodeproj
 4. Run (**⌘R**).
 
 Allow notification permission when prompted if you plan to use reminders.
+
+---
+
+## What's new in v1.0.5
+
+### Game timeline import
+
+Every version livestream ends with a timeline image: events, banner phases, and endgame rotations, with printed date ranges. Typing all of that into a calendar is the tedious part, so v1.0.5 turns the image into entries in three steps.
+
+1. **Settings → Games → Game Timeline → Share Schema & Prompt.** The bundled schema (`docs/GAME_TIMELINE_SCHEMA.md`) is a ready-to-paste prompt plus the exact JSON contract.
+2. Give that prompt and the timeline image to an LLM. Save its reply as a `.json` file.
+3. Import the file. LifeOS validates it, resolves every printed date, previews a summary, and writes the entries.
+
+- **Only three kinds are imported:** events, banner phases, and endgame modes. Patch windows, maintenance, pre-install, livestream, battle-pass, shop, and web rows are skipped and counted in the preview, so Ongoing does not fill with noise
+- **Genshin endgame is excluded on purpose.** Spiral Abyss and Imaginarium Theater are fixed monthly rotations already tracked as recurring entries, so the prompt tells the LLM to leave them out and the importer filters them for Genshin if they still appear. Star Rail and Wuthering Waves endgame rows are imported normally
+- **Events land in Ongoing.** A multi-day event becomes a normal ≥ 24 h window with a start date, an end date, and a duration; no reminder is created automatically
+- **Banners stay timed.** Phase 1 starts when the patch goes live on your server; phase 2 starts at the banner-switch hour. One entry per phase, so Ongoing shows the banner that is actually live
+- **Events and endgame stay day-based.** Date-only rows become all-day entries, keep the printed calendar day, and treat the end date as inclusive
+- **The preview is a summary, not a form.** It shows counts by kind, the resolved local window, new vs. updated rows, and warnings only for genuinely uncertain input (low confidence, unreadable dates, duplicate ids, skipped kinds, manual conflicts). One tap imports everything
+- **Re-import is an upsert.** Rows are keyed by `game + patch + stable id`, so a corrected file updates dates, titles, and durations in place. Your notes, completions, locations, and notification rules are left alone
+- **Manual entries win.** A hand-made entry with the same title on the same day is skipped and reported instead of duplicated
+- **One-tap removal.** Every run is tagged (`Genshin Impact 6.1`); **Imported Timelines** lists each run with a delete button that removes exactly the entries it created
+- **Year safety net.** A date that is more than 180 days in the past but lands within 180 days of today when moved forward one year is corrected, and the preview says so
+- **Tolerant parsing.** Markdown fences, surrounding prose, `T` separators, `Z`, and UTC offsets are all handled; offsets are discarded because the file is meant to be server-local wall clock
+- **Fully offline.** The app reads a local file. It never calls an AI service, a game API, or a scraper
+
+The contract is small enough that a model rarely gets it wrong:
+
+```json
+{
+  "format": "lifeos.timeline",
+  "version": 1,
+  "game": "Genshin Impact",
+  "patch": "6.1",
+  "items": [
+    {
+      "id": "genshin-6.1-astral-accord",
+      "kind": "event",
+      "title": "Astral Accord",
+      "start": "2026-10-29",
+      "end": "2026-11-11"
+    },
+    {
+      "id": "genshin-6.1-phase-1",
+      "kind": "banner",
+      "title": "Character Event Wish — Phase 1",
+      "start": "2026-10-29",
+      "end": "2026-11-18",
+      "phase": 1,
+      "featured": ["Neuvillette", "Wriothesley"]
+    }
+  ]
+}
+```
+
+### Time zones
+
+Timeline images print dates on the game's own calendar, not instants. The file therefore speaks **server-local wall clock**, and the app owns the conversion.
+
+- **Genshin Impact** defaults to America; **Honkai Star Rail** and **Wuthering Waves** default to Asia
+- **Server time is a fixed UTC offset, not a city zone.** Genshin/Star Rail/Wuthering Waves do not follow daylight saving: America is UTC−5, Europe UTC+1, Asia UTC+8, SEA UTC+7. That is why Genshin America's 04:00 reset is always **2:30 PM IST**, winter or summer
+- Each game has an editable **server**, **daily reset**, and **banner-switch hour** in the import screen. Both clocks are edited in *your* local time (so Genshin America reset dials as 2:30 PM IST) and stored as minutes on the server clock
+- **A date-only `end` is inclusive.** `end: "2026-11-11"` is playable through 11 November
+- **All-day starts are built from the printed components** in the phone's calendar. Converting a server midnight to an instant would shift an Asia date onto the previous IST day, so all-day rows deliberately skip that conversion
+- **Timed rows use the server calendar.** Banner phases and explicit cutoff times (`04:00`, `17:59`) are resolved on the server's fixed offset, so a window is the same length in July and January
+
+### Things to know
+
+- **The file must contain one game.** A Genshin file with Star Rail rows is rejected; generate one file per game
+- **Banners are one entry per phase.** If the image shows character and weapon wishes separately, they can be separate items with distinct ids
+- **Phase boundaries come from `phase` when present**, otherwise from the earliest printed banner day: the first banner day is treated as patch-live, later days as banner switches
+- **Short timed windows stay off Ongoing.** Anything under 24 hours (for example a maintenance window, if you ever import one) remains on the calendar only — existing Ongoing policy, not a regression
+- **No notifications are created.** Add a reminder to an imported entry like any other entry if it matters
+- **Reset and banner hours are adjustable per game.** Defaults are 04:00 reset for all three, with banner switches at 18:00 (Genshin), 12:00 (Star Rail), and 10:00 (WuWa) on the server clock. Change either picker directly under each game — both show your local clock
+- **Genshin endgame rows never import.** If a file contains only Spiral Abyss or Imaginarium Theater for Genshin, the import is rejected with an explanation instead of writing duplicates
+- **Removing an import also removes your edits** to those entries; it is a delete, not a revert
+- **`serverTimeZone` in the file is informational.** The app uses the server you selected and warns in the preview if the file disagrees
+- **Backups carry the import tags.** `importKey`, `importSource`, and `importedAt` are optional, so 1.0.4 and older backups still restore
+
+### Notes
+
+- Marketing version is **1.0.5** (`CURRENT_PROJECT_VERSION` 5)
+- The schema lives at `docs/GAME_TIMELINE_SCHEMA.md` and is bundled into the app for **Share Schema & Prompt**; a shorter fallback prompt is compiled in if the resource is ever missing
+- No new SwiftData model types were added; the three optional `Entry` fields are additive
+- The importer caps a file at 500 items
 
 ---
 
@@ -307,7 +395,7 @@ xcodebuild test \
 
 Or in Xcode: **⌘U**.
 
-Unit coverage includes recurrence, entry capabilities (incl. expense split), notification budget helpers, event window policy (including occurrence-cycle cadence), recap export formatting, backup encode/decode + replace/merge, automatic-backup scheduling/retention, archive period math and archive-vs-backup format separation, expense settlement text, scale/integrity harness, audit regression tests, and pity-counter rules. UI tests include a notification-banner icon smoke check (`LifeOSUITests`).
+Unit coverage includes recurrence, entry capabilities (incl. expense split), notification budget helpers, event window policy (including occurrence-cycle cadence), recap export formatting, backup encode/decode + replace/merge, automatic-backup scheduling/retention, archive period math and archive-vs-backup format separation, game timeline import (inclusive ends, banner phase boundaries, fixed server offsets, Genshin endgame exclusion, duplicate ids, year correction, manual conflicts, upsert, removal), expense settlement text, scale/integrity harness, audit regression tests, and pity-counter rules. UI tests include a notification-banner icon smoke check (`LifeOSUITests`).
 
 Calendar swipe actions, App Lock, the folder picker, and year heat maps should be verified manually on a simulator or device.
 
@@ -323,6 +411,7 @@ LifeOS/
 ├── Views/               Calendar (incl. grid/swipe helpers), entries, ongoing events, notifications, settings, export / backup
 ├── Utilities/           Theme, filters, date helpers, event window policy, haptics, app lock
 └── Resources/           Assets (App Icons + AccentColor)
+docs/                    GAME_TIMELINE_SCHEMA.md (LLM contract, bundled at build time)
 LifeOSTests/             Unit tests
 LifeOSUITests/           UI tests
 project.yml              XcodeGen definition
@@ -330,7 +419,7 @@ project.yml              XcodeGen definition
 
 ---
 
-## Design notes (v1.0.4)
+## Design notes (v1.0.5)
 
 - **Pity counters** live under Settings, not a fifth tab; they are banner-type rows (not calendar Banner Window entries) so pity survives a patch rotation
 - Cards heat from the game accent into orange/red as you enter approaching, soft pity, hard pity, and over pity
@@ -354,7 +443,13 @@ project.yml              XcodeGen definition
 - App Lock engages on background when enabled; notification sync is deferred until unlock (backups are not, since they never reach the UI)  
 - Face ID is withheld by iOS without `NSFaceIDUsageDescription`; because the lock uses `.deviceOwnerAuthentication`, the failure surfaces as a silent passcode fallback rather than an error, so the usage string is a hard requirement, not a nicety  
 - Entertainment logging is manual and notification-free by design  
-- Game event data is manual (no unofficial account scrapers)  
+- Game event data is manual or imported from a user-supplied timeline JSON; there are no unofficial account scrapers and no AI APIs  
+- **Timeline import is a contract, not a scraper.** The file is produced outside the app; LifeOS only validates and resolves it, so a bad parse is visible in the preview rather than hidden behind a network call
+- **The file speaks wall clock, the app owns the time zone.** Date-only rows use printed components; timed rows use the selected server's calendar. That split is why all-day events never drift a day and banner phases still land at the right hour
+- **Server clocks are fixed UTC offsets**, not DST-aware city zones. Genshin America at UTC−5 is what makes its 04:00 reset 2:30 PM IST year-round; using `America/New_York` would move it by an hour every November
+- **Genshin's two endgame modes belong to the recurrence engine**, not the importer. They repeat on a fixed monthly schedule, so the contract excludes them and the importer filters them defensively rather than creating a second copy of every cycle
+- Import upserts by `game|patch|id` and deliberately leaves notes, completions, locations, and reminders untouched, so a corrected file can be re-imported safely
+- Manual entries are indexed by title + local day and always win over an import, which avoids duplicate rows when a user has already typed an event by hand
 - Expense tracking is hangout-scoped (no dedicated Expenses tab); share text has no currency symbol yet  
 - Haptic feedback uses `UIFeedbackGenerator` and `.sensoryFeedback` for tactile responses on key interactions  
 

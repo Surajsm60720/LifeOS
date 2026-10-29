@@ -55,6 +55,7 @@ struct SettingsView: View {
     @State private var showingTemplates = false
     @State private var showingLibrary = false
     @State private var showingPityCounters = false
+    @State private var showingTimelineImport = false
     @State private var confirmClearAll = false
     @State private var todayCompletableCount = 0
     @StateObject private var entryStore = EntryStore()
@@ -148,6 +149,12 @@ struct SettingsView: View {
 
             Section {
                 Button {
+                    showingTimelineImport = true
+                } label: {
+                    Label("Game Timeline", systemImage: "calendar.badge.plus")
+                }
+
+                Button {
                     showingPityCounters = true
                 } label: {
                     Label("Pity Counters", systemImage: "sparkles")
@@ -155,7 +162,7 @@ struct SettingsView: View {
             } header: {
                 Text("Games")
             } footer: {
-                Text("Track pulls, 50/50, and hard pity for Genshin, Star Rail, and Wuthering Waves. Open this during a pull session.")
+                Text("Game Timeline imports a version's events, banners, and endgame windows from a JSON file an LLM builds from the livestream image. Pity Counters tracks pulls, 50/50, and hard pity.")
             }
 
             Section {
@@ -245,6 +252,9 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showingPityCounters) {
             PityCountersView()
+        }
+        .sheet(isPresented: $showingTimelineImport) {
+            TimelineImportView()
         }
         .confirmationDialog(
             "Delete all LifeOS data?",

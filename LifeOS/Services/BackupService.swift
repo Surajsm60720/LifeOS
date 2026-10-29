@@ -94,6 +94,10 @@ enum BackupService {
         var notificationRules: [NotificationRuleDTO]
         var progress: ProgressDTO?
         var completions: [CompletionDTO]
+        /// Omitted by backups made before timeline import existed.
+        var importKey: String?
+        var importSource: String?
+        var importedAt: Date?
     }
 
     struct LocationDTO: Codable, Equatable, Sendable {
@@ -335,6 +339,9 @@ enum BackupService {
         entry.eventTypeRaw = dto.eventTypeRaw
         entry.plannedActivity = dto.plannedActivity
         entry.playedWithRaw = dto.playedWithRaw
+        entry.importKey = dto.importKey
+        entry.importSource = dto.importSource
+        entry.importedAt = dto.importedAt
 
         if replaceChildren {
             replaceLocations(dto.locations, on: entry, modelContext: modelContext)
@@ -629,7 +636,10 @@ private extension BackupService.EntryDTO {
             },
             completions: entry.completions.map {
                 BackupService.CompletionDTO(occurrenceStart: $0.occurrenceStart, completedAt: $0.completedAt)
-            }
+            },
+            importKey: entry.importKey,
+            importSource: entry.importSource,
+            importedAt: entry.importedAt
         )
     }
 }
